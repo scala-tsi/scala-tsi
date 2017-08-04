@@ -13,8 +13,8 @@ class TypeScriptTypeSerializerTests extends FlatSpec with Matchers {
 
     x.trim should be("""
         |interface Person {
-        |  age : number
-        |  name : string
+        |  name: string
+        |  age: number
         |}
       """.stripMargin.trim)
   }

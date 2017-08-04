@@ -54,7 +54,7 @@ private class Macros(val c: blackbox.Context) {
     // TODO: Not get the name through reflection
     q"""{
        import nl.codestar.scala.ts.interface.TypescriptType._
-       TSIType(TSInterface(classOf[$name].getSimpleName, Seq(${members.head})))
+       TSIType(TSInterface(classOf[$name].getSimpleName, Seq(..$members)))
       }"""
   }
 
