@@ -38,12 +38,22 @@ object TypescriptTypeSerializer {
       })
       .mkString("\n")
 
+  private object TSInterfaceEntry {
+    def unapply(
+        typescriptType: TypescriptType): Option[(TypescriptType, Boolean)] =
+      typescriptType match {
+        case TSUnion(members) if members.contains(TSUndefined) =>
+          Some((TSUnion(members.filter(_ != TSUndefined)), false))
+        case other => Some((other, true))
+      }
+  }
+
   private def emitInterface(interface: TSInterface): String = interface match {
     case TSInterface(name, members) => {
       val mbs = members.map({
-        case TSInterface.Member(memberName, tp, true) =>
+        case (memberName, TSInterfaceEntry(tp, true)) =>
           s"  $memberName: ${serialize(tp)}"
-        case TSInterface.Member(memberName, tp, false) =>
+        case (memberName, TSInterfaceEntry(tp, false)) =>
           s"  $memberName?: ${serialize(tp)}"
       })
 
@@ -63,7 +73,7 @@ object TypescriptTypeSerializer {
   private def discoverNested(tp: TypescriptType): Set[TypescriptType] =
     tp match {
       case TSInterface(_, members) =>
-        members.map(_.tp).toSet.flatMap(discoverNested) + tp
+        members.values.toSet.flatMap(discoverNested) + tp
       case TSAlias(_, underlying) => discoverNested(underlying) + tp
       case TSTuple(members) => members.toSet.flatMap(discoverNested)
       case other => Set(other)

@@ -2,16 +2,10 @@ package nl.codestar.scala.ts.interface
 
 import nl.codestar.scala.ts.interface.TypescriptType._
 
+import scala.collection.immutable.ListMap
+
 package object dsl {
   import scala.language.implicitConversions
-
-  implicit def tuple2InterfaceMemberTs(
-      member: (String, TypescriptType)): TSInterface.Member =
-    TSInterface.Member.apply(member._1, member._2)
-  implicit def tuple2InterfaceMember[T: TSType](
-      member: (String, Class[T])
-  )(implicit tsType: TSType[T]): TSInterface.Member =
-    TSInterface.Member.apply(member._1, tsType.get)
 
   implicit class TypescriptTypeDSL(val t: TypescriptType) extends AnyVal {
     def |(tt: TypescriptType): TSUnion = t match {
@@ -22,25 +16,33 @@ package object dsl {
     def array: TSArray = TSArray(t)
   }
 
+  implicit def classToType[T](cls: Class[T])(
+      implicit tstype: TSType[T]): TypescriptType =
+    tstype.get
+  implicit def tupleToTSInterfaceEntry[T](entry: (String, Class[T]))(
+      implicit tsType: TSType[T]): (String, TypescriptType) =
+    (entry._1, tsType.get)
+
   implicit class TSInterfaceDSL(val interface: TSInterface) extends AnyVal {
-    def +(member: TSInterface.Member): TSInterface =
-      interface.copy(members = interface.members :+ member)
-    def ++(newMembers: Seq[TSInterface.Member]): TSInterface =
+    def +(member: (String, TypescriptType)): TSInterface =
+      interface.copy(members = interface.members + member)
+    def ++(newMembers: Seq[(String, TypescriptType)]): TSInterface =
       interface.copy(members = interface.members ++ newMembers)
   }
 
   implicit class TSITypeDSL[T](val tsiType: TSIType[T]) extends AnyVal {
-    def +(member: TSInterface.Member): TSIType[T] =
+    def +(member: (String, TypescriptType)): TSIType[T] =
       TSIType(tsiType.get + member)
-    def ++(newMembers: Seq[TSInterface.Member]): TSIType[T] =
+    def ++(newMembers: Seq[(String, TypescriptType)]): TSIType[T] =
       TSIType(tsiType.get ++ newMembers)
   }
 
-  def tsInterface[T](members: TSInterface.Member*)(
+  def tsInterface[T](members: (String, TypescriptType)*)(
       implicit ct: Manifest[T]): TSIType[T] =
     tsInterface[T]("I" + ct.runtimeClass.getSimpleName, members: _*)
-  def tsInterface[T](name: String, members: TSInterface.Member*): TSIType[T] =
-    TSIType(TSInterface(name, members))
+  def tsInterface[T](name: String,
+                     members: (String, TypescriptType)*): TSIType[T] =
+    TSIType(TSInterface(name, ListMap(members: _*)))
   def tsAlias[T, Alias](implicit tsType: TSType[Alias],
                         ct: Manifest[T]): TSType[T] =
     tsAlias[T, Alias](ct.runtimeClass.getSimpleName)

@@ -46,12 +46,13 @@ private class Macros(val c: blackbox.Context) {
 
     val members = caseClassFieldsTypes(T) map {
       case (name, tpe) =>
-        q"TSInterface.Member($name, implicitly[TSType[$tpe]].get, true)"
+        q"($name, implicitly[TSType[$tpe]].get)"
     }
 
     q"""{
        import nl.codestar.scala.ts.interface.TypescriptType._
-       TSIType(TSInterface("I" + ${symbol.name.toString}, Seq(..$members)))
+       import scala.collection.immutable.ListMap
+       TSIType(TSInterface("I" + ${symbol.name.toString}, ListMap(..$members)))
       }"""
   }
 

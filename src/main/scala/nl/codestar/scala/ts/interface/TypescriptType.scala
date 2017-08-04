@@ -1,5 +1,7 @@
 package nl.codestar.scala.ts.interface
 
+import scala.collection.immutable.ListMap
+
 sealed trait TypescriptType
 object TypescriptType {
   case class TSAlias(name: String, underlying: TypescriptType)
@@ -9,24 +11,9 @@ object TypescriptType {
   case object TSBoolean extends TypescriptType
   // TODO: TS Enum
   // case object TSEnum extends TypescriptBasicType
-  case class TSInterface(name: String, members: Seq[TSInterface.Member])
+  case class TSInterface(name: String,
+                         members: ListMap[String, TypescriptType])
       extends TypescriptType
-  case object TSInterface {
-    // TODO: Still generates a Member.apply(String,TypescriptType,Boolean) in scala 2.11
-    case class Member private (name: String,
-                               tp: TypescriptType,
-                               required: Boolean)
-    object Member {
-      def apply(name: String, tp: TypescriptType): Member = tp match {
-        case TSUnion(union) =>
-          Member.apply(name,
-                       TSUnion(union.filter(_ != TSUndefined)),
-                       required = !union.contains(TSUndefined))
-        case t => Member.apply(name, t, required = true)
-      }
-
-    }
-  }
   case object TSNever extends TypescriptType
   case object TSNull extends TypescriptType
   case object TSNumber extends TypescriptType
