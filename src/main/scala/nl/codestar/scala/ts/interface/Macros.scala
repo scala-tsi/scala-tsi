@@ -52,7 +52,7 @@ private class Macros(val c: blackbox.Context) {
 
     q"""{
        import nl.codestar.scala.ts.interface.TypescriptType._
-       TSIType(TSInterface($name, Seq(..$members)))
+       TSIType(TSInterface("I" + $name, Seq(..$members)))
       }"""
   }
 

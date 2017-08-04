@@ -14,7 +14,7 @@ class TypeScriptTypeSerializerTests extends FlatSpec with Matchers {
     val x = TypescriptTypeSerializer.emit[Person]
 
     x.trim should be("""
-        |interface Person {
+        |interface IPerson {
         |  name: string
         |  age: number
         |}
