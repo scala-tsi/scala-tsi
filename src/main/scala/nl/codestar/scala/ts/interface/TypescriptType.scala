@@ -2,20 +2,26 @@ package nl.codestar.scala.ts.interface
 
 sealed trait TypescriptType
 object TypescriptType {
-  case class TSAlias(name: String, underlying: TypescriptType) extends TypescriptType
+  case class TSAlias(name: String, underlying: TypescriptType)
+      extends TypescriptType
   case object TSAny extends TypescriptType
   case class TSArray(elements: TypescriptType) extends TypescriptType
   case object TSBoolean extends TypescriptType
   // TODO: TS Enum
   // case object TSEnum extends TypescriptBasicType
-  case class TSInterface(name: String, members: Seq[TSInterface.Member]) extends TypescriptType
+  case class TSInterface(name: String, members: Seq[TSInterface.Member])
+      extends TypescriptType
   case object TSInterface {
     // TODO: Still generates a Member.apply(String,TypescriptType,Boolean) in scala 2.11
-    case class Member private (name: String, tp: TypescriptType, required: Boolean)
+    case class Member private (name: String,
+                               tp: TypescriptType,
+                               required: Boolean)
     object Member {
       def apply(name: String, tp: TypescriptType): Member = tp match {
         case TSUnion(union) =>
-          Member.apply(name, TSUnion(union.filter(_ != TSUndefined)), required = !union.contains(TSUndefined))
+          Member.apply(name,
+                       TSUnion(union.filter(_ != TSUndefined)),
+                       required = !union.contains(TSUndefined))
         case t => Member.apply(name, t, required = true)
       }
 

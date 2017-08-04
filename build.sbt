@@ -15,15 +15,17 @@ scalacOptions ++= Seq(
   "-Ywarn-numeric-widen",
   "-Ywarn-value-discard",
   "-Ywarn-dead-code",
-  "-Xfatal-warnings"
+  "-Xfatal-warnings",
+  "-language:experimental.macros"
 )
 
 // scala 2.11 only
 scalacOptions ++= Seq("-Ydelambdafy:method", "-Ybackend:GenBCode","-Xsource:2.12", "-Ywarn-unused", "-Ywarn-unused-import")
 
 libraryDependencies ++= Seq(
-  "com.github.scopt" %% "scopt"     % "3.2.0",
-  "org.scalatest"    %% "scalatest" % "3.0.1" % "test"
+  "com.github.scopt" %% "scopt"          % "3.2.0",
+  "org.scala-lang"    % "scala-compiler" % scalaVersion.value % "compile",
+  "org.scalatest"    %% "scalatest"      % "3.0.1"            % "test"
 )
 
 addCommandAlias("generate-typescript", "runMain GenerateTypescript")

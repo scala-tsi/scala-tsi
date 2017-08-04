@@ -43,15 +43,15 @@ case class Bar(value: String)
 case class Baz(boo: Boolean, bar: Int)
 
 /**
- * interface IFoo {
- *   bar: string
- *   bool: boolean
- *   num?: number
- *   baz?: IBaz
- * }
- *
- * interface IBaz {
- *   boo: boolean
- *   bar: number
- * }
- */
+  * interface IFoo {
+  *   bar: string
+  *   bool: boolean
+  *   num?: number
+  *   baz?: IBaz
+  * }
+  *
+  * interface IBaz {
+  *   boo: boolean
+  *   bar: number
+  * }
+  */

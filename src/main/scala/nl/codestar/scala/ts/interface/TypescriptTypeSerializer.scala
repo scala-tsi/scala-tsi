@@ -41,8 +41,10 @@ object TypescriptTypeSerializer {
   private def emitInterface(interface: TSInterface): String = interface match {
     case TSInterface(name, members) => {
       val mbs = members.map({
-        case TSInterface.Member(memberName, tp, true) => s"  $memberName: ${serialize(tp)}"
-        case TSInterface.Member(memberName, tp, false) => s"  $memberName?: ${serialize(tp)}"
+        case TSInterface.Member(memberName, tp, true) =>
+          s"  $memberName: ${serialize(tp)}"
+        case TSInterface.Member(memberName, tp, false) =>
+          s"  $memberName?: ${serialize(tp)}"
       })
 
       s"""
@@ -58,10 +60,12 @@ object TypescriptTypeSerializer {
   }
 
   // TODO: Memoize or something, tail rec etc
-  private def discoverNested(tp: TypescriptType): Set[TypescriptType] = tp match {
-    case TSInterface(_, members) => members.map(_.tp).toSet.flatMap(discoverNested) + tp
-    case TSAlias(_, underlying) => discoverNested(underlying) + tp
-    case TSTuple(members) => members.toSet.flatMap(discoverNested)
-    case other => Set(other)
-  }
+  private def discoverNested(tp: TypescriptType): Set[TypescriptType] =
+    tp match {
+      case TSInterface(_, members) =>
+        members.map(_.tp).toSet.flatMap(discoverNested) + tp
+      case TSAlias(_, underlying) => discoverNested(underlying) + tp
+      case TSTuple(members) => members.toSet.flatMap(discoverNested)
+      case other => Set(other)
+    }
 }

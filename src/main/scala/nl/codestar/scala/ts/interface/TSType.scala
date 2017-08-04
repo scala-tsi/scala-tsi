@@ -21,7 +21,8 @@ object TSType {
 
 object TSIType {
   def apply[T](tt: TSInterface): TSIType[T] = new TSIType[T] { val get = tt }
-  def apply[T](name: String, members: Seq[TSInterface.Member] = Seq()): TSIType[T] =
+  def apply[T](name: String,
+               members: Seq[TSInterface.Member] = Seq()): TSIType[T] =
     TSIType(TSInterface(name, members))
 }
 
@@ -29,8 +30,10 @@ trait DefaultTSTypes {
   implicit val BooleanTsType: TSType[Boolean] = TSType(TSBoolean)
   implicit val StringTsType: TSType[String] = TSType(TSString)
   implicit def NumberTsType[T: Numeric]: TSType[T] = TSType(TSNumber)
-  implicit def seqTsType[E](implicit e: TSType[E]): TSType[Seq[E]] = TSType(TSArray(e.get))
-  implicit def optionTsType[E](implicit e: TSType[E]): TSType[Option[E]] = TSType(TSUnion.of(e.get, TSUndefined))
+  implicit def seqTsType[E](implicit e: TSType[E]): TSType[Seq[E]] =
+    TSType(TSArray(e.get))
+  implicit def optionTsType[E](implicit e: TSType[E]): TSType[Option[E]] =
+    TSType(TSUnion.of(e.get, TSUndefined))
 }
 
 object DefaultTSTypes extends DefaultTSTypes
