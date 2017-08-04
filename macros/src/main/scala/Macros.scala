@@ -2,7 +2,6 @@ package nl.codestar.scala.ts.interface
 
 import scala.collection.immutable.ListMap
 import scala.reflect.macros.blackbox
-//import scala.language.experimental.macros
 
 private class Macros(val c: blackbox.Context) {
   import c.universe._
