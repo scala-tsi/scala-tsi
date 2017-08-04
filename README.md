@@ -10,6 +10,7 @@
 * Handle Tuples
 * Undefined / null for options and optional interfaces
 * Macro/reflection for case classes
+* small dsl for defining manual types
 
 ## MVP
 
