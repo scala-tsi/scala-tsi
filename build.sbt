@@ -1,9 +1,11 @@
+import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.scalafmtTestOnCompile
+import sbt.Keys.scalacOptions
+
 name := "scala-ts-compiler"
 version := "0.1-SNAPSHOT"
-scalaVersion := "2.11.11"
 
-// Options for all scala versions
-scalacOptions ++= Seq(
+// TODO: Different versions between 2.11 and 2.12
+lazy val compilerOptions = Seq(
   "-unchecked",
   "-feature",
   "-deprecation",
@@ -17,19 +19,35 @@ scalacOptions ++= Seq(
   "-Ywarn-dead-code",
   "-Xfatal-warnings",
   "-language:experimental.macros"
+) ++
+  // Scala 2.11 only settings
+  Seq("-Ydelambdafy:method", "-Ybackend:GenBCode","-Xsource:2.12", "-Ywarn-unused", "-Ywarn-unused-import")
+
+lazy val commonSettings = Seq(
+  scalaVersion := "2.11.11",
+  organization := "nl.codestar",
+  scalacOptions ++= compilerOptions,
+  // Code formatting
+  scalafmtOnCompile in Compile := true,
+  scalafmtTestOnCompile in Compile := true
 )
 
-// scala 2.11 only
-scalacOptions ++= Seq("-Ydelambdafy:method", "-Ybackend:GenBCode","-Xsource:2.12", "-Ywarn-unused", "-Ywarn-unused-import")
+lazy val macros = (project in file("macros"))
+    .settings(
+      commonSettings,
+      libraryDependencies += Def.setting { "org.scala-lang" % "scala-reflect" % scalaVersion.value }.value
+    )
 
-libraryDependencies ++= Seq(
+lazy val root = (project in file("."))
+    .dependsOn(macros)
+    .settings(
+      commonSettings,
+      libraryDependencies ++= dependencies
+    )
+
+lazy val dependencies = Seq(
   "com.github.scopt" %% "scopt"          % "3.2.0",
-  "org.scala-lang"    % "scala-compiler" % scalaVersion.value % "compile",
   "org.scalatest"    %% "scalatest"      % "3.0.1"            % "test"
 )
 
 addCommandAlias("generate-typescript", "runMain GenerateTypescript")
-
-// Code formatting
-scalafmtOnCompile in Compile := true
-scalafmtTestOnCompile in Compile := true

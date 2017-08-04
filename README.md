@@ -18,6 +18,7 @@
 
 * Modules / classes / namespaces
 * Basic readme/documentation
+* Scala 2.11 & 2.12 cross-compilation
 
 ## Should have
 
