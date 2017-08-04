@@ -1,0 +1,43 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/scala-ts-interfaces
+    docker:
+      - image: codestar/circleci-scala-sbt-git:scala-2.11.11-sbt-0.13.15
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - scala-ts-interfaces-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
+            - scala-ts-interfaces-1
+
+      - run:
+          # TODO: For some reason circleci gets stuck in the shell if we don't add exit to sbt
+          command:
+            sbt compile test:compile exit
+
+      - save_cache:
+          key: scala-ts-interfaces-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
+          paths:
+            - target/resolution-cache
+            - target/streams
+            - project/target/resolution-cache
+            - project/target/streams
+            - ~/.sbt
+            - ~/.ivy2/cache
+            - ~/.m2
+      - save_cache:
+        # Changing this key/incrementing the number at the end is the only way to remove old dependencies and/or generate a more up-to-date cache
+          key: scala-ts-interfaces-1
+          paths:
+            - ~/.sbt
+            - ~/.ivy2/cache
+            - ~/.m2
+
+      - run:
+          command:
+            sbt test exit
+
+      - store_test_results:
+          path: target/test-reports
