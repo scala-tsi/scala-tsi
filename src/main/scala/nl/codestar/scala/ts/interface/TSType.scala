@@ -11,8 +11,6 @@ trait TSType[T] { self =>
 }
 trait TSIType[T] extends TSType[T] { self =>
   override def get: TSInterface
-
-  def withName(name: String) = TSIType(get.copy(name = name))
 }
 
 object TSType {
@@ -23,9 +21,6 @@ object TSType {
 
 object TSIType {
   def apply[T](tt: TSInterface): TSIType[T] = new TSIType[T] { val get = tt }
-  def apply[T](name: String,
-               members: Seq[TSInterface.Member] = Seq()): TSIType[T] =
-    TSIType(TSInterface(name, members))
 
   def fromCaseClass[T]: TSIType[T] = macro Macros.generateInterface[T]
 }
