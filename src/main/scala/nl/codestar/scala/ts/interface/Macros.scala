@@ -39,8 +39,9 @@ private class Macros(val c: blackbox.Context) {
 
   def generateInterface[T: c.WeakTypeTag]: Tree = {
     val T = c.weakTypeOf[T]
+    val symbol = getClassSymbol(T)
 
-    if (!isCaseClass(T))
+    if (!symbol.isCaseClass)
       c.error(c.enclosingPosition, s"Expected case class, but found: $T")
 
     val members = caseClassFieldsTypes(T) map {
@@ -48,12 +49,17 @@ private class Macros(val c: blackbox.Context) {
         q"TSInterface.Member($name, implicitly[TSType[$tpe]].get, true)"
     }
 
-    val name = T.typeSymbol.asClass.name.toString
-
     q"""{
        import nl.codestar.scala.ts.interface.TypescriptType._
-       TSIType(TSInterface("I" + $name, Seq(..$members)))
+       TSIType(TSInterface("I" + ${symbol.name.toString}, Seq(..$members)))
       }"""
+  }
+
+  private def getClassSymbol(T: Type): ClassSymbol = {
+    val symbol = T.typeSymbol
+    if (!symbol.isClass)
+      c.error(c.enclosingPosition, s"Expected class, but found $T")
+    symbol.asClass
   }
 
   protected def isCaseClass(tpe: Type) =

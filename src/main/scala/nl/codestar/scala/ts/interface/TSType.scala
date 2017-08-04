@@ -16,7 +16,7 @@ trait TSIType[T] extends TSType[T] { self =>
 object TSType {
   def apply[T](tt: TypescriptType): TSType[T] = new TSType[T] { val get = tt }
 
-  def get[T](o: T)(implicit tsType: TSType[T]): TypescriptType = tsType.get
+  def get[T](implicit tsType: TSType[T]): TypescriptType = tsType.get
 }
 
 object TSIType {
@@ -26,7 +26,6 @@ object TSIType {
     TSIType(TSInterface(name, members))
 
   def fromCaseClass[T]: TSIType[T] = macro Macros.generateInterface[T]
-  //def fromCaseClass[T](name: String): TSIType[T] = macro Macros.generateInterface[T](name)
 }
 
 trait DefaultTSTypes {
