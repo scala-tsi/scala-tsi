@@ -1,2 +1,4 @@
-*.class
-*.log
+.DS_Store
+target
+/.idea
+/.idea_modules
