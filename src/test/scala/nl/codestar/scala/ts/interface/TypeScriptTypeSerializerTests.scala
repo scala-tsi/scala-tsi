@@ -3,11 +3,13 @@ package nl.codestar.scala.ts.interface
 import org.scalatest.{FlatSpec, Matchers}
 import DefaultTSTypes._
 
+case class Person(name: String, age: Int)
+
 class TypeScriptTypeSerializerTests extends FlatSpec with Matchers {
 
   "Typescript type serializer" should "be able to generate typescript for a simple interface" in {
 
-    implicit val personTsWrites: TSType[Person] = Typescript.writes
+    implicit val personTsWrites: TSIType[Person] = TSIType.fromCaseClass
 
     val x = TypescriptTypeSerializer.emit[Person]
 
@@ -19,5 +21,3 @@ class TypeScriptTypeSerializerTests extends FlatSpec with Matchers {
       """.stripMargin.trim)
   }
 }
-
-case class Person(name: String, age: Int)

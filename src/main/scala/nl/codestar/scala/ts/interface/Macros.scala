@@ -2,7 +2,6 @@ package nl.codestar.scala.ts.interface
 
 import scala.collection.immutable.ListMap
 import scala.reflect.macros.blackbox
-import scala.language.experimental.macros
 
 private class Macros(val c: blackbox.Context) {
   import c.universe._
@@ -38,7 +37,16 @@ private class Macros(val c: blackbox.Context) {
     }: _*)
   }
 
-  def foo[T: c.WeakTypeTag]: Tree = {
+//  def generateInterface[T: c.WeakTypeTag]: Tree = {
+//    val T = c.weakTypeOf[T]
+//
+//    if(!isCaseClass(T))
+//      c.error(c.enclosingPosition, s"Expected case class, but found: $T")
+//
+//    val name = T.typeSymbol.asClass.name
+//  }
+
+  def generateInterface[T: c.WeakTypeTag]: Tree = {
     val T = c.weakTypeOf[T]
 
     if (!isCaseClass(T))
@@ -60,8 +68,4 @@ private class Macros(val c: blackbox.Context) {
 
   protected def isCaseClass(tpe: Type) =
     tpe.typeSymbol.isClass && tpe.typeSymbol.asClass.isCaseClass
-}
-
-object Typescript {
-  def writes[T]: TSType[T] = macro Macros.foo[T]
 }

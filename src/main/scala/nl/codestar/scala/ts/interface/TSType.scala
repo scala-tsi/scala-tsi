@@ -24,6 +24,9 @@ object TSIType {
   def apply[T](name: String,
                members: Seq[TSInterface.Member] = Seq()): TSIType[T] =
     TSIType(TSInterface(name, members))
+
+  def fromCaseClass[T]: TSIType[T] = macro Macros.generateInterface[T]
+  //def fromCaseClass[T](name: String): TSIType[T] = macro Macros.generateInterface[T](name)
 }
 
 trait DefaultTSTypes {

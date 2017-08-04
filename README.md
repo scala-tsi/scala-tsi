@@ -22,7 +22,7 @@
 
 * Enums
 * Solid test suite
-* SBT plugin to generate to files
+* SBT plugin to generate the files
 
 ## Nice to have
 
