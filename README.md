@@ -20,10 +20,11 @@
 
 ## Should have
 
-* Enums
 * Solid test suite
 * SBT plugin to generate the files
 
 ## Nice to have
+
+* Enums
 
 ## Wont have
