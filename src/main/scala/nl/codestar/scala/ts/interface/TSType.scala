@@ -11,6 +11,8 @@ trait TSType[T] { self =>
 }
 trait TSIType[T] extends TSType[T] { self =>
   override def get: TSInterface
+
+  def withName(name: String) = TSIType(get.copy(name = name))
 }
 
 object TSType {
