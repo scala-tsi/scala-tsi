@@ -9,10 +9,9 @@
 * Handle type aliases
 * Handle Tuples
 * Undefined / null for options and optional interfaces
+* Macro/reflection for case classes
 
 ## MVP
-
-* Macro/reflection for case classes
 
 ## MV Public Release
 
