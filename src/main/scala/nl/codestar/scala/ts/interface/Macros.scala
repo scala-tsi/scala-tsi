@@ -49,9 +49,12 @@ private class Macros(val c: blackbox.Context) {
         q"TSInterface.Member($name, implicitly[TSType[$tpe]].get, true)"
     }
 
+    val name = T.typeSymbol.asClass.name
+
+    // TODO: Not get the name through reflection
     q"""{
        import nl.codestar.scala.ts.interface.TypescriptType._
-       TSIType(TSInterface("Person", Seq(${members.head})))
+       TSIType(TSInterface(classOf[$name].getSimpleName, Seq(${members.head})))
       }"""
   }
 
