@@ -3,12 +3,15 @@ package nl.codestar.scala.ts.interface
 import TypescriptType._
 
 object TypescriptTypeSerializer {
+  // TODO: Optimize? Memoize? Tailrec?
   def serialize(tp: TypescriptType): String = tp match {
-    case TSAlias(name, _) => name
+    case TypescriptNamedType(name) => name
     case TSAny => "any"
     case TSArray(elements) => serialize(elements) + "[]"
     case TSBoolean => "boolean"
-    case TSInterface(name, _) => name
+    case TSIntersection(Seq()) => serialize(TSNever)
+    case TSIntersection(Seq(e)) => serialize(e)
+    case TSIntersection(of) => s"${of.map(serialize) mkString " | "}"
     case TSNever => "never"
     case TSNull => "null"
     case TSNumber => "number"
@@ -21,21 +24,15 @@ object TypescriptTypeSerializer {
     case TSVoid => "void"
   }
 
-  def emit[T](implicit tsType: TSType[T]): String = emits(tsType)
-  def emits(types: TSType[_]*): String =
+  def emit[T](implicit tsType: TSNamedType[T]): String = emits(tsType)
+  def emits(types: TSNamedType[_]*): String =
+    emitNamedTypes(types.map(_.get): _*)
+
+  private def emitNamedTypes(types: TypescriptNamedType*): String =
     types.toSet
-      .flatMap(
-        (t: TSType[_]) =>
-          t.get match {
-            case interface: TSInterface => discoverNested(interface)
-            case plain => Set(plain)
-        }
-      )
+      .flatMap(discoverNestedNames)
       .toSeq
-      .collect({
-        case alias: TSAlias => emitAlias(alias)
-        case interface: TSInterface => emitInterface(interface)
-      })
+      .map(emitNamed)
       .mkString("\n")
 
   private object TSInterfaceEntry {
@@ -48,8 +45,15 @@ object TypescriptTypeSerializer {
       }
   }
 
-  private def emitInterface(interface: TSInterface): String = interface match {
-    case TSInterface(name, members) => {
+  private def emitNamed(named: TypescriptNamedType): String = named match {
+    case TSAlias(name, underlying) =>
+      s"type $name = ${serialize(underlying)}"
+    case TSIndexedInterface(name, indexName, indexType, valueType) =>
+      s"""interface $name {
+         |  [$indexName: $indexType]: $valueType
+         |}
+       """.stripMargin
+    case TSInterface(name, members) =>
       val mbs = members.map({
         case (memberName, TSInterfaceEntry(tp, true)) =>
           s"  $memberName: ${serialize(tp)}"
@@ -62,20 +66,19 @@ object TypescriptTypeSerializer {
          |${mbs.mkString("\n")}
          |}
        """.stripMargin
+  }
+
+  // TODO: Optimize, Memoize or something, tail rec etc
+  private def discoverNestedNames(
+      tp: TypescriptType): Set[TypescriptNamedType] = {
+    val me: Set[TypescriptNamedType] = tp match {
+      case named: TypescriptNamedType => Set(named)
+      case _ => Set()
     }
-  }
-
-  private def emitAlias(alias: TSAlias): String = alias match {
-    case TSAlias(name, underlying) => s"type $name = ${serialize(underlying)}"
-  }
-
-  // TODO: Memoize or something, tail rec etc
-  private def discoverNested(tp: TypescriptType): Set[TypescriptType] =
     tp match {
-      case TSInterface(_, members) =>
-        members.values.toSet.flatMap(discoverNested) + tp
-      case TSAlias(_, underlying) => discoverNested(underlying) + tp
-      case TSTuple(members) => members.toSet.flatMap(discoverNested)
-      case other => Set(other)
+      case TypescriptAggregateType(nested) =>
+        nested.flatMap(discoverNestedNames) ++ me
+      case _ => me
     }
+  }
 }

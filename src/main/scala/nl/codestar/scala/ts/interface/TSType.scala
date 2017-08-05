@@ -24,7 +24,20 @@ To define an implicit TSType[T]:
 trait TSType[T] { self =>
   def get: TypescriptType
 }
-trait TSIType[T] extends TSType[T] { self =>
+@implicitNotFound(
+  """Could not find a named Typescript type mapping for type ${T}
+Make sure an implicit TSNamedType[${T}] or TSIType[${T}] is in scope.
+If you have defined a typescript mapping, we can only use typescript types with a name at this location.
+""")
+trait TSNamedType[T] extends TSType[T] { self =>
+  def get: TypescriptNamedType
+}
+@implicitNotFound(
+  """Could not find an interface Typescript type mapping for type ${T}
+Make sure an implicit TSIType[${T}] is in scope.
+If you have defined a typescript mapping, we can only use typescript interface types at this location.
+""")
+trait TSIType[T] extends TSNamedType[T] { self =>
   override def get: TSInterface
 }
 
@@ -39,15 +52,3 @@ object TSIType {
 
   def fromCaseClass[T]: TSIType[T] = macro Macros.generateInterface[T]
 }
-
-trait DefaultTSTypes {
-  implicit val BooleanTsType: TSType[Boolean] = TSType(TSBoolean)
-  implicit val StringTsType: TSType[String] = TSType(TSString)
-  implicit def NumberTsType[T: Numeric]: TSType[T] = TSType(TSNumber)
-  implicit def seqTsType[E](implicit e: TSType[E]): TSType[Seq[E]] =
-    TSType(TSArray(e.get))
-  implicit def optionTsType[E](implicit e: TSType[E]): TSType[Option[E]] =
-    TSType(TSUnion.of(e.get, TSUndefined))
-}
-
-object DefaultTSTypes extends DefaultTSTypes

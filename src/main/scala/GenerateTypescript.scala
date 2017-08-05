@@ -31,9 +31,7 @@ object GenerateTypescript extends App with DefaultTSTypes {
   import TypescriptTypeSerializer._
 
   parser.parse(args, Config()).foreach { config =>
-    import java.util.ArrayList
     println(emit[Foo])
-    println(emit[ArrayList[String]])
   }
 
   case class Config()

@@ -45,6 +45,9 @@ private class Macros(val c: blackbox.Context) {
       c.error(c.enclosingPosition, s"Expected case class, but found: $T")
 
     val members = caseClassFieldsTypes(T) map {
+      case (name, optional) if optional <:< typeOf[Option[_]] =>
+        val typeArg = optional.typeArgs.head
+        q"($name, TSUnion(implicitly[TSType[$typeArg]].get, TSUndefined))"
       case (name, tpe) =>
         q"($name, implicitly[TSType[$tpe]].get)"
     }
