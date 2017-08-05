@@ -1,6 +1,5 @@
 import nl.codestar.scala.ts.interface._
 import scopt.OptionParser
-
 import TypescriptType._
 import nl.codestar.scala.ts.interface.dsl._
 
@@ -32,7 +31,9 @@ object GenerateTypescript extends App with DefaultTSTypes {
   import TypescriptTypeSerializer._
 
   parser.parse(args, Config()).foreach { config =>
+    import java.util.ArrayList
     println(emit[Foo])
+    println(emit[ArrayList[String]])
   }
 
   case class Config()

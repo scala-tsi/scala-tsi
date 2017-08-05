@@ -4,8 +4,23 @@ import scala.annotation.implicitNotFound
 import TypescriptType._
 
 @implicitNotFound(
-  "Could not find a Typescript type mapping for type ${T}. Try to define an implicit TSType[${T}] or TSIType[${T}]"
-)
+  """Could not find a Typescript type mapping for type ${T}.
+Make sure an implicit TSType[${T}] or TSIType[${T}] is in scope.
+Make sure the initialization ordering is correct.
+
+To define an implicit TSType[T]:
+1. If the type maps directly to another type Other, use
+    implicit val tsT: TSType[T] = TSType.Of[Other] //or
+    implicit val tsT: TSType[T] = tsAlias[T, Other]
+2. If T is a case class, use
+    implicit val tsT: TSIType[T] = TSIType.fromCaseClass
+3. Or use the DSL to build your own interface:
+    import nl.codestar.scala.ts.interface.dsl._
+    implicit val tsT: TSIType[T] = tsInterface(
+      "foo" -> classOf[String],
+      "bar" -> classOf[Option[Int]]
+    )
+""")
 trait TSType[T] { self =>
   def get: TypescriptType
 }
