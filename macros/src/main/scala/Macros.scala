@@ -47,7 +47,7 @@ private class Macros(val c: blackbox.Context) {
     val members = caseClassFieldsTypes(T) map {
       case (name, optional) if optional <:< typeOf[Option[_]] =>
         val typeArg = optional.typeArgs.head
-        q"($name, TSUnion(implicitly[TSType[$typeArg]].get, TSUndefined))"
+        q"($name, TSUnion.of(implicitly[TSType[$typeArg]].get, TSUndefined))"
       case (name, tpe) =>
         q"($name, implicitly[TSType[$tpe]].get)"
     }
