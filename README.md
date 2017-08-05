@@ -5,16 +5,9 @@ Project to automatically generate TypeScript from your Scala domain model.
 ## Example
 Consider this domain model:
 ```
+// This type will get erased when serializing to JSON
 case class Email(address: String)
 case class Person(name: String, email: Email, age: Option[Int])
-
-// Play json (de)serializers
-// Email is put as a string directly in the json
-implicit val emailFormat: Format[Email] = Format(
-    json => json.validate[String].map(s => Email(address = string)),
-    email => JsString(email.address
-)
-implicit val personFormat: OFormat[Person] = Json.format
 
 ```
 
