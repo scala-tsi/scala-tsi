@@ -13,6 +13,7 @@ case class Person(name: String, email: Email, age: Option[Int])
 
 You can define the typescript mapping as follows:
 ```
+import nl.codestar.scala.ts.interface._
 import nl.codestar.scala.ts.interface.dsl._
 import DefaultTSTypes._
 
