@@ -1,32 +1,61 @@
-# Features
+# Scala-TS-interfaces
 
-## Implemented
+Project to automatically generate TypeScript from your Scala domain model.
 
-* Handle all TS native types
-* Discover missing/nested interfaces
-* Convenience method to create generators
-* Handle unions
-* Handle type aliases
-* Handle Tuples
-* Undefined / null for options and optional interfaces
-* Macro/reflection for case classes
-* small dsl for defining manual types
+## Example
+Consider this domain model:
+```
+case class Email(address: String)
+case class Person(name: String, email: Email, age: Option[Int])
 
-## MVP
+// Play json (de)serializers
+// Email is put as a string directly in the json
+implicit val emailFormat: Format[Email] = Format(
+    json => json.validate[String].map(s => Email(address = string)),
+    email => JsString(email.address
+)
+implicit val personFormat: OFormat[Person] = Json.format
 
-## MV Public Release
+```
 
-* Modules / classes / namespaces
-* Basic readme/documentation
-* Scala 2.11 & 2.12 cross-compilation
+You can define the typescript mapping as follows:
+```
+import nl.codestar.scala.ts.interface.dsl._
+import DefaultTSTypes._
 
-## Should have
+implicit val tsEmail: TSType[Email] = tsAlias[Email, String]("Email")
+// If you rather not have a "Email" type alias, use:
+// implicit val tsEmail: TSType[Email] = TSType.of[String]
+implicit val tsPerson: TSIType[Person] = TSIType.fromCaseClass
 
-* Solid test suite
-* SBT plugin to generate the files
+// TODO: how do people actually emit the files?
+val interfaces: String = emit[Person]
+```
 
-## Nice to have
+this will generate:
+```
+interface IPerson {
+  name: string,
+  email: Email,
+  age?: number
+}
 
-* Enums
+type Email = string
+```
 
-## Wont have
+## Installation
+TODO
+
+## Usage
+TODO
+
+## Documentation
+TODO (won't ever get done)
+
+## Comparison to scala-ts
+
+Explain why the scala-ts approach isn't viable for us, because it's fairly limited and doesn't allow control over types. Plus it generated optional members as `member: T | null`, that alone makes it clearly unviable for everything all the time.
+
+## Features
+
+See [this issue](https://github.com/code-star/scala-ts-interfaces/issues/1)
