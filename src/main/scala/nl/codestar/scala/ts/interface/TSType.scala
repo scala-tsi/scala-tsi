@@ -16,7 +16,7 @@ trait TSIType[T] extends TSType[T] { self =>
 object TSType {
   def apply[T](tt: TypescriptType): TSType[T] = new TSType[T] { val get = tt }
 
-  def get[T](implicit tsType: TSType[T]): TypescriptType = tsType.get
+  def of[T](implicit tsType: TSType[T]): TypescriptType = tsType.get
 }
 
 object TSIType {
