@@ -17,7 +17,6 @@ lazy val compilerOptions = Seq(
   "-Ywarn-numeric-widen",
   "-Ywarn-value-discard",
   "-Ywarn-dead-code",
-  "-Xfatal-warnings",
   "-language:experimental.macros"
 ) ++
   // Scala 2.11 only settings

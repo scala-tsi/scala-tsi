@@ -31,8 +31,14 @@ object TypescriptType {
   case class TSArray(elementType: TypescriptType)
       extends TypescriptAggregateType { def nested = Set(elementType) }
   case object TSBoolean extends TypescriptType
-  // TODO: TS Enum
-  // case object TSEnum extends TypescriptBasicType
+  case class TSEnum(name: String,
+                    const: Boolean,
+                    entries: ListMap[String, Option[Int]])
+      extends TypescriptNamedType
+      with TypescriptAggregateType {
+    def nested = Set(TSNumber)
+  }
+
   /** Represents Typescript indexed interfaces
     * interface name { [indexName:indexType]: valueType}
     * @param indexType index type, TSNumber or TSString
