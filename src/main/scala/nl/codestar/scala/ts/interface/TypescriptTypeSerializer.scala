@@ -5,7 +5,7 @@ import TypescriptType._
 object TypescriptTypeSerializer {
   // TODO: Optimize? Memoize? Tailrec?
   def serialize(tp: TypescriptType): String = tp match {
-    case TypescriptNamedType(name) => name
+    case t: TypescriptNamedType => t.name
     case TSAny => "any"
     case TSArray(elements) => serialize(elements) + "[]"
     case TSBoolean => "boolean"
@@ -48,6 +48,7 @@ object TypescriptTypeSerializer {
   private def emitNamed(named: TypescriptNamedType): String = named match {
     case TSAlias(name, underlying) =>
       s"type $name = ${serialize(underlying)}"
+
     case TSEnum(name, const, entries) =>
       val mbs = entries.map({
         case (entryName, Some(i)) => s"  $entryName = $i"
@@ -57,6 +58,9 @@ object TypescriptTypeSerializer {
          |${mbs.mkString(",\n")}
          |}
        """.stripMargin
+
+    case _: TSExternalName => ""
+
     case TSIndexedInterface(name, indexName, indexType, valueType) =>
       s"""interface $name {
          |  [$indexName: $indexType]: $valueType

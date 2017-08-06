@@ -16,6 +16,8 @@ package object dsl {
     def array: TSArray = TSArray(t)
   }
 
+  implicit def stringToType[T](s: String): TSType[T] =
+    TSNamedType.fromString(s)
   implicit def classToType[T](cls: Class[T])(
       implicit tstype: TSType[T]): TypescriptType =
     tstype.get

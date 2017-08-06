@@ -30,16 +30,28 @@ trait TSNamedType[T] extends TSType[T] { self =>
   def get: TypescriptNamedType
 }
 
-@implicitNotFound(
-  "Could not find a TSIType[${T}] in scope. If you have defined a typescript mapping, we can only use typescript interface types at this location.")
-trait TSIType[T] extends TSNamedType[T] { self =>
-  override def get: TSInterface
-}
-
 object TSType {
   def apply[T](tt: TypescriptType): TSType[T] = new TSType[T] { val get = tt }
 
   def of[T](implicit tsType: TSType[T]): TypescriptType = tsType.get
+}
+
+object TSNamedType {
+  def apply[T](tt: TypescriptNamedType): TSNamedType[T] = new TSNamedType[T] {
+    val get = tt
+  }
+
+  def fromString[T](s: String): TSNamedType[T] =
+    TypescriptType.fromString(s) match {
+      case t: TSExternalName => TSNamedType(t)
+      case _ => throw new IllegalArgumentException(s"String $s is a ")
+    }
+}
+
+@implicitNotFound(
+  "Could not find a TSIType[${T}] in scope. If you have defined a typescript mapping, we can only use typescript interface types at this location.")
+trait TSIType[T] extends TSNamedType[T] { self =>
+  override def get: TSInterface
 }
 
 object TSIType {

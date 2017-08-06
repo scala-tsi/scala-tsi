@@ -1,19 +1,31 @@
 package nl.codestar.scala.ts.interface
 
+import java.util.regex.Pattern
+
 import scala.collection.immutable.ListMap
 
 sealed trait TypescriptType
 
 object TypescriptType {
+  private[interface] def fromString(tpe: String): TypescriptType =
+    tpe match {
+      case "any" => TSAny
+      case "boolean" => TSBoolean
+      case "never" => TSNever
+      case "null" => TSNull
+      case "number" => TSNumber
+      case "string" => TSString
+      case "undefined" => TSUndefined
+      case "void" => TSVoid
+      case _ => TSExternalName(tpe)
+    }
 
   /** A marker trait for a TS type that has a name */
   sealed trait TypescriptNamedType extends TypescriptType {
     def name: String
+    require(isValidTSName(name), s"Not a valid TypeScript identifier: $name")
   }
-  object TypescriptNamedType {
-    def unapply(namedType: TypescriptNamedType): Option[String] =
-      Some(namedType.name)
-  }
+  object TypescriptNamedType
 
   /** A marker trait for a TS type that can contain nested types */
   sealed trait TypescriptAggregateType extends TypescriptType {
@@ -38,6 +50,8 @@ object TypescriptType {
       with TypescriptAggregateType {
     def nested = Set(TSNumber)
   }
+  // Not really a typescript type, but a marker for us that it is a type with some name that is not known/defined by us
+  case class TSExternalName(name: String) extends TypescriptNamedType
 
   /** Represents Typescript indexed interfaces
     * interface name { [indexName:indexType]: valueType}
@@ -82,4 +96,60 @@ object TypescriptType {
     def of(of: TypescriptType*) = TSUnion(of)
   }
   case object TSVoid extends TypescriptType
+
+  private val tsIdentifierPattern = Pattern.compile(
+    "[_$\\p{L}\\p{Nl}][_$\\p{L}\\p{Nl}\\p{Nd}\\{Mn}\\{Mc}\\{Pc}]*")
+  private[interface] def isValidTSName(name: String): Boolean =
+    tsIdentifierPattern.matcher(name).find() && !reservedKeywords.contains(
+      name)
+
+  private[interface] final val reservedKeywords: Set[String] = Set(
+    "break",
+    "case",
+    "catch",
+    "class",
+    "const",
+    "continue",
+    "debugger",
+    "default",
+    "delete",
+    "do",
+    "else",
+    "enum",
+    "export",
+    "extends",
+    "false",
+    "finally",
+    "for",
+    "function",
+    "if",
+    "import",
+    "in",
+    "instanceof",
+    "new",
+    "null",
+    "return",
+    "super",
+    "switch",
+    "this",
+    "throw",
+    "true",
+    "try",
+    "typeof",
+    "var",
+    "void",
+    "while",
+    "with",
+    // Strict mode
+    "as",
+    "implements",
+    "interface",
+    "let",
+    "package",
+    "private",
+    "protected",
+    "public",
+    "static",
+    "yield"
+  )
 }
