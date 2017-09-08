@@ -16,10 +16,11 @@ trait DefaultTSTypes
 object DefaultTSTypes extends DefaultTSTypes
 
 trait PrimitiveTSTypes {
-  implicit val BooleanTsType: TSType[Boolean] = TSType(TSBoolean)
-  implicit val StringTsType: TSType[String] = TSType(TSString)
-  implicit def NumberTsType[T: Numeric]: TSType[T] = TSType(TSNumber)
+  implicit val booleanTsType: TSType[Boolean] = TSType(TSBoolean)
+  implicit val stringTsType: TSType[String] = TSType(TSString)
+  implicit def numberTsType[T: Numeric]: TSType[T] = TSType(TSNumber)
 }
+object PrimitiveTSTypes extends PrimitiveTSTypes
 
 trait GenericTSTypes {
   // All scala collection types implement Traversable and are almost always translated to javascript arrays
@@ -46,6 +47,10 @@ trait JavaTSTypes {
   implicit def tsJavaCollection[E](
       implicit e: TSType[E]): TSType[java.util.Collection[E]] =
     TSType(TSArray(e.get))
+
+  implicit val uriTSType: TSType[java.net.URI] = TSType(TSString)
+  implicit val urlTSType: TSType[java.net.URL] = TSType(TSString)
+  implicit val uuidTSType: TSType[java.util.UUID] = TSType(TSString)
 }
 
 trait TupleTSTypes {

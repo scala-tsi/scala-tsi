@@ -38,15 +38,18 @@ trait TSNamedType[T] extends TSType[T] { self =>
 }
 
 object TSType {
-  def apply[T](tt: TypescriptType): TSType[T] = new TSType[T] { val get = tt }
+  private class TSTypeImpl[T](override val get: TypescriptType)
+      extends TSType[T]
+  def apply[T](tt: TypescriptType): TSType[T] = new TSTypeImpl(tt)
 
   def of[T](implicit tsType: TSType[T]): TypescriptType = tsType.get
 }
 
 object TSNamedType {
-  def apply[T](tt: TypescriptNamedType): TSNamedType[T] = new TSNamedType[T] {
-    val get = tt
-  }
+  private class TSNamedTypeImpl[T](override val get: TypescriptNamedType)
+      extends TSNamedType[T]
+  def apply[T](tt: TypescriptNamedType): TSNamedType[T] =
+    new TSNamedTypeImpl(tt)
 
   def fromString[T](s: String): TSNamedType[T] =
     TypescriptType.fromString(s) match {
@@ -65,7 +68,9 @@ trait TSIType[T] extends TSNamedType[T] { self =>
 }
 
 object TSIType {
-  def apply[T](tt: TSInterface): TSIType[T] = new TSIType[T] { val get = tt }
+  private class TSITypeImpl[T](override val get: TSInterface)
+      extends TSIType[T]
+  def apply[T](tt: TSInterface): TSIType[T] = new TSITypeImpl(tt)
 
   def fromCaseClass[T]: TSIType[T] = macro Macros.generateInterface[T]
 }
