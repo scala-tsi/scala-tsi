@@ -48,7 +48,7 @@ lazy val plugin = (project in file("plugin"))
     .dependsOn(macros, root)
     .settings(
       commonSettings ++ (sbtPlugin := true),
-      libraryDependencies ++= dependencies
+      libraryDependencies += "org.clapper" %% "classutil" % "1.1.2"
     )
 
 lazy val dependencies = Seq(

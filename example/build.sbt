@@ -1,6 +1,5 @@
 import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.scalafmtTestOnCompile
 import sbt.Keys._
-import Import.TypescriptKeys._
 
 lazy val root = (project in file("."))
 .settings(
@@ -10,11 +9,12 @@ lazy val root = (project in file("."))
     scalacOptions ++= compilerOptions,
     scalafmtOnCompile in Compile := true,
     scalafmtTestOnCompile in Compile := true,
-    inputDirectory := sourceDirectory.value / "models"
+    inputDirectory in Compile := (scalaSource in Compile).value / "models"
   ),
+  libraryDependencies += "org.clapper" %% "classutil" % "1.1.2"
 )
 
-compile in Compile <<= (compile in Compile) dependsOn typescript
+(compile in Compile) := ((compile in Compile) dependsOn (typescript in Compile)).value
 
 lazy val compilerOptions = Seq(
   "-unchecked",
