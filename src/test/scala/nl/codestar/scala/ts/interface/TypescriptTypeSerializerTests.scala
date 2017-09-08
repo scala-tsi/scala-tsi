@@ -156,10 +156,10 @@ class TypescriptTypeSerializerTests
     ignoreUnused(Something())
 
     implicit val somethingTSType: TSNamedType[Something] =
-      tsInterface(name = "ISomething",
-                  indexName = "as",
-                  indexType = TSString,
-                  valueType = TSString)
+      tsInterfaceIndexed(name = "ISomething",
+                         indexName = "as",
+                         indexType = TSString,
+                         valueType = TSString)
 
     val typescript = TypescriptTypeSerializer.emit[Something]
 

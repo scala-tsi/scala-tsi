@@ -26,11 +26,11 @@ object TypescriptTypeSerializer {
     case TSVoid => "void"
   }
 
-  def emit[T](implicit tsType: TSNamedType[T]): String = emits(tsType)
-  def emits(types: TSNamedType[_]*): String =
-    emitNamedTypes(types.map(_.get): _*)
+  // Unfortunately no vararg generics in scala
+  def emit[T](implicit tsType: TSNamedType[T]): String =
+    emits(tsType.get)
 
-  private def emitNamedTypes(types: TypescriptNamedType*): String =
+  def emits(types: TypescriptNamedType*): String =
     types.toSet
       .flatMap(discoverNestedNames)
       .toSeq
@@ -98,3 +98,5 @@ object TypescriptTypeSerializer {
     }
   }
 }
+
+object TypescriptEmitter {}
