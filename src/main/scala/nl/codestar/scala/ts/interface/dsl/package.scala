@@ -45,6 +45,12 @@ package object dsl {
   def tsInterface[T](name: String,
                      members: (String, TypescriptType)*): TSIType[T] =
     TSIType(TSInterface(name, ListMap(members: _*)))
+  def tsInterface[T](name: String,
+                     indexName: String = "key",
+                     indexType: TypescriptType = TSString,
+                     valueType: TypescriptType): TSNamedType[T] =
+    TSNamedType(TSInterfaceIndexed(name, indexName, indexType, valueType))
+
   def tsAlias[T, Alias](implicit tsType: TSType[Alias],
                         ct: Manifest[T]): TSType[T] =
     tsAlias[T, Alias](ct.runtimeClass.getSimpleName)
