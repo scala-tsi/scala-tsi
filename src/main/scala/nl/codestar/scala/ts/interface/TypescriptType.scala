@@ -54,11 +54,20 @@ object TypescriptType {
   case class TSExternalName(name: String) extends TypescriptNamedType
 
   /** Represents Typescript indexed interfaces
-    * interface name { [indexName:indexType]: valueType}
+    * { [indexName:indexType]: valueType}
     * @param indexType index type, TSNumber or TSString
     **/
-  case class TSIndexedInterface(name: String,
-                                indexName: String,
+  case class TSIndexedInterface(indexName: String = "key",
+                                indexType: TypescriptType,
+                                valueType: TypescriptType)
+      extends TypescriptAggregateType {
+    require(
+      indexType == TSString || indexType == TSNumber,
+      s"TypeScript indexed interface can only have index type string or number, not $indexType")
+    def nested = Set(indexType, valueType)
+  }
+  case class TSInterfaceIndexed(name: String,
+                                indexName: String = "key",
                                 indexType: TypescriptType,
                                 valueType: TypescriptType)
       extends TypescriptNamedType

@@ -9,6 +9,8 @@ object TypescriptTypeSerializer {
     case TSAny => "any"
     case TSArray(elements) => serialize(elements) + "[]"
     case TSBoolean => "boolean"
+    case TSIndexedInterface(indexName, indexType, valueType) =>
+      s"{ [ $indexName: ${serialize(indexType)} ]: ${serialize(valueType)} }"
     case TSIntersection(Seq()) => serialize(TSNever)
     case TSIntersection(Seq(e)) => serialize(e)
     case TSIntersection(of) => s"${of.map(serialize) mkString " | "}"
@@ -61,11 +63,12 @@ object TypescriptTypeSerializer {
 
     case _: TSExternalName => ""
 
-    case TSIndexedInterface(name, indexName, indexType, valueType) =>
+    case TSInterfaceIndexed(name, indexName, indexType, valueType) =>
       s"""interface $name {
-         |  [$indexName: $indexType]: $valueType
-         |}
+        |  [ $indexName: ${serialize(indexType)} ]: ${serialize(valueType)}
+        |}
        """.stripMargin
+
     case TSInterface(name, members) =>
       def symbol(required: Boolean) = if (required) ":" else "?:"
 
