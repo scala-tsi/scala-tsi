@@ -30,11 +30,11 @@ object GenerateTypescript extends App with DefaultTSTypes {
     "tuple" -> tuple
   )
 
+  val A = implicitly[TSNamedType[A]].get
+
   implicit val baxTSType: TSIType[Bax] = TSIType.fromCaseClass
 
   val parser = WriteTSToFiles.optionParser
-
-  import TypescriptTypeSerializer._
 
   parser.parse(args, Config()).foreach { config =>
     config.output(emits(classOf[Foo], classOf[Bax]))

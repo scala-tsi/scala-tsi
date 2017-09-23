@@ -78,4 +78,5 @@ object TSIType {
 
   // TODO: Put here or on TSType?
   def fromCaseClass[T]: TSIType[T] = macro Macros.generateInterface[T]
+
 }
