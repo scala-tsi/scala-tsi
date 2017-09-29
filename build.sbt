@@ -38,10 +38,13 @@ lazy val macros = (project in file("macros"))
     )
 
 lazy val root = (project in file("."))
+    .enablePlugins(SbtTwirl)
     .dependsOn(macros)
     .settings(
       commonSettings,
-      libraryDependencies ++= dependencies
+      libraryDependencies ++= dependencies,
+      TwirlKeys.templateFormats += "ts" -> "nl.codestar.scala.ts.template.TypescriptFormat",
+      TwirlKeys.templateImports += "nl.codestar.scala.ts.interface.TypescriptInterface"
     )
 
 lazy val dependencies = Seq(

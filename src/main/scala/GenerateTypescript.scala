@@ -28,10 +28,17 @@ object GenerateTypescript extends App with DefaultTSTypes {
 
   val parser = new OptionParser[Config]("Generate typescript") {}
 
-  import TypescriptTypeSerializer._
-
   parser.parse(args, Config()).foreach { config =>
-    println(emit[Foo])
+    val imports = Seq(
+      TypescriptInterface[Foo](fileName = ".",
+                               name = "IUser",
+                               tsType = fooGenerator),
+      TypescriptInterface[Foo](fileName = ".",
+                               name = "IAgent",
+                               tsType = fooGenerator)
+    )
+    val tsi = TypescriptInterface[Foo](tsType = fooGenerator)
+    println(ts.module(tsi, "pronto").body.trim)
   }
 
   case class Config()
