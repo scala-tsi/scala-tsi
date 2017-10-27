@@ -6,9 +6,9 @@ import org.clapper.classutil.ClassFinder
 import sbt.Keys._
 import sbt._
 
-object Plugin extends AutoPlugin {
+object TypescriptGenPlugin extends AutoPlugin {
   object autoImport {
-    val typescript = TaskKey[File]("typescript", "Generate typescript for classes")
+    val typescript = TaskKey[Seq[File]]("typescript", "Generate typescript for classes")
     val typescriptClassesToGenerateFor = SettingKey[Seq[String]]("Classes to generate typescript interfaces for")
     val typescriptGenerationImports = SettingKey[Seq[String]]("additional imports (i.e. your packages so you don't need to prefix your classes)")
     //val inputDirectory = SettingKey[File]("typescript-input-directory")
@@ -25,27 +25,24 @@ object Plugin extends AutoPlugin {
     Seq(
       typescriptGenerationImports := Seq("nl.codestar.scala.ts.maakhiertypescriptvan._"),
       typescriptClassesToGenerateFor := Seq("HierWilIkTypescriptVan"),
-      typescript := createTypescriptGenerationTemplate(typescriptGenerationImports.value, typescriptClassesToGenerateFor.value, target.value)
+      typescript := createTypescriptGenerationTemplate(typescriptGenerationImports.value, typescriptClassesToGenerateFor.value, sourceManaged.value)
     )
 
   override lazy val projectSettings =
     inConfig(Compile)(typescriptSettings)
 
-  def createTypescriptGenerationTemplate(imports: Seq[String], typesToGenerate: Seq[String], targetDir: File): File = {
-    println("Going to do a thing now!")
+  def createTypescriptGenerationTemplate(imports: Seq[String], typesToGenerate: Seq[String], sourceManaged: File): Seq[File] = {
+    val targetFile = sourceManaged / "Dummy.scala"
+
+    println(s"Going to write dummy scala file to ${targetFile.absolutePath}")
+
     val towrite: String =
       """
-        |package dummy
-        |object Main extends App {
+        |object Dummy extends App {
         |  println("Hello world from the SBT plugin!")
         |}""".stripMargin
 
-    val file = new File(targetDir, "hello.scala")
-    file.createNewFile()
-    val writer = new PrintWriter(file)
-    writer.write(towrite)
-    writer.close()
-    println("I did a thing!")
-    file
+    IO.write(targetFile, towrite)
+    Seq(targetFile)
   }
 }
