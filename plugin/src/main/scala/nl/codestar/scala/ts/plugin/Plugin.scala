@@ -32,11 +32,12 @@ object Plugin extends AutoPlugin {
     inConfig(Compile)(typescriptSettings)
 
   def createTypescriptGenerationTemplate(imports: Seq[String], typesToGenerate: Seq[String], targetDir: File): File = {
+    println("Going to do a thing now!")
     val towrite: String =
       """
         |package dummy
-        |object Application extends App {
-        |  println("Hello world!")
+        |object Main extends App {
+        |  println("Hello world from the SBT plugin!")
         |}""".stripMargin
 
     val file = new File(targetDir, "hello.scala")
@@ -44,6 +45,7 @@ object Plugin extends AutoPlugin {
     val writer = new PrintWriter(file)
     writer.write(towrite)
     writer.close()
+    println("I did a thing!")
     file
   }
 }

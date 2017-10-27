@@ -44,7 +44,7 @@ lazy val root = (project in file("."))
       libraryDependencies ++= dependencies
     )
 
-lazy val plugin = (project in file("plugin"))
+lazy val `scala-tsi-sbt` = (project in file("plugin"))
     .dependsOn(macros, root)
     .settings(
       commonSettings ++ (sbtPlugin := true),
@@ -56,5 +56,3 @@ lazy val dependencies = Seq(
   "com.github.scopt" %% "scopt"          % "3.7.0",
   "org.scalatest"    %% "scalatest"      % "3.0.1"            % "test"
 )
-
-addCommandAlias("generate-typescript", "runMain GenerateTypescript")
