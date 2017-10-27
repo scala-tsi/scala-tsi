@@ -47,8 +47,7 @@ lazy val root = (project in file("."))
 lazy val `scala-tsi-sbt` = (project in file("plugin"))
     .dependsOn(macros, root)
     .settings(
-      commonSettings ++ (sbtPlugin := true),
-      libraryDependencies += "org.clapper" %% "classutil" % "1.1.2"
+      commonSettings ++ (sbtPlugin := true)
     )
 
 lazy val dependencies = Seq(
