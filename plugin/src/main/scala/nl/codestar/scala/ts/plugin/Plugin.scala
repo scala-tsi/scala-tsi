@@ -1,5 +1,7 @@
 package nl.codestar.scala.ts.plugin
 
+import java.io.PrintWriter
+
 import org.clapper.classutil.ClassFinder
 import sbt.Keys._
 import sbt._
@@ -28,7 +30,7 @@ object Plugin extends AutoPlugin {
 
   override lazy val projectSettings =
     inConfig(Compile)(typescriptSettings)
-  
+
   def createTypescriptGenerationTemplate(imports: Seq[String], typesToGenerate: Seq[String], targetDir: File): File = {
     val towrite: String =
       """
@@ -39,6 +41,9 @@ object Plugin extends AutoPlugin {
 
     val file = new File(targetDir, "hello.scala")
     file.createNewFile()
+    val writer = new PrintWriter(file)
+    writer.write(towrite)
+    writer.close()
     file
   }
 }
