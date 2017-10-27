@@ -23,14 +23,12 @@ object Plugin extends AutoPlugin {
     Seq(
       typescriptGenerationImports := Seq("nl.codestar.scala.ts.maakhiertypescriptvan._"),
       typescriptClassesToGenerateFor := Seq("HierWilIkTypescriptVan"),
-      typescript := createTypescriptGenerationTemplate(typescriptGenerationImports.value, typescriptClassesToGenerateFor.value, ???)
+      typescript := createTypescriptGenerationTemplate(typescriptGenerationImports.value, typescriptClassesToGenerateFor.value, target.value)
     )
 
   override lazy val projectSettings =
     inConfig(Compile)(typescriptSettings)
-
-
-
+  
   def createTypescriptGenerationTemplate(imports: Seq[String], typesToGenerate: Seq[String], targetDir: File): File = {
     val towrite: String =
       """
