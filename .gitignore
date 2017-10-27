@@ -1,4 +1,4 @@
 .DS_Store
 target
-/.idea
-/.idea_modules
+.idea
+.idea_modules
