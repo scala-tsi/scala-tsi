@@ -1,5 +1,6 @@
 package nl.codestar.scala.ts.interface
 
+import nl.codestar.scala.ts.interface.TypescriptType.TSString
 import org.scalatest.{FlatSpec, Matchers}
 import nl.codestar.scala.ts.interface.dsl._
 
@@ -7,6 +8,16 @@ class TypescriptTypeSerializerTests
     extends FlatSpec
     with Matchers
     with DefaultTSTypes {
+  import org.scalactic._
+
+  def whiteSpaceNormalised: Uniformity[String] =
+    new AbstractStringUniformity {
+
+      /**Returns the string with all consecutive white spaces reduced to a single space, then removes empty lines.*/
+      def normalized(s: String): String = s.replaceAll("\\s+", " ")
+      override def toString: String = "whiteSpaceNormalised"
+    }
+
   // Scala 2.11.11 (maybe others) give false positive unused warnings if a class is used only as a generic
   def ignoreUnused(o: Object) = ()
 
@@ -19,13 +30,10 @@ class TypescriptTypeSerializerTests
 
     val typescript = TypescriptTypeSerializer.emit[Person]
 
-    typescript.trim ===
-      """
-        |interface IPerson {
+    typescript.trim should equal("""interface IPerson {
         |  name: string
         |  age: number
-        |}
-      """.stripMargin
+        |}""".stripMargin)(after being whiteSpaceNormalised)
   }
 
   it should "be able to generate multiple typescript interfaces for a nested case classes" in {
@@ -42,17 +50,13 @@ class TypescriptTypeSerializerTests
 
     val typescript = TypescriptTypeSerializer.emit[ComplexCaseClass]
 
-    typescript.trim ===
-      """
-        |interface INestedCaseClass {
+    typescript.trim should equal("""interface INestedCaseClass {
         |  name: string
         |}
         |
-        |
         |interface IComplexCaseClass {
         |  nested: INestedCaseClass
-        |}
-      """.stripMargin.trim
+        |}""".stripMargin)(after being whiteSpaceNormalised)
   }
 
   it should "be able to handle options in a case class" in {
@@ -65,11 +69,9 @@ class TypescriptTypeSerializerTests
 
     val typescript = TypescriptTypeSerializer.emit[OptionCaseClass]
 
-    typescript.trim ===
-      """interface IOptionCaseClass {
+    typescript.trim should equal("""interface IOptionCaseClass {
         |  option?: string
-        |}
-      """.stripMargin
+        |}""".stripMargin)(after being whiteSpaceNormalised)
   }
 
   it should "handle recursive types" in {
@@ -79,19 +81,20 @@ class TypescriptTypeSerializerTests
     ignoreUnused(A(null))
     ignoreUnused(B(null))
 
-    implicit val tsA: TSType[A] = "A"
+    implicit val tsA: TSType[A] = "IA"
     implicit val tsB: TSIType[B] = TSIType.fromCaseClass
     val tsAGenerated: TSIType[A] = TSIType.fromCaseClass
 
-    TypescriptTypeSerializer.emit(tsAGenerated) ===
-      """interface IB {
+    TypescriptTypeSerializer
+      .emit(tsAGenerated)
+      .replaceAll("\\s", "") should equal("""
+        |interface IB {
         |  a: IA
         |}
         |
         |interface IA {
         |  b: IB
-        |}
-      """.stripMargin
+        |}""".stripMargin.replaceAll("\\s", ""))
   }
 
   it should "be able to handle all primitive types" in {
@@ -115,18 +118,53 @@ class TypescriptTypeSerializerTests
 
     val typescript = TypescriptTypeSerializer.emit[PrimitiveTypes]
 
-    typescript.trim ===
-      """interface IPrimitiveTypes {
+    typescript.trim should equal("""interface IPrimitiveTypes {
         |  char: number
         |  string: string
         |  byte: number
         |  short: number
         |  int: number
         |  long: number
+        |  float: number
         |  double: number
         |  boolean: boolean
         |  stringSeq: string[]
-        |}
-      """.stripMargin
+        |}""".stripMargin)(after being whiteSpaceNormalised)
+  }
+
+  it should "serialize an indexed interface" in {
+    case class Something(
+        values: Map[String, String] = Map("a" -> "b")
+    )
+
+    ignoreUnused(Something())
+
+    implicit val somethingTSType: TSIType[Something] = TSIType.fromCaseClass
+
+    val typescript = TypescriptTypeSerializer.emit[Something]
+
+    typescript.trim should equal("""interface ISomething {
+      |  values: { [ key: string ]: string }
+      |}""".stripMargin)(after being whiteSpaceNormalised)
+  }
+
+  it should "serialize a named indexed interface" in {
+    case class Something(
+        values: Map[String, String] = Map("a" -> "b")
+    )
+
+    ignoreUnused(Something())
+
+    implicit val somethingTSType: TSNamedType[Something] =
+      tsInterfaceIndexed(name = "ISomething",
+                         indexName = "as",
+                         indexType = TSString,
+                         valueType = TSString)
+
+    val typescript = TypescriptTypeSerializer.emit[Something]
+
+    typescript.trim should equal("""interface ISomething {
+        |  [ as: string ]: string
+        |}""".stripMargin)(after being whiteSpaceNormalised)
   }
 }

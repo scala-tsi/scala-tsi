@@ -1,4 +1,4 @@
-// import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.scalafmtTestOnCompile
+//import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.scalafmtTestOnCompile
 import sbt.Keys.scalacOptions
 
 name := "scala-ts-compiler"
@@ -52,6 +52,7 @@ lazy val plugin = (project in file("plugin"))
     )
 
 lazy val dependencies = Seq(
+  "com.github.pathikrit" %% "better-files" % "3.1.0",
   "com.github.scopt" %% "scopt"          % "3.7.0",
   "org.scalatest"    %% "scalatest"      % "3.0.1"            % "test"
 )

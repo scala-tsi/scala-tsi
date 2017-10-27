@@ -1,6 +1,7 @@
 import nl.codestar.scala.ts.interface._
-import scopt.OptionParser
 import TypescriptType._
+import nl.codestar.scala.ts.WriteTSToFiles
+import nl.codestar.scala.ts.WriteTSToFiles.Config
 import nl.codestar.scala.ts.interface.dsl._
 
 object GenerateTypescript extends App with DefaultTSTypes {
@@ -11,13 +12,15 @@ object GenerateTypescript extends App with DefaultTSTypes {
   val union = TSUnion.of(TSString, TSBoolean, TSNull)
   val tuple = TSTuple.of(TSString, union)
 
-  implicit val bazGenerator: TSIType[Baz] = tsInterface(
+  implicit val bazTSType: TSIType[Baz] = tsInterface(
     "boo" -> TSBoolean,
     "baz" -> TSNumber
   )
 
-  implicit val fooGenerator: TSIType[Foo] = tsInterface(
-    "bar" -> classOf[String],
+  implicit val barTSType: TSType[Bar] = TSType.sameAs[Bar, String]
+
+  implicit val fooTSType: TSIType[Foo] = tsInterface(
+    "bar" -> classOf[Bar],
     "bool" -> classOf[Boolean],
     "num" -> classOf[Option[Int]],
     "baz" -> classOf[Baz],
@@ -26,20 +29,22 @@ object GenerateTypescript extends App with DefaultTSTypes {
     "tuple" -> tuple
   )
 
-  val parser = new OptionParser[Config]("Generate typescript") {}
+  //val A = implicitly[TSNamedType[A]].get
+
+  implicit val baxTSType: TSIType[Bax] = TSIType.fromCaseClass
+
+  val parser = WriteTSToFiles.optionParser
 
   import TypescriptTypeSerializer._
-
   parser.parse(args, Config()).foreach { config =>
-    println(emit[Foo])
+    config.output(emits(classOf[Foo], classOf[Bax]))
   }
-
-  case class Config()
 }
 
 class Foo(bar: Bar, bool: Boolean, num: Option[Int], baz: Option[Baz])
 case class Bar(value: String)
 case class Baz(boo: Boolean, bar: Int)
+case class Bax(x: Int, y: Int)
 
 /**
   * interface IFoo {
@@ -52,5 +57,10 @@ case class Baz(boo: Boolean, bar: Int)
   * interface IBaz {
   *   boo: boolean
   *   bar: number
+  * }
+  *
+  * interface IBax {
+  *   x: number
+  *   y: number
   * }
   */
