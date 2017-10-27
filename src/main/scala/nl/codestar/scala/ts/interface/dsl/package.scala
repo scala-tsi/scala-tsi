@@ -21,6 +21,9 @@ package object dsl {
   implicit def classToType[T](cls: Class[T])(
       implicit tstype: TSType[T]): TypescriptType =
     tstype.get
+  implicit def classToNamedType[T](cls: Class[T])(
+      implicit tstype: TSNamedType[T]): TypescriptNamedType =
+    tstype.get
   implicit def tupleToTSInterfaceEntry[T](entry: (String, Class[T]))(
       implicit tsType: TSType[T]): (String, TypescriptType) =
     (entry._1, tsType.get)
@@ -45,16 +48,19 @@ package object dsl {
   def tsInterface[T](name: String,
                      members: (String, TypescriptType)*): TSIType[T] =
     TSIType(TSInterface(name, ListMap(members: _*)))
-  def tsInterface[T](name: String,
-                     indexName: String = "key",
-                     indexType: TypescriptType = TSString,
-                     valueType: TypescriptType): TSNamedType[T] =
+
+  def tsInterfaceIndexed[T](name: String,
+                            indexName: String = "key",
+                            indexType: TypescriptType = TSString,
+                            valueType: TypescriptType): TSNamedType[T] =
     TSNamedType(TSInterfaceIndexed(name, indexName, indexType, valueType))
 
   def tsAlias[T, Alias](implicit tsType: TSType[Alias],
-                        ct: Manifest[T]): TSType[T] =
+                        ct: Manifest[T]): TSNamedType[T] =
     tsAlias[T, Alias](ct.runtimeClass.getSimpleName)
   def tsAlias[T, Alias](name: String)(
-      implicit tsType: TSType[Alias]): TSType[T] =
-    TSType(TSAlias(name, tsType.get))
+      implicit tsType: TSType[Alias]): TSNamedType[T] =
+    tsAlias[T](name, tsType.get)
+  def tsAlias[T](name: String, tsType: TypescriptType): TSNamedType[T] =
+    TSNamedType(TSAlias(name, tsType))
 }

@@ -42,7 +42,11 @@ object TSType {
       extends TSType[T]
   def apply[T](tt: TypescriptType): TSType[T] = new TSTypeImpl(tt)
 
-  def of[T](implicit tsType: TSType[T]): TypescriptType = tsType.get
+  def sameAs[Target, Source](
+      implicit sourceType: TSType[Source]): TSType[Target] =
+    TSType(sourceType.get)
+
+  def fromCaseClass[T]: TSIType[T] = macro Macros.generateInterface[T]
 }
 
 object TSNamedType {
@@ -72,5 +76,7 @@ object TSIType {
       extends TSIType[T]
   def apply[T](tt: TSInterface): TSIType[T] = new TSITypeImpl(tt)
 
+  // TODO: Put here or on TSType?
   def fromCaseClass[T]: TSIType[T] = macro Macros.generateInterface[T]
+
 }
