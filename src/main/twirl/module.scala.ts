@@ -1,6 +1,6 @@
-@(tsi: TypescriptInterface[_ <: AnyRef], moduleName: String)
+@(tsi: TypescriptInterface[_], moduleName: String)
 
-@es6imports(tsi.imports)
+@tsi.imports.map(_.toString).mkString("\n")
 
 module @{moduleName} {
   'use strict';

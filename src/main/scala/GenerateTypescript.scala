@@ -30,14 +30,13 @@ object GenerateTypescript extends App with DefaultTSTypes {
 
   parser.parse(args, Config()).foreach { config =>
     val imports = Seq(
-      TypescriptInterface[Foo](fileName = ".",
-                               name = "IUser",
-                               tsType = fooGenerator),
-      TypescriptInterface[Foo](fileName = ".",
-                               name = "IAgent",
-                               tsType = fooGenerator)
+      TypescriptInterface[Foo](fileName = "IUser.ts", name = "IUser"),
+      TypescriptInterface[Foo](fileName = "IAgent.ts", name = "IAgent")
     )
-    val tsi = TypescriptInterface[Foo](tsType = fooGenerator)
+
+    val tsi = TypescriptInterface[Foo](
+      imports = ES6TypescriptImport.fromInterfaces(imports))
+
     println(ts.module(tsi, "pronto").body.trim)
   }
 
