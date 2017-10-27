@@ -7,8 +7,8 @@ import sbt._
 object Plugin extends AutoPlugin {
   object autoImport {
     val typescript = TaskKey[File]("typescript", "Generate typescript for classes")
-    val typescriptClassesToGenerateFor = SettingsKey[Seq[String]]("Classes to generate typescript interfaces for")
-    val typescriptGenerationImports = SettingsKey[Seq[String]]("additional imports (i.e. your packages so you don't need to prefix your classes)")
+    val typescriptClassesToGenerateFor = SettingKey[Seq[String]]("Classes to generate typescript interfaces for")
+    val typescriptGenerationImports = SettingKey[Seq[String]]("additional imports (i.e. your packages so you don't need to prefix your classes)")
     //val inputDirectory = SettingKey[File]("typescript-input-directory")
     //val outputFile = SettingKey[File]("typescript-output-file", "File where all typescript interfaces will be written to")
   }
@@ -21,7 +21,7 @@ object Plugin extends AutoPlugin {
 
   lazy val typescriptSettings: Seq[Def.Setting[_]] =
     Seq(
-      typescriptGenerationImports := Seq("nl.codestar.scala.ts.maakhiertypescriptvan._")
+      typescriptGenerationImports := Seq("nl.codestar.scala.ts.maakhiertypescriptvan._"),
       typescriptClassesToGenerateFor := Seq("HierWilIkTypescriptVan"),
       typescript := createTypescriptGenerationTemplate(typescriptGenerationImports.value, typescriptClassesToGenerateFor.value, ???)
     )
@@ -39,7 +39,7 @@ object Plugin extends AutoPlugin {
         |  println("Hello world!")
         |}""".stripMargin
 
-    val file = new File(targetdir, "hello.scala")
+    val file = new File(targetDir, "hello.scala")
     file.createNewFile()
     file
   }
