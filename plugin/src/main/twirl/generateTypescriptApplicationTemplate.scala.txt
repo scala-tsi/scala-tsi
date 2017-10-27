@@ -1,0 +1,31 @@
+@(imports: Seq[String], classes: Seq[String], targetFile: String)
+
+package nl.codestar.scala.ts.output
+
+import _root_.nl.codestar.scala.ts.interface.TSNamedType
+import _root_.nl.codestar.scala.ts.interface.TypescriptType.TypescriptNamedType
+import _root_.java.io.File
+
+/** User imports */
+@for(imp <- imports) {
+import @imp
+}
+
+object ApplicationTypescriptGeneration {
+
+  // If you get a implicit not found error here, make sure you have defined a TSType[T] implicit and imported it
+  val toOutput: Seq[TypescriptNamedType] = Seq(
+    @for(userClass <- classes) {
+      implicitly[TSNamedType[userClass]].get,
+    }
+  )
+  // TODO: If we want to support scala 2.11 the last must not have a trailing comma
+
+  val options = _root_.nl.codestar.scala.ts.output.OutputOptions(
+    targetFile = new File(targetfile)
+  )
+
+  def main(args: Array[String]): Unit = {
+    _root_.nl.codestar.scala.ts.output.WriteTSToFiles.write(options)(toOutput)
+  }
+}
