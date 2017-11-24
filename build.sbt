@@ -1,9 +1,6 @@
 //import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.scalafmtTestOnCompile
 import sbt.Keys.scalacOptions
 
-name := "scala-ts-compiler"
-version := "0.1-SNAPSHOT"
-
 // TODO: Different versions between 2.11 and 2.12
 lazy val compilerOptions = Seq(
   "-unchecked",
@@ -26,15 +23,16 @@ lazy val compilerOptions = Seq(
 lazy val commonSettings = Seq(
   scalaVersion := "2.12.4",
   organization := "nl.codestar",
-  scalacOptions ++= compilerOptions,
+  version := "0.1-SNAPSHOT",
+  scalacOptions ++= compilerOptions
   // Code formatting
   //scalafmtOnCompile in Compile := true,
-  //scalafmtTestOnCompile in Compile := true,
-) ++ mavenCentralSettings
+  //scalafmtTestOnCompile in Compile := true
+)
 
 
 /* Settings to publish to maven central */
-lazy val mavenCentralSettings: Seq[Def.Setting[_]] = Seq(
+lazy val publishSettings = Seq(
   publishMavenStyle := true,
   publishTo := Some(if(isSnapshot.value) Opts.resolver.sonatypeSnapshots else Opts.resolver.sonatypeStaging),
   credentials += (sys.env.get("MAVEN_CENTRAL_USER") match {
@@ -45,37 +43,42 @@ lazy val mavenCentralSettings: Seq[Def.Setting[_]] = Seq(
   homepage := Some(url("https://github.com/code-star/scala-ts-interfaces/")),
   scmInfo := Some(ScmInfo(url("https://github.com/code-star/scala-ts-interfaces"), "scm:git@github.com:code-star/scala-ts-interfaces.git")),
   developers := List(
-    Developer(id="dhoepelman", name="David Hoepelman", email="david.hoepelman@ordina.nl", url=url("https://github.com/dhoepelman"))
-    // TODO: Add Donovan
+    Developer(id="dhoepelman", name="David Hoepelman", email="david.hoepelman@ordina.nl", url=url("https://github.com/dhoepelman")),
+    Developer(id="donovan", name="Donovan de Kuiper", email="donovan.de.kuiper@ordina.nl", url=url("https://github.com/Hayena"))
   )
 )
 
-lazy val macros = (project in file("macros"))
+lazy val root = project.aggregate(`scala-tsi`, `sbt-scala-tsi`)
+
+lazy val `scala-tsi-macros` = (project in file("macros"))
   .settings(
     commonSettings,
+    name := "scala-tsi-macros",
     libraryDependencies += Def.setting {
       "org.scala-lang" % "scala-reflect" % scalaVersion.value
     }.value
   )
 
-lazy val root = (project in file("."))
-  .dependsOn(macros)
+lazy val `scala-tsi` = (project in file("."))
+  .dependsOn(`scala-tsi-macros`)
+  .settings(commonSettings)
+  .settings(publishSettings)
   .settings(
-    commonSettings,
+    name := "scala-tsi",
     libraryDependencies ++= dependencies
   )
 
-lazy val `scala-tsi-sbt` = (project in file("plugin"))
+lazy val `sbt-scala-tsi` = (project in file("plugin"))
   .enablePlugins(SbtTwirl)
-  .dependsOn(macros, root)
+  .settings(commonSettings)
+  .settings(publishSettings)
   .settings(
-    commonSettings ++ (sbtPlugin := true)
+    name := "sbt-scala-tsi",
+    sbtPlugin := true
   )
 
 lazy val dependencies = Seq(
   // format: off
-  "com.github.pathikrit" %% "better-files" % "3.1.0",
-  "com.github.scopt"     %% "scopt"        % "3.7.0",
   "org.scalatest"        %% "scalatest"    % "3.0.1"     % "test"
   // format: on
 )
