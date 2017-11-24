@@ -1,5 +1,3 @@
-addSbtPlugin("com.lucidchart" % "sbt-scalafmt" % "1.11")
+addSbtPlugin("com.lucidchart" % "sbt-scalafmt" % "1.14")
 
-lazy val root = Project("plugin", file(".")).dependsOn(ProjectRef(plugin, "plugin"))
-
-lazy val plugin = file("../").getCanonicalFile.toURI
+addSbtPlugin("nl.codestar" % "scala-tsi-sbt" % "0.1-SNAPSHOT")

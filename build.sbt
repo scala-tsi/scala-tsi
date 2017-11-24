@@ -48,6 +48,7 @@ lazy val root = (project in file("."))
   )
 
 lazy val `scala-tsi-sbt` = (project in file("plugin"))
+  .enablePlugins(SbtTwirl)
   .dependsOn(macros, root)
   .settings(
     commonSettings ++ (sbtPlugin := true)

@@ -19,7 +19,7 @@ import TypescriptType._
  */
 
 @implicitNotFound(
-  "Could not find a Typescript type mapping for type ${T}. Make sure an implicit TSType[${T}] or TSIType[${T}] is in scope and was defined before this point.")
+  "Could not find an implicit TSType[${T}] in scope. Make sure you created and imported a typescript mapping for the type.")
 trait TSType[T] { self =>
   def get: TypescriptType
   override def equals(obj: scala.Any): Boolean = obj match {
@@ -31,7 +31,7 @@ trait TSType[T] { self =>
 }
 
 @implicitNotFound(
-  "Could not find a TSNamedType[${T}] in scope. If you have defined a typescript mapping, we can only use typescript types with a name at this location.")
+  "Could not find an implicit TSNamedType[${T}] in scope. Make sure you created and imported a named typescript mapping for the type.")
 trait TSNamedType[T] extends TSType[T] { self =>
   def get: TypescriptNamedType
   override def toString: String = s"TSNamedType($get)"
@@ -64,7 +64,7 @@ object TSNamedType {
 }
 
 @implicitNotFound(
-  "Could not find a TSIType[${T}] in scope. If you have defined a typescript mapping, we can only use typescript interface types at this location.")
+  "Could not find an implicit TSIType[${T}] in scope. Make sure you created and imported a typescript interface for the type.")
 trait TSIType[T] extends TSNamedType[T] { self =>
   override def get: TSInterface
   override def toString: String = s"TSIType($get)"
