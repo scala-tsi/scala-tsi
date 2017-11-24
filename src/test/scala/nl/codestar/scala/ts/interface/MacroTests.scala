@@ -13,8 +13,8 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     case class Person(name: String, age: Int)
     ignoreUnused(Person("", 1))
     TSType.fromCaseClass[Person] shouldBe TSType.interface("IPerson",
-                                                       "name" -> TSString,
-                                                       "age" -> TSNumber)
+                                                           "name" -> TSString,
+                                                           "age" -> TSNumber)
   }
 
   it should "handle optional types" in {

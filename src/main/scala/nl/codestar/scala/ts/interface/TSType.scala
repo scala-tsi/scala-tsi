@@ -43,13 +43,15 @@ object TSType {
   /** Create a Typescript alias "T" for type T, with the definition of Alias
     * @example alias[Foo, String] will generate typescript `type Foo = string`
     */
-  def alias[T, Alias](implicit tsType: TSType[Alias], ct: Manifest[T]): TSNamedType[T] =
+  def alias[T, Alias](implicit tsType: TSType[Alias],
+                      ct: Manifest[T]): TSNamedType[T] =
     alias[T, Alias](ct.runtimeClass.getSimpleName)
 
   /** Create a Typescript alias "name" for type T, with the definition of Alias
     * @example alias[Foo, String]("IFoo") will generate typescript `type IFoo = string`
     */
-  def alias[T, Alias](name: String)(implicit tsType: TSType[Alias]): TSNamedType[T] =
+  def alias[T, Alias](name: String)(
+      implicit tsType: TSType[Alias]): TSNamedType[T] =
     alias(name, tsType.get)
 
   /** Create a Typescript alias "name" for type T, with the definition of tsType
@@ -65,26 +67,29 @@ object TSType {
     TypescriptType.fromString(name) match {
       case t: TSExternalName => TSNamedType(t)
       case t =>
-        throw new IllegalArgumentException(s"String $name is a predefined type $t")
+        throw new IllegalArgumentException(
+          s"String $name is a predefined type $t")
     }
 
   /** Create an interface "name" for T
     * @example interface[Foo]("MyFoo", "bar" -> TSString) will output "interface MyFoo { bar: string }" */
-  def interface[T](name: String, members: (String, TypescriptType)*): TSIType[T] =
+  def interface[T](name: String,
+                   members: (String, TypescriptType)*): TSIType[T] =
     TSIType(TSInterface(name, ListMap(members: _*)))
 
   /** Create an interface "IClassname" for T
     * @example interface[Foo]("bar" -> TSString) will output "interface IFoo { bar: string }" */
-  def interface[T](members: (String, TypescriptType)*)(implicit ct: Manifest[T]): TSIType[T] =
+  def interface[T](members: (String, TypescriptType)*)(
+      implicit ct: Manifest[T]): TSIType[T] =
     interface[T]("I" + ct.runtimeClass.getSimpleName, members: _*)
 
   /** Create an indexed interface for T
     * @example interfaceIndexed[Foo]("IFooLookup", "key", TSString, TSInt) will output "interface IFooLookup { [key: string] : Int }"
     */
   def interfaceIndexed[T](name: String,
-    indexName: String = "key",
-    indexType: TypescriptType = TSString,
-    valueType: TypescriptType): TSNamedType[T] =
+                          indexName: String = "key",
+                          indexType: TypescriptType = TSString,
+                          valueType: TypescriptType): TSNamedType[T] =
     TSNamedType(TSInterfaceIndexed(name, indexName, indexType, valueType))
 }
 
