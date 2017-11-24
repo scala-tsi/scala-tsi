@@ -4,16 +4,13 @@ lazy val root = (project in file("."))
   .enablePlugins(TypescriptGenPlugin)
   .settings(
     Seq(
-      scalaVersion := "2.12.3",
+      scalaVersion := "2.12.4",
       organization := "nl.codestar",
       scalacOptions ++= compilerOptions,
       typescriptClassesToGenerateFor := Seq("Foo"),
       typescriptGenerationImports := Seq("models._", "Foo._")
       //scalafmtOnCompile in Compile := true,
       //scalafmtTestOnCompile in Compile := true
-    ),
-    libraryDependencies ++= Seq(
-      "org.clapper" %% "classutil" % "1.1.2"
     )
   )
 
