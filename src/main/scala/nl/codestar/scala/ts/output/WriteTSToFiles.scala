@@ -8,7 +8,7 @@ import nl.codestar.scala.ts.interface.TypescriptTypeSerializer
 object WriteTSToFiles {
   def write(options: OutputOptions)(types: Seq[TypescriptNamedType]): Unit = {
     val output = TypescriptTypeSerializer.emits(types: _*)
-    if(!options.targetFile.exists()) {
+    if (!options.targetFile.exists()) {
       options.targetFile.createNewFile()
     }
     val writer = new FileWriter(options.targetFile)

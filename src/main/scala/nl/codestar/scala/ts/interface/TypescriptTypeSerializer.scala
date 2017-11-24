@@ -6,24 +6,24 @@ object TypescriptTypeSerializer {
   // TODO: Optimize? Memoize? Tailrec?
   def serialize(tp: TypescriptType): String = tp match {
     case t: TypescriptNamedType => t.name
-    case TSAny => "any"
-    case TSArray(elements) => serialize(elements) + "[]"
-    case TSBoolean => "boolean"
+    case TSAny                  => "any"
+    case TSArray(elements)      => serialize(elements) + "[]"
+    case TSBoolean              => "boolean"
     case TSIndexedInterface(indexName, indexType, valueType) =>
       s"{ [ $indexName: ${serialize(indexType)} ]: ${serialize(valueType)} }"
-    case TSIntersection(Seq()) => serialize(TSNever)
+    case TSIntersection(Seq())  => serialize(TSNever)
     case TSIntersection(Seq(e)) => serialize(e)
-    case TSIntersection(of) => s"${of.map(serialize) mkString " | "}"
-    case TSNever => "never"
-    case TSNull => "null"
-    case TSNumber => "number"
-    case TSTuple(members) => s"[${members.map(serialize) mkString ", "}]"
-    case TSString => "string"
-    case TSUndefined => "undefined"
-    case TSUnion(Seq()) => serialize(TSNever)
-    case TSUnion(Seq(e)) => serialize(e)
-    case TSUnion(of) => s"(${of.map(serialize) mkString " | "})"
-    case TSVoid => "void"
+    case TSIntersection(of)     => s"${of.map(serialize) mkString " | "}"
+    case TSNever                => "never"
+    case TSNull                 => "null"
+    case TSNumber               => "number"
+    case TSTuple(members)       => s"[${members.map(serialize) mkString ", "}]"
+    case TSString               => "string"
+    case TSUndefined            => "undefined"
+    case TSUnion(Seq())         => serialize(TSNever)
+    case TSUnion(Seq(e))        => serialize(e)
+    case TSUnion(of)            => s"(${of.map(serialize) mkString " | "})"
+    case TSVoid                 => "void"
   }
 
   // Unfortunately no vararg generics in scala
@@ -54,7 +54,7 @@ object TypescriptTypeSerializer {
     case TSEnum(name, const, entries) =>
       val mbs = entries.map({
         case (entryName, Some(i)) => s"  $entryName = $i"
-        case (entryName, None) => s"  $entryName"
+        case (entryName, None)    => s"  $entryName"
       })
       s"""${if (const) "const " else ""}enum $name {
          |${mbs.mkString(",\n")}
@@ -89,7 +89,7 @@ object TypescriptTypeSerializer {
       tp: TypescriptType): Set[TypescriptNamedType] = {
     val me: Set[TypescriptNamedType] = tp match {
       case named: TypescriptNamedType => Set(named)
-      case _ => Set()
+      case _                          => Set()
     }
     tp match {
       case TypescriptAggregateType(nested) =>
