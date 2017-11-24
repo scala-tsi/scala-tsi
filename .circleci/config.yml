@@ -38,7 +38,7 @@ jobs:
       - run:
           name: Check formatting
           command:
-            sbt scalafmt::test test:scalafmt::test exit
+            sbt scalafmt::test test:scalafmt::test sbt:scalafmt::test exit
 
       - run:
           command:
