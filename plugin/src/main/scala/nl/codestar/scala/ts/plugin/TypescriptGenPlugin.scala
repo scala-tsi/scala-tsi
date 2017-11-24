@@ -24,24 +24,19 @@ object TypescriptGenPlugin extends AutoPlugin {
       generateTypescript := runTypescriptGeneration.value,
       typescriptGenerationImports := Seq(),
       typescriptClassesToGenerateFor := Seq(),
-      generateTypescriptGeneratorApplication := createTypescriptGenerationTemplate(typescriptGenerationImports.value, typescriptClassesToGenerateFor.value, sourceManaged.value),
+      generateTypescriptGeneratorApplication := createTypescriptGenerationTemplate(typescriptGenerationImports.value, typescriptClassesToGenerateFor.value, sourceManaged.value, typescriptOutputFile.value),
       sourceGenerators += generateTypescriptGeneratorApplication in Compile
     )
 
   override lazy val projectSettings =
     inConfig(Compile)(typescriptSettings)
 
-  def createTypescriptGenerationTemplate(imports: Seq[String], typesToGenerate: Seq[String], sourceManaged: File): Seq[File] = {
-    val targetFile = sourceManaged / "nl" / "codestar" / "scala" / "ts" / "output" / "ApplicationTypescriptGeneration.scala"
+  def createTypescriptGenerationTemplate(imports: Seq[String], typesToGenerate: Seq[String], sourceManaged: File, typescriptOutputFile: File): Seq[File] = {
+    val targetFile = sourceManaged / "nl" / "codestar" / "scala" / "ts" / "generator" / "ApplicationTypescriptGeneration.scala"
 
     println(s"Going to write dummy scala file to ${targetFile.absolutePath}")
 
-    val towrite: String =
-      """package nl.codestar.scala.ts.output
-        |
-        |object ApplicationTypescriptGeneration extends App {
-        |  println("Hello world from the SBT plugin!")
-        |}""".stripMargin
+    val towrite: String = txt.generateTypescriptApplicationTemplate(imports, typesToGenerate, typescriptOutputFile.getAbsolutePath).body.stripMargin
 
     IO.write(targetFile, towrite)
     Seq(targetFile)
@@ -49,6 +44,6 @@ object TypescriptGenPlugin extends AutoPlugin {
 
   def runTypescriptGeneration: Def.Initialize[Task[Unit]] =
     (runMain in Compile)
-      .toTask(" nl.codestar.scala.ts.output.ApplicationTypescriptGeneration")
+      .toTask(" nl.codestar.scala.ts.generator.ApplicationTypescriptGeneration")
       .dependsOn(generateTypescriptGeneratorApplication in Compile)
 }

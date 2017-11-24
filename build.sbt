@@ -48,6 +48,7 @@ lazy val root = (project in file("."))
   )
 
 lazy val `scala-tsi-sbt` = (project in file("plugin"))
+  .enablePlugins(SbtTwirl)
   .dependsOn(macros, root)
   .settings(
     commonSettings ++ (sbtPlugin := true)
@@ -58,5 +59,4 @@ lazy val dependencies = Seq(
   "com.github.pathikrit" %% "better-files" % "3.1.0",
   "com.github.scopt"     %% "scopt"        % "3.7.0",
   "org.scalatest"        %% "scalatest"    % "3.0.1"     % "test"
-  // format: on
 )
