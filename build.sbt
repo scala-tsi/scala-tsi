@@ -48,8 +48,6 @@ lazy val publishSettings = Seq(
   )
 )
 
-lazy val root = project.aggregate(`scala-tsi`, `sbt-scala-tsi`)
-
 lazy val `scala-tsi-macros` = (project in file("macros"))
   .settings(
     commonSettings,
