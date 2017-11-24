@@ -51,7 +51,9 @@ lazy val `scala-tsi-sbt` = (project in file("plugin"))
     )
 
 lazy val dependencies = Seq(
+  // format: off
   "com.github.pathikrit" %% "better-files" % "3.1.0",
-  "com.github.scopt" %% "scopt"          % "3.7.0",
-  "org.scalatest"    %% "scalatest"      % "3.0.1"            % "test"
+  "com.github.scopt"     %% "scopt"        % "3.7.0",
+  "org.scalatest"        %% "scalatest"    % "3.0.1"     % "test"
+  // format: on
 )
