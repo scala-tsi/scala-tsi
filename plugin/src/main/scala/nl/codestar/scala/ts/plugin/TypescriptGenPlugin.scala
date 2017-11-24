@@ -23,22 +23,23 @@ object TypescriptGenPlugin extends AutoPlugin {
   private val scala_ts_compiler_version = "0.1-SNAPSHOT"
 
   override lazy val projectSettings = Seq(
-    generateTypescript := runTypescriptGeneration.value,
+    // User settings
+    libraryDependencies += "nl.codestar" %% "scala-ts-compiler" % scala_ts_compiler_version,
     typescriptGenerationImports := Seq(),
     typescriptClassesToGenerateFor := Seq(),
-    generateTypescriptGeneratorApplication := createTypescriptGenerationTemplate(typescriptGenerationImports.value, typescriptClassesToGenerateFor.value, sourceManaged.value, typescriptOutputFile.value),
-    sourceGenerators += generateTypescriptGeneratorApplication in Compile,
-    libraryDependencies += "nl.codestar" % "scala-ts-compiler" % scala_ts_compiler_version
+    typescriptOutputFile := target.value / "scala-interfaces.ts",
+    // Task settings
+    generateTypescript := runTypescriptGeneration.value,
+    generateTypescriptGeneratorApplication in Compile := createTypescriptGenerationTemplate(typescriptGenerationImports.value, typescriptClassesToGenerateFor.value, sourceManaged.value, typescriptOutputFile.value),
+    sourceGenerators in Compile += generateTypescriptGeneratorApplication in Compile,
   )
 
   def createTypescriptGenerationTemplate(imports: Seq[String], typesToGenerate: Seq[String], sourceManaged: File, typescriptOutputFile: File): Seq[File] = {
     val targetFile = sourceManaged / "nl" / "codestar" / "scala" / "ts" / "generator" / "ApplicationTypescriptGeneration.scala"
 
-    println(s"Going to write dummy scala file to ${targetFile.absolutePath}")
+    val toWrite: String = txt.generateTypescriptApplicationTemplate(imports, typesToGenerate, typescriptOutputFile.getAbsolutePath).body.stripMargin
 
-    val towrite: String = txt.generateTypescriptApplicationTemplate(imports, typesToGenerate, typescriptOutputFile.getAbsolutePath).body.stripMargin
-
-    IO.write(targetFile, towrite)
+    IO.write(targetFile, toWrite)
     Seq(targetFile)
   }
 

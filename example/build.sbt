@@ -7,15 +7,13 @@ lazy val root = (project in file("."))
       scalaVersion := "2.12.3",
       organization := "nl.codestar",
       scalacOptions ++= compilerOptions,
-      typescriptOutputFile := file("./typescript.ts"),
       typescriptClassesToGenerateFor := Seq("Foo"),
       typescriptGenerationImports := Seq("models._")
       //scalafmtOnCompile in Compile := true,
       //scalafmtTestOnCompile in Compile := true
     ),
     libraryDependencies ++= Seq(
-      "org.clapper" %% "classutil" % "1.1.2",
-      "nl.codestar" %% "scala-ts-compiler" % "0.1-SNAPSHOT"
+      "org.clapper" %% "classutil" % "1.1.2"
     )
   )
 
