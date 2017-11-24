@@ -30,9 +30,9 @@ lazy val commonSettings = Seq(
   //scalafmtTestOnCompile in Compile := true
 )
 
-
 /* Settings to publish to maven central */
 lazy val publishSettings = Seq(
+  // format: off
   publishMavenStyle := true,
   publishTo := Some(if(isSnapshot.value) Opts.resolver.sonatypeSnapshots else Opts.resolver.sonatypeStaging),
   credentials += (sys.env.get("MAVEN_CENTRAL_USER") match {
@@ -46,6 +46,7 @@ lazy val publishSettings = Seq(
     Developer(id="dhoepelman", name="David Hoepelman", email="david.hoepelman@ordina.nl", url=url("https://github.com/dhoepelman")),
     Developer(id="donovan", name="Donovan de Kuiper", email="donovan.de.kuiper@ordina.nl", url=url("https://github.com/Hayena"))
   )
+  // format: on
 )
 
 lazy val `scala-tsi-macros` = (project in file("macros"))
