@@ -23,12 +23,12 @@ lazy val compilerOptions = Seq(
   // Seq("-Ydelambdafy:method", "-Ybackend:GenBCode","-Xsource:2.12", "-Ywarn-unused", "-Ywarn-unused-import")
 
 lazy val commonSettings = Seq(
-  scalaVersion := "2.12.3",
+  scalaVersion := "2.12.4",
   organization := "nl.codestar",
-  scalacOptions ++= compilerOptions
+  scalacOptions ++= compilerOptions,
   // Code formatting
-  //scalafmtOnCompile in Compile := true,
-  //scalafmtTestOnCompile in Compile := true
+  scalafmtOnCompile in Compile := true,
+  scalafmtTestOnCompile in Compile := true
 )
 
 lazy val macros = (project in file("macros"))

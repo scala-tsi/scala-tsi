@@ -13,7 +13,7 @@ jobs:
             - scala-ts-interfaces-1
 
       - run:
-          # TODO: For some reason circleci gets stuck in the shell if we don't add exit to sbt
+          name: Compile
           command:
             sbt compile test:compile exit
 
@@ -34,6 +34,11 @@ jobs:
             - ~/.sbt
             - ~/.ivy2/cache
             - ~/.m2
+
+      - run:
+          name: Check formatting
+          command:
+            sbt scalafmt::test test:scalafmt::test exit
 
       - run:
           command:

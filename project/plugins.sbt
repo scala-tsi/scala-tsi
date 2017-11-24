@@ -1,1 +1,1 @@
-// addSbtPlugin("com.lucidchart" % "sbt-scalafmt" % "1.11")
+addSbtPlugin("com.lucidchart" % "sbt-scalafmt" % "1.14")
