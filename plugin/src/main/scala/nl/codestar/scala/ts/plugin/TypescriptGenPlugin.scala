@@ -19,17 +19,17 @@ object TypescriptGenPlugin extends AutoPlugin {
   // Do we need this?
   //override def `requires`: Plugins = JvmPlugin
 
-  lazy val typescriptSettings: Seq[Def.Setting[_]] =
-    Seq(
-      generateTypescript := runTypescriptGeneration.value,
-      typescriptGenerationImports := Seq(),
-      typescriptClassesToGenerateFor := Seq(),
-      generateTypescriptGeneratorApplication := createTypescriptGenerationTemplate(typescriptGenerationImports.value, typescriptClassesToGenerateFor.value, sourceManaged.value, typescriptOutputFile.value),
-      sourceGenerators += generateTypescriptGeneratorApplication in Compile
-    )
+  // TODO: Automatically get this from the main build.sbt, e.g. with sbt-buildinfo
+  private val scala_ts_compiler_version = "0.1-SNAPSHOT"
 
-  override lazy val projectSettings =
-    inConfig(Compile)(typescriptSettings)
+  override lazy val projectSettings = Seq(
+    generateTypescript := runTypescriptGeneration.value,
+    typescriptGenerationImports := Seq(),
+    typescriptClassesToGenerateFor := Seq(),
+    generateTypescriptGeneratorApplication := createTypescriptGenerationTemplate(typescriptGenerationImports.value, typescriptClassesToGenerateFor.value, sourceManaged.value, typescriptOutputFile.value),
+    sourceGenerators += generateTypescriptGeneratorApplication in Compile,
+    libraryDependencies += "nl.codestar" % "scala-ts-compiler" % scala_ts_compiler_version
+  )
 
   def createTypescriptGenerationTemplate(imports: Seq[String], typesToGenerate: Seq[String], sourceManaged: File, typescriptOutputFile: File): Seq[File] = {
     val targetFile = sourceManaged / "nl" / "codestar" / "scala" / "ts" / "generator" / "ApplicationTypescriptGeneration.scala"
