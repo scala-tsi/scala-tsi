@@ -54,6 +54,7 @@ lazy val `scala-tsi-macros` = (project in file("macros"))
   .settings(
     commonSettings,
     name := "scala-tsi-macros",
+    description := "Macros for scala-tsi",
     libraryDependencies += Def.setting {
       "org.scala-lang" % "scala-reflect" % scalaVersion.value
     }.value
@@ -65,6 +66,7 @@ lazy val `scala-tsi` = (project in file("."))
   .settings(publishSettings)
   .settings(
     name := "scala-tsi",
+    description := "Generate Typescript interfaces from your scala classes",
     libraryDependencies ++= dependencies
   )
 
@@ -74,6 +76,7 @@ lazy val `sbt-scala-tsi` = (project in file("plugin"))
   .settings(publishSettings)
   .settings(
     name := "sbt-scala-tsi",
+    description := "SBT plugin to generate Typescript interfaces from your scala classes as part of your build",
     sbtPlugin := true
   )
 
