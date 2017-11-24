@@ -10,7 +10,7 @@ package object dsl {
   implicit class TypescriptTypeDSL(val t: TypescriptType) extends AnyVal {
     def |(tt: TypescriptType): TSUnion = t match {
       case TSUnion(of) => TSUnion(of :+ tt)
-      case _ => TSUnion.of(t, tt)
+      case _           => TSUnion.of(t, tt)
     }
 
     def array: TSArray = TSArray(t)

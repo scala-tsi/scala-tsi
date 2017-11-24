@@ -24,7 +24,7 @@ trait TSType[T] { self =>
   def get: TypescriptType
   override def equals(obj: scala.Any): Boolean = obj match {
     case o: TSType[_] => get == o.get
-    case _ => false
+    case _            => false
   }
   override def hashCode(): Int = get.hashCode()
   override def toString: String = s"TSType($get)"
@@ -59,8 +59,7 @@ object TSNamedType {
     TypescriptType.fromString(s) match {
       case t: TSExternalName => TSNamedType(t)
       case t =>
-        throw new IllegalArgumentException(
-          s"String $s is a predefined type $t")
+        throw new IllegalArgumentException(s"String $s is a predefined type $t")
     }
 }
 
@@ -72,8 +71,7 @@ trait TSIType[T] extends TSNamedType[T] { self =>
 }
 
 object TSIType {
-  private class TSITypeImpl[T](override val get: TSInterface)
-      extends TSIType[T]
+  private class TSITypeImpl[T](override val get: TSInterface) extends TSIType[T]
   def apply[T](tt: TSInterface): TSIType[T] = new TSITypeImpl(tt)
 
   // TODO: Put here or on TSType?

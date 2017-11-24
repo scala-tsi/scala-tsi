@@ -9,15 +9,15 @@ sealed trait TypescriptType
 object TypescriptType {
   private[interface] def fromString(tpe: String): TypescriptType =
     tpe match {
-      case "any" => TSAny
-      case "boolean" => TSBoolean
-      case "never" => TSNever
-      case "null" => TSNull
-      case "number" => TSNumber
-      case "string" => TSString
+      case "any"       => TSAny
+      case "boolean"   => TSBoolean
+      case "never"     => TSNever
+      case "null"      => TSNull
+      case "number"    => TSNumber
+      case "string"    => TSString
       case "undefined" => TSUndefined
-      case "void" => TSVoid
-      case _ => TSExternalName(tpe)
+      case "void"      => TSVoid
+      case _           => TSExternalName(tpe)
     }
 
   /** A marker trait for a TS type that has a name */
@@ -77,8 +77,7 @@ object TypescriptType {
       s"TypeScript indexed interface $name can only have index type string or number, not $indexType")
     def nested = Set(indexType, valueType)
   }
-  case class TSInterface(name: String,
-                         members: ListMap[String, TypescriptType])
+  case class TSInterface(name: String, members: ListMap[String, TypescriptType])
       extends TypescriptNamedType
       with TypescriptAggregateType {
     def nested = members.values.toSet
@@ -109,8 +108,7 @@ object TypescriptType {
   private val tsIdentifierPattern = Pattern.compile(
     "[_$\\p{L}\\p{Nl}][_$\\p{L}\\p{Nl}\\p{Nd}\\{Mn}\\{Mc}\\{Pc}]*")
   private[interface] def isValidTSName(name: String): Boolean =
-    tsIdentifierPattern.matcher(name).find() && !reservedKeywords.contains(
-      name)
+    tsIdentifierPattern.matcher(name).find() && !reservedKeywords.contains(name)
 
   private[interface] final val reservedKeywords: Set[String] = Set(
     "break",

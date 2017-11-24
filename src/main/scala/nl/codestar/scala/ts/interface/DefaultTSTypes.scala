@@ -24,8 +24,8 @@ object PrimitiveTSTypes extends PrimitiveTSTypes
 
 trait GenericTSTypes {
   // All scala collection types implement Traversable and are almost always translated to javascript arrays
-  implicit def tsTraversable[E](
-      implicit e: TSType[E]): TSType[Traversable[E]] = TSType(TSArray(e.get))
+  implicit def tsTraversable[E](implicit e: TSType[E]): TSType[Traversable[E]] =
+    TSType(TSArray(e.get))
   // This chooses null union to represent Option types.
   // When defining interfaces however Option will be represented with undefined union
   implicit def tsOption[E](implicit e: TSType[E]): TSType[Option[E]] =
