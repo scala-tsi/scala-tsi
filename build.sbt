@@ -28,8 +28,8 @@ lazy val commonSettings = Seq(
   organization := "nl.codestar",
   scalacOptions ++= compilerOptions,
   // Code formatting
-  scalafmtOnCompile in Compile := true,
-  scalafmtTestOnCompile in Compile := true
+  //scalafmtOnCompile in Compile := true,
+  //scalafmtTestOnCompile in Compile := true
 )
 
 lazy val macros = (project in file("macros"))
