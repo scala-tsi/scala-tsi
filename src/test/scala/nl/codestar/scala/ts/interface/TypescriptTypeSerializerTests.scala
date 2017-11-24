@@ -26,7 +26,7 @@ class TypescriptTypeSerializerTests
 
     ignoreUnused(Person("", 0))
 
-    implicit val personTsWrites: TSIType[Person] = TSIType.fromCaseClass
+    implicit val personTsWrites: TSIType[Person] = TSType.fromCaseClass
 
     val typescript = TypescriptTypeSerializer.emit[Person]
 
@@ -43,10 +43,8 @@ class TypescriptTypeSerializerTests
     ignoreUnused(ComplexCaseClass(null))
     ignoreUnused(NestedCaseClass(null))
 
-    implicit val nestedCaseClassTSType: TSIType[NestedCaseClass] =
-      TSIType.fromCaseClass
-    implicit val complexCaseClassTSType: TSIType[ComplexCaseClass] =
-      TSIType.fromCaseClass
+    implicit val nestedCaseClassTSType: TSIType[NestedCaseClass] = TSType.fromCaseClass
+    implicit val complexCaseClassTSType: TSIType[ComplexCaseClass] = TSType.fromCaseClass
 
     val typescript = TypescriptTypeSerializer.emit[ComplexCaseClass]
 
@@ -64,8 +62,7 @@ class TypescriptTypeSerializerTests
 
     ignoreUnused(OptionCaseClass(null))
 
-    implicit val optionCaseClassTSType: TSIType[OptionCaseClass] =
-      TSIType.fromCaseClass
+    implicit val optionCaseClassTSType: TSIType[OptionCaseClass] = TSType.fromCaseClass
 
     val typescript = TypescriptTypeSerializer.emit[OptionCaseClass]
 
@@ -82,8 +79,8 @@ class TypescriptTypeSerializerTests
     ignoreUnused(B(null))
 
     implicit val tsA: TSType[A] = "IA"
-    implicit val tsB: TSIType[B] = TSIType.fromCaseClass
-    val tsAGenerated: TSIType[A] = TSIType.fromCaseClass
+    implicit val tsB: TSIType[B] = TSType.fromCaseClass
+    val tsAGenerated: TSIType[A] = TSType.fromCaseClass
 
     TypescriptTypeSerializer
       .emit(tsAGenerated)
@@ -113,8 +110,7 @@ class TypescriptTypeSerializerTests
 
     ignoreUnused(PrimitiveTypes(0, "", 1, 1, 1, 1, 1, 1, true, Seq.empty))
 
-    implicit val primitiveTypesTSType: TSIType[PrimitiveTypes] =
-      TSIType.fromCaseClass
+    implicit val primitiveTypesTSType: TSIType[PrimitiveTypes] = TSType.fromCaseClass
 
     val typescript = TypescriptTypeSerializer.emit[PrimitiveTypes]
 
@@ -139,7 +135,7 @@ class TypescriptTypeSerializerTests
 
     ignoreUnused(Something())
 
-    implicit val somethingTSType: TSIType[Something] = TSIType.fromCaseClass
+    implicit val somethingTSType: TSIType[Something] = TSType.fromCaseClass
 
     val typescript = TypescriptTypeSerializer.emit[Something]
 
@@ -156,7 +152,7 @@ class TypescriptTypeSerializerTests
     ignoreUnused(Something())
 
     implicit val somethingTSType: TSNamedType[Something] =
-      tsInterfaceIndexed(name = "ISomething",
+      TSType.interfaceIndexed(name = "ISomething",
                          indexName = "as",
                          indexType = TSString,
                          valueType = TSString)
