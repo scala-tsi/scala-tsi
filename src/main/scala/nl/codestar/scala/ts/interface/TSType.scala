@@ -3,6 +3,8 @@ package nl.codestar.scala.ts.interface
 import scala.annotation.implicitNotFound
 import TypescriptType._
 
+import scala.collection.immutable.ListMap
+
 /* TODO: Move this somewhere to the docs
  * To define an implicit TSType[T]:
 1. If the type maps directly to another type Other, use
@@ -30,6 +32,67 @@ trait TSType[T] { self =>
   override def toString: String = s"TSType($get)"
 }
 
+object TSType {
+  private class TSTypeImpl[T](override val get: TypescriptType)
+      extends TSType[T]
+  def apply[T](tt: TypescriptType): TSType[T] = new TSTypeImpl(tt)
+
+  /** Generate a typescript interface for a case class */
+  def fromCaseClass[T]: TSIType[T] = macro Macros.generateInterface[T]
+
+  /** Create a Typescript alias "T" for type T, with the definition of Alias
+    * @example alias[Foo, String] will generate typescript `type Foo = string`
+    */
+  def alias[T, Alias](implicit tsType: TSType[Alias],
+                      ct: Manifest[T]): TSNamedType[T] =
+    alias[T, Alias](ct.runtimeClass.getSimpleName)
+
+  /** Create a Typescript alias "name" for type T, with the definition of Alias
+    * @example alias[Foo, String]("IFoo") will generate typescript `type IFoo = string`
+    */
+  def alias[T, Alias](name: String)(
+      implicit tsType: TSType[Alias]): TSNamedType[T] =
+    alias(name, tsType.get)
+
+  /** Create a Typescript alias "name" for type T, with the definition of tsType
+    * @example alias[Foo]("IFoo", TSString) will generate typescript `type IFoo = string`
+    */
+  def alias[T](name: String, tsType: TypescriptType): TSNamedType[T] =
+    TSNamedType(TSAlias(name, tsType))
+
+  /** Create "name" as the typescript type for T, with "name" being defined elsewhere
+    * external[Foo]("IXyz") will use "IXyz" as the typescript type every time something contains a Foo
+    */
+  def external[T](name: String): TSNamedType[T] =
+    TypescriptType.fromString(name) match {
+      case t: TSExternalName => TSNamedType(t)
+      case t =>
+        throw new IllegalArgumentException(
+          s"String $name is a predefined type $t")
+    }
+
+  /** Create an interface "name" for T
+    * @example interface[Foo]("MyFoo", "bar" -> TSString) will output "interface MyFoo { bar: string }" */
+  def interface[T](name: String,
+                   members: (String, TypescriptType)*): TSIType[T] =
+    TSIType(TSInterface(name, ListMap(members: _*)))
+
+  /** Create an interface "IClassname" for T
+    * @example interface[Foo]("bar" -> TSString) will output "interface IFoo { bar: string }" */
+  def interface[T](members: (String, TypescriptType)*)(
+      implicit ct: Manifest[T]): TSIType[T] =
+    interface[T]("I" + ct.runtimeClass.getSimpleName, members: _*)
+
+  /** Create an indexed interface for T
+    * @example interfaceIndexed[Foo]("IFooLookup", "key", TSString, TSInt) will output "interface IFooLookup { [key: string] : Int }"
+    */
+  def interfaceIndexed[T](name: String,
+                          indexName: String = "key",
+                          indexType: TypescriptType = TSString,
+                          valueType: TypescriptType): TSNamedType[T] =
+    TSNamedType(TSInterfaceIndexed(name, indexName, indexType, valueType))
+}
+
 @implicitNotFound(
   "Could not find an implicit TSNamedType[${T}] in scope. Make sure you created and imported a named typescript mapping for the type.")
 trait TSNamedType[T] extends TSType[T] { self =>
@@ -37,30 +100,11 @@ trait TSNamedType[T] extends TSType[T] { self =>
   override def toString: String = s"TSNamedType($get)"
 }
 
-object TSType {
-  private class TSTypeImpl[T](override val get: TypescriptType)
-      extends TSType[T]
-  def apply[T](tt: TypescriptType): TSType[T] = new TSTypeImpl(tt)
-
-  def sameAs[Target, Source](
-      implicit sourceType: TSType[Source]): TSType[Target] =
-    TSType(sourceType.get)
-
-  def fromCaseClass[T]: TSIType[T] = macro Macros.generateInterface[T]
-}
-
 object TSNamedType {
   private class TSNamedTypeImpl[T](override val get: TypescriptNamedType)
       extends TSNamedType[T]
   def apply[T](tt: TypescriptNamedType): TSNamedType[T] =
     new TSNamedTypeImpl(tt)
-
-  def fromString[T](s: String): TSNamedType[T] =
-    TypescriptType.fromString(s) match {
-      case t: TSExternalName => TSNamedType(t)
-      case t =>
-        throw new IllegalArgumentException(s"String $s is a predefined type $t")
-    }
 }
 
 @implicitNotFound(
@@ -73,8 +117,4 @@ trait TSIType[T] extends TSNamedType[T] { self =>
 object TSIType {
   private class TSITypeImpl[T](override val get: TSInterface) extends TSIType[T]
   def apply[T](tt: TSInterface): TSIType[T] = new TSITypeImpl(tt)
-
-  // TODO: Put here or on TSType?
-  def fromCaseClass[T]: TSIType[T] = macro Macros.generateInterface[T]
-
 }

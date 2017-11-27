@@ -2,7 +2,6 @@ package nl.codestar.scala.ts.interface
 
 import org.scalatest.{FlatSpec, Matchers}
 import nl.codestar.scala.ts.interface.TypescriptType._
-import nl.codestar.scala.ts.interface.dsl._
 
 case class Person(name: String, age: Int)
 
@@ -13,15 +12,15 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
   "The case class to TypeScript type macro" should "be able to translate a simple case class" in {
     case class Person(name: String, age: Int)
     ignoreUnused(Person("", 1))
-    TSIType.fromCaseClass[Person] shouldBe tsInterface("IPerson",
-                                                       "name" -> TSString,
-                                                       "age" -> TSNumber)
+    TSType.fromCaseClass[Person] shouldBe TSType.interface("IPerson",
+                                                           "name" -> TSString,
+                                                           "age" -> TSNumber)
   }
 
   it should "handle optional types" in {
     case class TestOptional(opt: Option[Long])
     ignoreUnused(TestOptional(None))
-    TSIType.fromCaseClass[TestOptional] shouldBe tsInterface(
+    TSType.fromCaseClass[TestOptional] shouldBe TSType.interface(
       "ITestOptional",
       "opt" -> TSUnion.of(TSNumber, TSUndefined))
   }
@@ -32,9 +31,9 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
 
     ignoreUnused(B(A(false)))
 
-    implicit val tsA: TSIType[A] = TSIType.fromCaseClass
+    implicit val tsA: TSIType[A] = TSType.fromCaseClass
 
-    TSIType.fromCaseClass[B] shouldBe tsInterface("IB", "a" -> tsA.get)
+    TSType.fromCaseClass[B] shouldBe TSType.interface("IB", "a" -> tsA.get)
   }
 
   it should "not compile if a nested definition is missing" in {
