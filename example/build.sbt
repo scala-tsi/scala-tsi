@@ -21,7 +21,8 @@ lazy val compilerOptions = Seq(
   "-feature",
   "-deprecation",
   "-Xlint",
-  "-encoding", "UTF8",
+  "-encoding",
+  "UTF8",
   "-target:jvm-1.8",
   "-Xfuture",
   "-Yno-adapted-args",
@@ -30,6 +31,3 @@ lazy val compilerOptions = Seq(
   "-Ywarn-dead-code",
   "-language:experimental.macros"
 )
-
-
-
