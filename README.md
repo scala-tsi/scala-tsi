@@ -24,7 +24,7 @@ lazy val root = (project in file("."))
       typescriptClassesToGenerateFor := Seq("MyClass"),
       // Make sure this also imports your own TSType[_] implicits
       typescriptGenerationImports := Seq("mymodel._"),
-      typescriptOutputFile := "model.ts"
+      typescriptOutputFile := baseDirectory.value / "model.ts"
     )
 ```
 
@@ -85,11 +85,11 @@ lazy val root = (project in file("."))
   .settings(
     typescriptClassesToGenerateFor := Seq("Person"),
     typescriptGenerationImports := Seq("myproject._", "MyModelTSTypes._"),
-    typescriptOutputFile := "model.ts"
+    typescriptOutputFile := baseDirectory.value / "model.ts"
   )
 ```
 
-this will generate a file `model.ts`:
+this will generate in your project root a `model.ts`:
 ```
 interface IPerson {
   name: string,
