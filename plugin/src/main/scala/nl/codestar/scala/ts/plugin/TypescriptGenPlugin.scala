@@ -26,11 +26,11 @@ object TypescriptGenPlugin extends AutoPlugin {
   //override def `requires`: Plugins = JvmPlugin
 
   // TODO: Automatically get this from the main build.sbt, e.g. with sbt-buildinfo
-  private val scala_ts_compiler_version = "0.1-SNAPSHOT"
+  private val scala_ts_compiler_version = "0.1.0-SNAPSHOT"
 
   override lazy val projectSettings = Seq(
     // User settings
-    libraryDependencies += "nl.codestar" %% "scala-ts-compiler" % scala_ts_compiler_version,
+    libraryDependencies += "nl.codestar" %% "scala-tsi" % scala_ts_compiler_version,
     typescriptGenerationImports := Seq(),
     typescriptClassesToGenerateFor := Seq(),
     typescriptOutputFile := target.value / "scala-interfaces.ts",
