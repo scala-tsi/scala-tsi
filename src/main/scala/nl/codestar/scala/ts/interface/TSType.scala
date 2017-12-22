@@ -44,7 +44,8 @@ object TSType {
     * Will not generate a `type Source = Target` line like alias
     * @see alias
     **/
-  def of[Source, Target](implicit tsType: TSType[Target]): TSType[Source] = TSType(tsType.get)
+  def of[Source, Target](implicit tsType: TSType[Target]): TSType[Source] =
+    TSType(tsType.get)
 
   /** Create a Typescript alias "T" for type T, with the definition of Alias
     * @example alias[Foo, String] will generate typescript `type Foo = string`

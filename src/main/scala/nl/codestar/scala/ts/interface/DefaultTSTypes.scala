@@ -25,7 +25,8 @@ trait CollectionTSTypes {
   implicit def tsOption[E](implicit e: TSType[E]): TSType[Option[E]] =
     TSType(TSUnion.of(e.get, TSNull))
 
-  implicit def tsEither[L,R](implicit tsLeft: TSType[L], tsRight: TSType[R]): TSType[Either[L,R]] =
+  implicit def tsEither[L, R](implicit tsLeft: TSType[L],
+                              tsRight: TSType[R]): TSType[Either[L, R]] =
     TSType(TSUnion.of(tsLeft.get, tsRight.get))
 
   implicit def tsStringMap[E](implicit e: TSType[E]): TSType[Map[String, E]] =
