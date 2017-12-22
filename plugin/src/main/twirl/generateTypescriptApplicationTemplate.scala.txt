@@ -4,7 +4,6 @@ package nl.codestar.scala.ts.generator
 
 import _root_.nl.codestar.scala.ts.interface.TSNamedType
 import _root_.nl.codestar.scala.ts.interface.TypescriptType.TypescriptNamedType
-import _root_.nl.codestar.scala.ts.interface.DefaultTSTypes
 import _root_.java.io.File
 
 /** User imports */
@@ -13,7 +12,6 @@ import @imp
 }
 
 object ApplicationTypescriptGeneration {
-  import DefaultTSTypes._
 
   // If you get a implicit not found error here, make sure you have defined a TSType[T] implicit and imported it
   val toOutput: Seq[TypescriptNamedType] = Seq(
