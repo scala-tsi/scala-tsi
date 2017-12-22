@@ -42,14 +42,14 @@ jobs:
 
       - run:
           command:
-            sbt test scala-tsi-macros/test exit
+            sbt test scala-tsi-macros/test sbt-scala-tsi/publishLocal exit
 
       - store_test_results:
           path: target/test-reports
 
       - run:
           command:
-            sbt publishLocal scala-tsi-macros/publishLocal
+            sbt publishLocal scala-tsi-macros/publishLocal sbt-scala-tsi/publishLocal
 
       - run:
           command: |
