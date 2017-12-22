@@ -6,8 +6,7 @@ trait DefaultTSTypes
     extends PrimitiveTSTypes
     with CollectionTSTypes
     with TupleTSTypes
-    with JavaTSTypes {
-}
+    with JavaTSTypes {}
 object DefaultTSTypes extends DefaultTSTypes
 
 trait PrimitiveTSTypes {
@@ -18,8 +17,8 @@ trait PrimitiveTSTypes {
 object PrimitiveTSTypes extends PrimitiveTSTypes
 
 trait CollectionTSTypes {
-  implicit def tsSeq[E : TSType]: TSType[scala.collection.Seq[E]] = tsTraversable
-  implicit def tsSet[E : TSType]: TSType[scala.collection.Set[E]] = tsTraversable
+  implicit def tsSeq[E: TSType]: TSType[scala.collection.Seq[E]] = tsTraversable
+  implicit def tsSet[E: TSType]: TSType[scala.collection.Set[E]] = tsTraversable
 
   // This chooses null union to represent Option types.
   // When defining interfaces however Option will be represented with undefined union
@@ -32,7 +31,8 @@ trait CollectionTSTypes {
   implicit def tsIntMap[E](implicit e: TSType[E]): TSType[Map[Int, E]] =
     TSType(TSIndexedInterface(indexType = TSNumber, valueType = e.get))
 
-  def tsTraversable[E, CC <: Traversable[E]](implicit e: TSType[E]): TSType[CC] =
+  def tsTraversable[E, CC <: Traversable[E]](
+      implicit e: TSType[E]): TSType[CC] =
     TSType(TSArray(e.get))
 }
 

@@ -108,7 +108,8 @@ object TypescriptType {
   private val tsIdentifierPattern = Pattern.compile(
     "[_$\\p{L}\\p{Nl}][_$\\p{L}\\p{Nl}\\p{Nd}\\{Mn}\\{Mc}\\{Pc}]*")
   private[interface] def isValidTSName(name: String): Boolean =
-    tsIdentifierPattern.matcher(name).matches() && !reservedKeywords.contains(name)
+    tsIdentifierPattern.matcher(name).matches() && !reservedKeywords.contains(
+      name)
 
   private[interface] final val reservedKeywords: Set[String] = Set(
     "break",

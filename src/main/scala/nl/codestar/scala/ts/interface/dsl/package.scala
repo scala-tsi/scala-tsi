@@ -37,7 +37,8 @@ package object dsl {
   implicit class TSInterfaceDSL(val interface: TSInterface) extends AnyVal {
     def +(member: (String, TypescriptType)): TSInterface =
       interface.copy(members = interface.members + member)
-    def ++(newMembers: GenTraversableOnce[(String, TypescriptType)]): TSInterface =
+    def ++(
+        newMembers: GenTraversableOnce[(String, TypescriptType)]): TSInterface =
       interface.copy(members = interface.members ++ newMembers)
     def -(member: String): TSInterface =
       interface.copy(members = interface.members - member)
@@ -51,6 +52,7 @@ package object dsl {
     def ++(newMembers: Seq[(String, TypescriptType)]): TSIType[T] =
       TSIType(tsiType.get ++ newMembers)
     def -(member: String): TSIType[T] = TSIType(tsiType.get - member)
-    def --(members: GenTraversableOnce[String]): TSIType[T] = TSIType(tsiType.get -- members)
+    def --(members: GenTraversableOnce[String]): TSIType[T] =
+      TSIType(tsiType.get -- members)
   }
 }
