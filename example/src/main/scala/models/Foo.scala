@@ -1,6 +1,6 @@
 package models
 
-import nl.codestar.scala.ts.interface.{ DefaultTSTypes, TSType }
+import nl.codestar.scala.ts.interface.{DefaultTSTypes, TSType}
 import nl.codestar.scala.ts.interface.TypescriptType._
 
 case class Foo(bar: Bar, bool: Boolean, num: Option[Int], baz: Option[Baz])
