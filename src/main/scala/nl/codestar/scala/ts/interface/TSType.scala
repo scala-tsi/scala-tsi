@@ -40,8 +40,12 @@ object TSType {
   /** Generate a typescript interface for a case class */
   def fromCaseClass[T]: TSIType[T] = macro Macros.generateInterface[T]
 
+  /** Creates a */
+  def of[T, Target](implicit tsType: TSType[Target]): TSType[T] = TSType(tsType.get)
+
   /** Create a Typescript alias "T" for type T, with the definition of Alias
     * @example alias[Foo, String] will generate typescript `type Foo = string`
+    * @see TSType.of
     */
   def alias[T, Alias](implicit tsType: TSType[Alias],
                       ct: Manifest[T]): TSNamedType[T] =
