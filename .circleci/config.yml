@@ -15,7 +15,7 @@ jobs:
       - run:
           name: Compile
           command:
-            sbt compile test:compile exit
+            sbt compile test:compile scala-tsi-macros/compile scala-tsi-macros/test:compile exit
 
       - save_cache:
           key: scala-ts-interfaces-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
@@ -42,7 +42,19 @@ jobs:
 
       - run:
           command:
-            sbt test exit
+            sbt test scala-tsi-macros/test exit
 
       - store_test_results:
           path: target/test-reports
+
+      - run:
+          command:
+            sbt publishLocal scala-tsi-macros/publishLocal
+
+      - run:
+          command: |
+            cd example
+            sbt test
+
+      - store_test_results:
+          path: example/target/test-reports
