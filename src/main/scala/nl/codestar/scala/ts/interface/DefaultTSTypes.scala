@@ -4,15 +4,9 @@ import nl.codestar.scala.ts.interface.TypescriptType._
 
 trait DefaultTSTypes
     extends PrimitiveTSTypes
-    with GenericTSTypes
+    with CollectionTSTypes
     with TupleTSTypes
-    with JavaTSTypes {
-
-  implicit def seqTsType[E](implicit e: TSType[E]): TSType[Seq[E]] =
-    TSType(TSArray(e.get))
-  implicit def optionTsType[E](implicit e: TSType[E]): TSType[Option[E]] =
-    TSType(TSUnion.of(e.get, TSUndefined))
-}
+    with JavaTSTypes {}
 object DefaultTSTypes extends DefaultTSTypes
 
 trait PrimitiveTSTypes {
@@ -22,17 +16,24 @@ trait PrimitiveTSTypes {
 }
 object PrimitiveTSTypes extends PrimitiveTSTypes
 
-trait GenericTSTypes {
-  // All scala collection types implement Traversable and are almost always translated to javascript arrays
-  implicit def tsTraversable[E](implicit e: TSType[E]): TSType[Traversable[E]] =
-    TSType(TSArray(e.get))
+trait CollectionTSTypes {
+  implicit def tsSeq[E: TSType]: TSType[scala.collection.Seq[E]] = tsTraversable
+  implicit def tsSet[E: TSType]: TSType[scala.collection.Set[E]] = tsTraversable
+
   // This chooses null union to represent Option types.
   // When defining interfaces however Option will be represented with undefined union
   implicit def tsOption[E](implicit e: TSType[E]): TSType[Option[E]] =
     TSType(TSUnion.of(e.get, TSNull))
 
-  implicit def tsMap[E](implicit e: TSType[E]): TSType[Map[String, E]] =
+  implicit def tsStringMap[E](implicit e: TSType[E]): TSType[Map[String, E]] =
     TSType(TSIndexedInterface(indexType = TSString, valueType = e.get))
+
+  implicit def tsIntMap[E](implicit e: TSType[E]): TSType[Map[Int, E]] =
+    TSType(TSIndexedInterface(indexType = TSNumber, valueType = e.get))
+
+  def tsTraversable[E, CC <: Traversable[E]](
+      implicit e: TSType[E]): TSType[CC] =
+    TSType(TSArray(e.get))
 }
 
 trait JavaTSTypes {
