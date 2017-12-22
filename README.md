@@ -1,6 +1,29 @@
-# Scala-TS-interfaces
+# Scala-TSI
 
-Project to automatically generate TypeScript from your Scala domain model.
+[![Maven Central](https://img.shields.io/maven-central/v/nl.codestart/scala-tsi.svg)](https://mvnrepository.com/artifact/nl.codestar/scala-tsi)
+[![CircleCI](https://img.shields.io/circleci/project/github/code-star/scala-tsi.svg)](https://circleci.com/gh/code-star/scala-tsi/)
+
+Scala TSI can automatically generate Typescript Interfaces from your Scala classes.
+
+## Installation
+
+To use the project add the SBT plugin dependency in `project/plugins.sbt`:
+
+```scala
+addSbtPlugin("nl.codestar" % "sbt-scala-tsi" % "0.1")
+```
+
+And enable the plugin on projects using:
+
+```scala
+// Replace with your project definition
+lazy val root = (project in file("."))
+    // This enables the plugin on your project
+    .enablePlugins(TypescriptGenPlugin)
+```
+
+## Configuration
+
 
 ## Example
 Consider this domain model:
