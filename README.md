@@ -69,9 +69,8 @@ import nl.codestar.scala.ts.interface._
 object MyModelTSTypes extends DefaultTSTypes {
  
   // TSType.tsAlias[X, Y] will add a `type X = Y` line to the generated typescript
+  // Alternatively, TSType.transparent[X, Y] will always replace X with the typescript type of Y in the generated typescript
   implicit val tsEmail = TSType.tsAlias[Email, String]("Email")
-  // Alternatively, TSType.of[X, Y] will always replace X with the typescript type of Y in the generated typescript
-  // implicit val tsEmail = TSType.of[Email, String]
   
   // TSType.fromCaseClass will convert your case class to a typescript definition
   implicit val tsPerson = TSType.fromCaseClass[Person]
