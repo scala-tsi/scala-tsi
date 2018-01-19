@@ -105,6 +105,28 @@ object TypescriptType {
   }
   case object TSVoid extends TypescriptType
 
+  sealed trait TSLiteral[T] extends TypescriptNamedType {
+    val name: String
+    val members: Seq[T]
+  }
+
+  case class TSLiteralString(name: String, members: Seq[String])
+      extends TSLiteral[String]
+  case class TSLiteralNumber[T: Numeric](name: String, members: Seq[T])
+      extends TSLiteral[T]
+
+  object TSLiteral {
+    def apply(name: String, members: Seq[String]) =
+      TSLiteralString(name, members)
+    def apply[T: Numeric](name: String, members: Seq[T]) =
+      TSLiteralNumber(name, members)
+
+    def of(name: String, members: String*) =
+      TSLiteralString(name, members)
+    def of[T: Numeric](name: String, members: T*) =
+      TSLiteralNumber(name, members)
+  }
+
   private val tsIdentifierPattern = Pattern.compile(
     "[_$\\p{L}\\p{Nl}][_$\\p{L}\\p{Nl}\\p{Nd}\\{Mn}\\{Mc}\\{Pc}]*")
   private[interface] def isValidTSName(name: String): Boolean =

@@ -1,6 +1,6 @@
 package nl.codestar.scala.ts.interface
 
-import nl.codestar.scala.ts.interface.TypescriptType.TSString
+import nl.codestar.scala.ts.interface.TypescriptType.{TSLiteral, TSString}
 import org.scalatest.{FlatSpec, Matchers}
 import nl.codestar.scala.ts.interface.dsl._
 
@@ -166,5 +166,47 @@ class TypescriptTypeSerializerTests
     typescript.trim should equal("""interface ISomething {
         |  [ as: string ]: string
         |}""".stripMargin)(after being whiteSpaceNormalised)
+  }
+
+  it should "be able to handle string literal types" in {
+    abstract class Value(val name: String)
+
+    object Value {
+      def entries: Seq[Value] = Seq(
+        Value1,
+        Value2
+      )
+
+      case object Value1 extends Value("value-1")
+      case object Value2 extends Value("value-2")
+    }
+
+    implicit val valueTSType: TSNamedType[Value] =
+      TSNamedType(TSLiteral("value", Value.entries.map(_.name)))
+
+    val typescript = TypescriptTypeSerializer.emit[Value]
+
+    typescript should equal("""type value = "value-1" | "value-2"""")
+  }
+
+  it should "be able to handle numeric literal types" in {
+    abstract class Value(val name: Int)
+
+    object Value {
+      def entries: Seq[Value] = Seq(
+        Value1,
+        Value2
+      )
+
+      case object Value1 extends Value(1)
+      case object Value2 extends Value(2)
+    }
+
+    implicit val valueTSType: TSNamedType[Value] =
+      TSNamedType(TSLiteral("value", Value.entries.map(_.name)))
+
+    val typescript = TypescriptTypeSerializer.emit[Value]
+
+    typescript should equal("""type value = 1 | 2""")
   }
 }
