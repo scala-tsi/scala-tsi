@@ -82,6 +82,11 @@ object TypescriptTypeSerializer {
          |${mbs.mkString("\n")}
          |}
        """.stripMargin
+
+    case TSLiteralString(name, members) =>
+      s"""type $name = ${members.map(s => s""""$s"""") mkString " | "}"""
+    case TSLiteralNumber(name, members) =>
+      s"""type $name = ${members mkString " | "}"""
   }
 
   // TODO: Optimize, Memoize or something, tail rec etc
