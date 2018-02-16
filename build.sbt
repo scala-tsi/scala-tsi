@@ -23,7 +23,7 @@ lazy val compilerOptions = Seq(
 lazy val commonSettings = Seq(
   scalaVersion := "2.12.4",
   organization := "nl.codestar",
-  version := "0.1.0-SNAPSHOT",
+  version := "0.1.1-SNAPSHOT",
   scalacOptions ++= compilerOptions
   // Code formatting
   //scalafmtOnCompile in Compile := true,
@@ -39,9 +39,9 @@ lazy val publishSettings = Seq(
     case Some(user) => Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, sys.env("MAVEN_CENTRAL_PASSWORD"))
     case None => Credentials(Path.userHome / ".ivy2" / ".nl-codestar-maven-central-credentials")
   }),
-  licenses := Seq("MIT" -> url("https://github.com/code-star/scala-ts-interfaces/blob/master/LICENSE")),
-  homepage := Some(url("https://github.com/code-star/scala-ts-interfaces/")),
-  scmInfo := Some(ScmInfo(url("https://github.com/code-star/scala-ts-interfaces"), "scm:git@github.com:code-star/scala-ts-interfaces.git")),
+  licenses := Seq("MIT" -> url("https://github.com/code-star/scala-tsi/blob/master/LICENSE")),
+  homepage := Some(url("https://github.com/code-star/scala-tsi")),
+  scmInfo := Some(ScmInfo(url("https://github.com/code-star/scala-tsi"), "scm:git@github.com:code-star/scala-tsi.git")),
   developers := List(
     Developer(id="dhoepelman", name="David Hoepelman", email="david.hoepelman@ordina.nl", url=url("https://github.com/dhoepelman")),
     Developer(id="donovan", name="Donovan de Kuiper", email="donovan.de.kuiper@ordina.nl", url=url("https://github.com/Hayena"))
@@ -70,13 +70,15 @@ lazy val `scala-tsi` = (project in file("."))
   )
 
 lazy val `sbt-scala-tsi` = (project in file("plugin"))
-  .enablePlugins(SbtTwirl)
+  .enablePlugins(SbtTwirl, BuildInfoPlugin)
   .settings(commonSettings)
   .settings(publishSettings)
   .settings(
     name := "sbt-scala-tsi",
     description := "SBT plugin to generate Typescript interfaces from your scala classes as part of your build",
-    sbtPlugin := true
+    sbtPlugin := true,
+    buildInfoKeys := Seq[BuildInfoKey](version),
+    buildInfoPackage := "sbt.info"
   )
 
 lazy val dependencies = Seq(

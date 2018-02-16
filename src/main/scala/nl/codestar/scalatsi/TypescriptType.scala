@@ -1,13 +1,21 @@
-package nl.codestar.scala.ts.interface
+package nl.codestar.scalatsi
 
 import java.util.regex.Pattern
 
 import scala.collection.immutable.ListMap
+import TypescriptType._
 
-sealed trait TypescriptType
+sealed trait TypescriptType {
+  def |(tt: TypescriptType): TSUnion = this match {
+    case TSUnion(of) => TSUnion(of :+ tt)
+    case _           => TSUnion.of(this, tt)
+  }
+
+  def array: TSArray = TSArray(this)
+}
 
 object TypescriptType {
-  private[interface] def fromString(tpe: String): TypescriptType =
+  private[scalatsi] def fromString(tpe: String): TypescriptType =
     tpe match {
       case "any"       => TSAny
       case "boolean"   => TSBoolean
@@ -39,10 +47,20 @@ object TypescriptType {
 
   case class TSAlias(name: String, underlying: TypescriptType)
       extends TypescriptNamedType
+      with TypescriptAggregateType {
+    override def nested = Set(underlying)
+  }
   case object TSAny extends TypescriptType
   case class TSArray(elementType: TypescriptType)
       extends TypescriptAggregateType { def nested = Set(elementType) }
   case object TSBoolean extends TypescriptType
+
+  sealed trait TSLiteralType[T] extends TypescriptType { val value: T }
+  case class TSLiteralString(value: String) extends TSLiteralType[String]
+  case class TSLiteralNumber(value: BigDecimal)
+      extends TSLiteralType[BigDecimal]
+  case class TSLiteralBoolean(value: Boolean) extends TSLiteralType[Boolean]
+
   case class TSEnum(name: String,
                     const: Boolean,
                     entries: ListMap[String, Option[Int]])
@@ -107,11 +125,11 @@ object TypescriptType {
 
   private val tsIdentifierPattern = Pattern.compile(
     "[_$\\p{L}\\p{Nl}][_$\\p{L}\\p{Nl}\\p{Nd}\\{Mn}\\{Mc}\\{Pc}]*")
-  private[interface] def isValidTSName(name: String): Boolean =
+  private[scalatsi] def isValidTSName(name: String): Boolean =
     tsIdentifierPattern.matcher(name).matches() && !reservedKeywords.contains(
       name)
 
-  private[interface] final val reservedKeywords: Set[String] = Set(
+  private[scalatsi] final val reservedKeywords: Set[String] = Set(
     "break",
     "case",
     "catch",

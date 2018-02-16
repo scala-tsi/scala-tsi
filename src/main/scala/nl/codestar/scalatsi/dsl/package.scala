@@ -1,23 +1,13 @@
-package nl.codestar.scala.ts.interface
+package nl.codestar.scalatsi
 
-import nl.codestar.scala.ts.interface.TypescriptType._
+import nl.codestar.scalatsi.TypescriptType._
 
 import scala.collection.GenTraversableOnce
 
 package object dsl {
   import scala.language.implicitConversions
 
-  implicit class TypescriptTypeDSL(val t: TypescriptType) extends AnyVal {
-    def |(tt: TypescriptType): TSUnion = t match {
-      case TSUnion(of) => TSUnion(of :+ tt)
-      case _           => TSUnion.of(t, tt)
-    }
-
-    def array: TSArray = TSArray(t)
-  }
-
   // Implicit conversions to allow a more natural DSL
-  implicit def stringToType[T](s: String): TSType[T] = TSType.external(s)
   implicit def classToType[T](cls: Class[T])(
       implicit tsType: TSType[T]): TypescriptType = tsType.get
   implicit def classToNamedType[T](cls: Class[T])(
@@ -25,6 +15,14 @@ package object dsl {
   implicit def tupleToTSInterfaceEntry[T](entry: (String, Class[T]))(
       implicit tsType: TSType[T]): (String, TypescriptType) =
     (entry._1, tsType.get)
+
+  // Literal types
+  implicit def stringToLiteral(s: String) = TSLiteralString(s)
+  implicit def booleanToLiteral(bool: Boolean) = TSLiteralBoolean(bool)
+  implicit def intToLiteral(i: Int) = TSLiteralNumber(BigDecimal(i))
+  implicit def longToLiteral(l: Long) = TSLiteralNumber(BigDecimal(l))
+  implicit def doubleToLiteral(d: Double) = TSLiteralNumber(BigDecimal(d))
+  implicit def bigDecimalToLiteral(big: BigDecimal) = TSLiteralNumber(big)
 
   // Implicit conversion from typescript types to the TSType typeclasss
   implicit def typescriptTypeToTSType[T <: TypescriptType](tpe: T): TSType[T] =
