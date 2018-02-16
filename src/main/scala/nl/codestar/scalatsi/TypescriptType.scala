@@ -3,6 +3,7 @@ package nl.codestar.scalatsi
 import java.util.regex.Pattern
 
 import scala.collection.immutable.ListMap
+import TypescriptType._
 
 sealed trait TypescriptType {
   def |(tt: TypescriptType): TSUnion = this match {
@@ -14,7 +15,7 @@ sealed trait TypescriptType {
 }
 
 object TypescriptType {
-  private[interface] def fromString(tpe: String): TypescriptType =
+  private[scalatsi] def fromString(tpe: String): TypescriptType =
     tpe match {
       case "any"       => TSAny
       case "boolean"   => TSBoolean
@@ -124,11 +125,11 @@ object TypescriptType {
 
   private val tsIdentifierPattern = Pattern.compile(
     "[_$\\p{L}\\p{Nl}][_$\\p{L}\\p{Nl}\\p{Nd}\\{Mn}\\{Mc}\\{Pc}]*")
-  private[interface] def isValidTSName(name: String): Boolean =
+  private[scalatsi] def isValidTSName(name: String): Boolean =
     tsIdentifierPattern.matcher(name).matches() && !reservedKeywords.contains(
       name)
 
-  private[interface] final val reservedKeywords: Set[String] = Set(
+  private[scalatsi] final val reservedKeywords: Set[String] = Set(
     "break",
     "case",
     "catch",
