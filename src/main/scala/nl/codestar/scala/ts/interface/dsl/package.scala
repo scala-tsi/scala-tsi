@@ -24,7 +24,6 @@ package object dsl {
   implicit def doubleToLiteral(d: Double) = TSLiteralNumber(BigDecimal(d))
   implicit def bigDecimalToLiteral(big: BigDecimal) = TSLiteralNumber(big)
 
-
   // Implicit conversion from typescript types to the TSType typeclasss
   implicit def typescriptTypeToTSType[T <: TypescriptType](tpe: T): TSType[T] =
     TSType(tpe)

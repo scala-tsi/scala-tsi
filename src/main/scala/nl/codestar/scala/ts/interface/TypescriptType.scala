@@ -47,7 +47,8 @@ object TypescriptType {
   }
 
   case class TSAlias(name: String, underlying: TypescriptType)
-      extends TypescriptNamedType with TypescriptAggregateType {
+      extends TypescriptNamedType
+      with TypescriptAggregateType {
     override def nested = Set(underlying)
   }
   case object TSAny extends TypescriptType
@@ -57,7 +58,8 @@ object TypescriptType {
 
   sealed trait TSLiteralType[T] extends TypescriptType { val value: T }
   case class TSLiteralString(value: String) extends TSLiteralType[String]
-  case class TSLiteralNumber(value: BigDecimal) extends TSLiteralType[BigDecimal]
+  case class TSLiteralNumber(value: BigDecimal)
+      extends TSLiteralType[BigDecimal]
   case class TSLiteralBoolean(value: Boolean) extends TSLiteralType[Boolean]
 
   case class TSEnum(name: String,
