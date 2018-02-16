@@ -1,7 +1,6 @@
 import sbt.Keys._
 
 lazy val root = (project in file("."))
-  .enablePlugins(TypescriptGenPlugin)
   .settings(
     Seq(
       scalaVersion := "2.12.4",

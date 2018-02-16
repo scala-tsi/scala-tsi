@@ -44,8 +44,16 @@ object TSType {
   /** Generate a typescript interface for a case class */
   def fromCaseClass[T]: TSIType[T] = macro Macros.generateInterface[T]
 
+  /** Uses the typescript type of Target whenever we're looking for the typescript type of Source
+    * This will not generate a `type Source = Target` line like alias
+    * @see alias
+    **/
+  def sameAs[Source, Target](implicit tsType: TSType[Target]): TSType[Source] =
+    TSType(tsType.get)
+
   /** Create a Typescript alias "T" for type T, with the definition of Alias
     * @example alias[Foo, String] will generate typescript `type Foo = string`
+    * @see sameAs
     */
   def alias[T, Alias](implicit tsType: TSType[Alias],
                       ct: Manifest[T]): TSNamedType[T] =
@@ -53,6 +61,7 @@ object TSType {
 
   /** Create a Typescript alias "name" for type T, with the definition of Alias
     * @example alias[Foo, String]("IFoo") will generate typescript `type IFoo = string`
+    * @see sameAs
     */
   def alias[T, Alias](name: String)(
       implicit tsType: TSType[Alias]): TSNamedType[T] =
@@ -60,6 +69,7 @@ object TSType {
 
   /** Create a Typescript alias "name" for type T, with the definition of tsType
     * @example alias[Foo]("IFoo", TSString) will generate typescript `type IFoo = string`
+    * @see sameAs
     */
   def alias[T](name: String, tsType: TypescriptType): TSNamedType[T] =
     TSNamedType(TSAlias(name, tsType))
