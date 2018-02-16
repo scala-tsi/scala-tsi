@@ -1,4 +1,4 @@
-package nl.codestar.scala.ts.output
+package nl.codestar.scalatsi.output
 
 import java.io.File
 

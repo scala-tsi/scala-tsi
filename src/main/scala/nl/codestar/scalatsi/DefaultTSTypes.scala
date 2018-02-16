@@ -1,20 +1,12 @@
-package nl.codestar.scala.ts.interface
-
-import nl.codestar.scala.ts.interface.TypescriptType._
+package nl.codestar.scalatsi
 
 trait DefaultTSTypes
     extends PrimitiveTSTypes
     with CollectionTSTypes
     with TupleTSTypes
     with JavaTSTypes {}
-object DefaultTSTypes extends DefaultTSTypes
 
-trait PrimitiveTSTypes {
-  implicit val booleanTsType: TSType[Boolean] = TSType(TSBoolean)
-  implicit val stringTsType: TSType[String] = TSType(TSString)
-  implicit def numberTsType[T: Numeric]: TSType[T] = TSType(TSNumber)
-}
-object PrimitiveTSTypes extends PrimitiveTSTypes
+object DefaultTSTypes extends DefaultTSTypes
 
 trait CollectionTSTypes {
   implicit def tsSeq[E: TSType]: TSType[scala.collection.Seq[E]] = tsTraversable
@@ -32,7 +24,7 @@ trait CollectionTSTypes {
     TSType(TSIndexedInterface(indexType = TSNumber, valueType = e.get))
 
   def tsTraversable[E, CC <: Traversable[E]](
-      implicit e: TSType[E]): TSType[CC] =
+    implicit e: TSType[E]): TSType[CC] =
     TSType(TSArray(e.get))
 }
 
@@ -46,7 +38,7 @@ trait JavaTSTypes {
 
   // All java collection types implement Collection and are almost always translated to javascript arrays
   implicit def tsJavaCollection[E](
-      implicit e: TSType[E]): TSType[java.util.Collection[E]] =
+    implicit e: TSType[E]): TSType[java.util.Collection[E]] =
     TSType(TSArray(e.get))
 
   implicit val uriTSType: TSType[java.net.URI] = TSType(TSString)
@@ -58,32 +50,32 @@ trait TupleTSTypes {
   implicit def tsTuple1[T1](implicit t1: TSType[T1]): TSType[Tuple1[T1]] =
     TSType(TSTuple.of(t1.get))
   implicit def tsTuple2[T1, T2](implicit t1: TSType[T1],
-                                t2: TSType[T2]): TSType[(T1, T2)] =
+    t2: TSType[T2]): TSType[(T1, T2)] =
     TSType(TSTuple.of(t1.get, t2.get))
   implicit def tsTuple3[T1, T2, T3](implicit t1: TSType[T1],
-                                    t2: TSType[T2],
-                                    t3: TSType[T3]): TSType[(T1, T2, T3)] =
+    t2: TSType[T2],
+    t3: TSType[T3]): TSType[(T1, T2, T3)] =
     TSType(TSTuple.of(t1.get, t2.get, t3.get))
   implicit def tsTuple4[T1, T2, T3, T4](
-      implicit t1: TSType[T1],
-      t2: TSType[T2],
-      t3: TSType[T3],
-      t4: TSType[T4]): TSType[(T1, T2, T3, T4)] =
+    implicit t1: TSType[T1],
+    t2: TSType[T2],
+    t3: TSType[T3],
+    t4: TSType[T4]): TSType[(T1, T2, T3, T4)] =
     TSType(TSTuple.of(t1.get, t2.get, t3.get, t4.get))
   implicit def tsTuple5[T1, T2, T3, T4, T5](
-      implicit t1: TSType[T1],
-      t2: TSType[T2],
-      t3: TSType[T3],
-      t4: TSType[T4],
-      t5: TSType[T5]): TSType[(T1, T2, T3, T4, T5)] =
+    implicit t1: TSType[T1],
+    t2: TSType[T2],
+    t3: TSType[T3],
+    t4: TSType[T4],
+    t5: TSType[T5]): TSType[(T1, T2, T3, T4, T5)] =
     TSType(TSTuple.of(t1.get, t2.get, t3.get, t4.get, t5.get))
   implicit def tsTuple6[T1, T2, T3, T4, T5, T6](
-      implicit t1: TSType[T1],
-      t2: TSType[T2],
-      t3: TSType[T3],
-      t4: TSType[T4],
-      t5: TSType[T5],
-      t6: TSType[T6]): TSType[(T1, T2, T3, T4, T5, T6)] =
+    implicit t1: TSType[T1],
+    t2: TSType[T2],
+    t3: TSType[T3],
+    t4: TSType[T4],
+    t5: TSType[T5],
+    t6: TSType[T6]): TSType[(T1, T2, T3, T4, T5, T6)] =
     TSType(TSTuple.of(t1.get, t2.get, t3.get, t4.get, t5.get, t6.get))
   // TODO: Tuple7-21
 }

@@ -1,6 +1,6 @@
-package nl.codestar.scala.ts.interface
+package nl.codestar.scalatsi
 
-import TypescriptType._
+import nl.codestar.scalatsi.TypescriptType._
 
 object TypescriptTypeSerializer {
   // TODO: Optimize? Memoize? Tailrec?

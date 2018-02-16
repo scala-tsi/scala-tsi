@@ -1,8 +1,6 @@
-package nl.codestar.scala.ts.interface
+package nl.codestar.scalatsi
 
 import java.util.regex.Pattern
-
-import nl.codestar.scala.ts.interface.TypescriptType.{TSArray, TSUnion}
 
 import scala.collection.immutable.ListMap
 

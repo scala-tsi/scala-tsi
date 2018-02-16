@@ -1,4 +1,4 @@
-package nl.codestar.scala.ts.interface
+package nl.codestar.scalatsi
 
 import nl.codestar.scala.ts.interface.TypescriptType._
 

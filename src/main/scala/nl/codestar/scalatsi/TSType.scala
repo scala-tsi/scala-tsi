@@ -1,8 +1,8 @@
-package nl.codestar.scala.ts.interface
+package nl.codestar.scalatsi
+
+import nl.codestar.scala.ts.interface.TypescriptType._
 
 import scala.annotation.implicitNotFound
-import TypescriptType._
-
 import scala.collection.immutable.ListMap
 
 /* TODO: Move this somewhere to the docs

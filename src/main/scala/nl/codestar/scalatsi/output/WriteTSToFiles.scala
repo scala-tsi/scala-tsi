@@ -1,9 +1,9 @@
-package nl.codestar.scala.ts.output
+package nl.codestar.scalatsi.output
 
 import java.io.FileWriter
 
-import nl.codestar.scala.ts.interface.TypescriptType.TypescriptNamedType
-import nl.codestar.scala.ts.interface.TypescriptTypeSerializer
+import nl.codestar.scalatsi.TypescriptType.TypescriptNamedType
+import nl.codestar.scalatsi.TypescriptTypeSerializer
 
 object WriteTSToFiles {
   def write(options: OutputOptions)(types: Seq[TypescriptNamedType]): Unit = {
