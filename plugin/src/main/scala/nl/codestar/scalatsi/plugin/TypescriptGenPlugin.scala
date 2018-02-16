@@ -1,7 +1,8 @@
 package nl.codestar.scalatsi.plugin
 
 import sbt.Keys._
-import sbt.{AutoPlugin, Def, File, IO, SettingKey, Task, TaskKey}
+import sbt._
+import sbt.info.BuildInfo
 
 object TypescriptGenPlugin extends AutoPlugin {
   object autoImport {
