@@ -43,6 +43,12 @@ object TypescriptType {
   case class TSArray(elementType: TypescriptType)
       extends TypescriptAggregateType { def nested = Set(elementType) }
   case object TSBoolean extends TypescriptType
+
+  sealed trait TSLiteralType[T] extends TypescriptType { val value: T }
+  case class TSLiteralString(value: String) extends TSLiteralType[String]
+  case class TSLiteralNumber(value: BigDecimal) extends TSLiteralType[BigDecimal]
+  case class TSLiteralBoolean(value: Boolean) extends TSLiteralBoolean[Boolean]
+
   case class TSEnum(name: String,
                     const: Boolean,
                     entries: ListMap[String, Option[Int]])
