@@ -79,7 +79,6 @@ lazy val `sbt-scala-tsi` = (project in file("plugin"))
     sbtPlugin := true,
     buildInfoKeys := Seq[BuildInfoKey](version),
     buildInfoPackage := "sbt.info"
-
   )
 
 lazy val dependencies = Seq(
