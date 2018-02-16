@@ -70,13 +70,16 @@ lazy val `scala-tsi` = (project in file("."))
   )
 
 lazy val `sbt-scala-tsi` = (project in file("plugin"))
-  .enablePlugins(SbtTwirl)
+  .enablePlugins(SbtTwirl, BuildInfoPlugin)
   .settings(commonSettings)
   .settings(publishSettings)
   .settings(
     name := "sbt-scala-tsi",
     description := "SBT plugin to generate Typescript interfaces from your scala classes as part of your build",
-    sbtPlugin := true
+    sbtPlugin := true,
+    buildInfoKeys := Seq[BuildInfoKey](version),
+    buildInfoPackage := "sbt.info"
+
   )
 
 lazy val dependencies = Seq(
