@@ -2,6 +2,7 @@ package nl.codestar.scala.ts.plugin
 
 import sbt.Keys._
 import sbt.{Def, _}
+import sbt.info.BuildInfo
 
 object TypescriptGenPlugin extends AutoPlugin {
   object autoImport {
@@ -14,7 +15,6 @@ object TypescriptGenPlugin extends AutoPlugin {
       SettingKey[Seq[String]]("Classes to generate typescript interfaces for")
     val typescriptGenerationImports = SettingKey[Seq[String]](
       "Additional imports (i.e. your packages so you don't need to prefix your classes)")
-    //val inputDirectory = SettingKey[File]("typescript-input-directory")
     val typescriptOutputFile = SettingKey[File](
       "File where all typescript interfaces will be written to")
   }
@@ -22,11 +22,8 @@ object TypescriptGenPlugin extends AutoPlugin {
   import autoImport._
 
   override def trigger = allRequirements
-  // Do we need this?
-  //override def `requires`: Plugins = JvmPlugin
 
-  // TODO: Automatically get this from the main build.sbt, e.g. with sbt-buildinfo
-  private val scala_ts_compiler_version = "0.1.0-SNAPSHOT"
+  private val scala_ts_compiler_version = BuildInfo.version
 
   override lazy val projectSettings = Seq(
     // User settings
