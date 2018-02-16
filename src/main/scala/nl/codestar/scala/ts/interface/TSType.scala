@@ -33,7 +33,7 @@ trait TSType[T] { self =>
 
   // Forwarders to the underlying TypescriptType
   def |(other: TypescriptType): TSUnion = get | other
-  def |[U](other: TSType[U]): TSUnion = this | other.get
+  def |(other: TSType[_]): TSUnion = this | other.get
 }
 
 object TSType {
