@@ -1,20 +1,14 @@
-package nl.codestar.scala.ts.interface
+package nl.codestar.scalatsi
 
-import nl.codestar.scala.ts.interface.TypescriptType._
+import nl.codestar.scalatsi.TypescriptType._
 
 trait DefaultTSTypes
     extends PrimitiveTSTypes
     with CollectionTSTypes
     with TupleTSTypes
     with JavaTSTypes {}
-object DefaultTSTypes extends DefaultTSTypes
 
-trait PrimitiveTSTypes {
-  implicit val booleanTsType: TSType[Boolean] = TSType(TSBoolean)
-  implicit val stringTsType: TSType[String] = TSType(TSString)
-  implicit def numberTsType[T: Numeric]: TSType[T] = TSType(TSNumber)
-}
-object PrimitiveTSTypes extends PrimitiveTSTypes
+object DefaultTSTypes extends DefaultTSTypes
 
 trait CollectionTSTypes {
   implicit def tsSeq[E: TSType]: TSType[scala.collection.Seq[E]] = tsTraversable

@@ -1,8 +1,9 @@
-package nl.codestar.scala.ts.interface
+package nl.codestar.scalatsi
 
-import nl.codestar.scala.ts.interface.TypescriptType._
+import nl.codestar.scalatsi.TypescriptType._
 import org.scalatest.{FlatSpec, Matchers}
-import nl.codestar.scala.ts.interface.dsl._
+import nl.codestar.scalatsi.dsl._
+import nl.codestar.scalatsi._
 
 class TypescriptTypeSerializerTests
     extends FlatSpec

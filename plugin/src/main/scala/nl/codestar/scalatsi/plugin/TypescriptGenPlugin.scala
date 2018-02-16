@@ -1,7 +1,7 @@
-package nl.codestar.scala.ts.plugin
+package nl.codestar.scalatsi.plugin
 
 import sbt.Keys._
-import sbt.{Def, _}
+import sbt._
 import sbt.info.BuildInfo
 
 object TypescriptGenPlugin extends AutoPlugin {
@@ -62,6 +62,6 @@ object TypescriptGenPlugin extends AutoPlugin {
 
   def runTypescriptGeneration: Def.Initialize[Task[Unit]] =
     (runMain in Compile)
-      .toTask(" nl.codestar.scala.ts.generator.ApplicationTypescriptGeneration")
+      .toTask(" nl.codestar.scalatsi.generator.ApplicationTypescriptGeneration")
       .dependsOn(generateTypescriptGeneratorApplication in Compile)
 }

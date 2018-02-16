@@ -1,8 +1,8 @@
-package nl.codestar.scala.ts.interface
+package nl.codestar.scalatsi
+
+import nl.codestar.scalatsi.TypescriptType._
 
 import scala.annotation.implicitNotFound
-import TypescriptType._
-
 import scala.collection.immutable.ListMap
 
 /* TODO: Move this somewhere to the docs
@@ -13,7 +13,7 @@ import scala.collection.immutable.ListMap
 2. If T is a case class, use
     implicit val tsT: TSIType[T] = TSIType.fromCaseClass
 3. Or use the DSL to build your own interface:
-    import nl.codestar.scala.ts.interface.dsl._
+    import nl.codestar.scalatsi.dsl._
     implicit val tsT: TSIType[T] = tsInterface(
       "foo" -> classOf[String],
       "bar" -> classOf[Option[Int]]

@@ -1,9 +1,9 @@
 @(imports: Seq[String], classes: Seq[String], targetFile: String)
 
-package nl.codestar.scala.ts.generator
+package nl.codestar.scalatsi.generator
 
-import _root_.nl.codestar.scala.ts.interface.TSNamedType
-import _root_.nl.codestar.scala.ts.interface.TypescriptType.TypescriptNamedType
+import _root_.nl.codestar.scalatsi.TSNamedType
+import _root_.nl.codestar.scalatsi.TypescriptType.TypescriptNamedType
 import _root_.java.io.File
 
 /** User imports */
@@ -21,11 +21,11 @@ object ApplicationTypescriptGeneration {
   )
   // TODO: If we want to support scala 2.11 the last must not have a trailing comma
 
-  val options = _root_.nl.codestar.scala.ts.output.OutputOptions(
+  val options = _root_.nl.codestar.scalatsi.output.OutputOptions(
     targetFile = new File("@targetFile")
   )
 
   def main(args: Array[String]): Unit = {
-    _root_.nl.codestar.scala.ts.output.WriteTSToFiles.write(options)(toOutput)
+    _root_.nl.codestar.scalatsi.output.WriteTSToFiles.write(options)(toOutput)
   }
 }

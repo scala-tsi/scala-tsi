@@ -1,4 +1,4 @@
-package nl.codestar.scala.ts.interface
+package nl.codestar.scalatsi
 
 import scala.collection.immutable.ListMap
 import scala.reflect.macros.blackbox
@@ -53,8 +53,8 @@ private class Macros(val c: blackbox.Context) {
     }
 
     q"""{
-       import nl.codestar.scala.ts.interface.TypescriptType._
-       import nl.codestar.scala.ts.interface.{ TSType, TSNamedType, TSIType }
+       import nl.codestar.scalatsi.TypescriptType._
+       import nl.codestar.scalatsi.{ TSType, TSNamedType, TSIType }
        import scala.collection.immutable.ListMap
        TSIType(TSInterface("I" + ${symbol.name.toString}, ListMap(..$members)))
       }"""

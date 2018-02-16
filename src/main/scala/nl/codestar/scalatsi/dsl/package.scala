@@ -1,6 +1,6 @@
-package nl.codestar.scala.ts.interface
+package nl.codestar.scalatsi
 
-import nl.codestar.scala.ts.interface.TypescriptType._
+import nl.codestar.scalatsi.TypescriptType._
 
 import scala.collection.GenTraversableOnce
 

@@ -1,7 +1,7 @@
-package nl.codestar.scala.ts.interface
+package nl.codestar.scalatsi
 
 import org.scalatest.{FlatSpec, Matchers}
-import nl.codestar.scala.ts.interface.TypescriptType._
+import nl.codestar.scalatsi.TypescriptType._
 
 case class Person(name: String, age: Int)
 
