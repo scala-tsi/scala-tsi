@@ -30,6 +30,10 @@ trait TSType[T] { self =>
   }
   override def hashCode(): Int = get.hashCode()
   override def toString: String = s"TSType($get)"
+
+  // Forwarders to the underlying TypescriptType
+  def |(other: TypescriptType): TSUnion = get | other
+  def |(other: TSType[_]): TSUnion = this | other.get
 }
 
 object TSType {

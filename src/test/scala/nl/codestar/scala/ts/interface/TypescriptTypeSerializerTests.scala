@@ -1,6 +1,6 @@
 package nl.codestar.scala.ts.interface
 
-import nl.codestar.scala.ts.interface.TypescriptType.TSString
+import nl.codestar.scala.ts.interface.TypescriptType._
 import org.scalatest.{FlatSpec, Matchers}
 import nl.codestar.scala.ts.interface.dsl._
 
@@ -8,18 +8,20 @@ class TypescriptTypeSerializerTests
     extends FlatSpec
     with Matchers
     with DefaultTSTypes {
+
   import org.scalactic._
 
   def whiteSpaceNormalised: Uniformity[String] =
     new AbstractStringUniformity {
 
-      /**Returns the string with all consecutive white spaces reduced to a single space, then removes empty lines.*/
+      /** Returns the string with all consecutive white spaces reduced to a single space, then removes empty lines. */
       def normalized(s: String): String = s.replaceAll("\\s+", " ")
+
       override def toString: String = "whiteSpaceNormalised"
     }
 
   // Scala 2.11.11 (maybe others) give false positive unused warnings if a class is used only as a generic
-  def ignoreUnused(o: Object) = ()
+  def ignoreUnused(o: Object): Unit = ()
 
   "The Typescript serializer" should "serialize to a simple interface" in {
     case class Person(name: String, age: Int)
@@ -81,7 +83,7 @@ class TypescriptTypeSerializerTests
     ignoreUnused(A(null))
     ignoreUnused(B(null))
 
-    implicit val tsA: TSType[A] = "IA"
+    implicit val tsA: TSType[A] = TSType.external("IA")
     implicit val tsB: TSIType[B] = TSType.fromCaseClass
     val tsAGenerated: TSIType[A] = TSType.fromCaseClass
 
@@ -144,8 +146,20 @@ class TypescriptTypeSerializerTests
     val typescript = TypescriptTypeSerializer.emit[Something]
 
     typescript.trim should equal("""interface ISomething {
-      |  values: { [ key: string ]: string }
-      |}""".stripMargin)(after being whiteSpaceNormalised)
+        |  values: { [ key: string ]: string }
+        |}""".stripMargin)(after being whiteSpaceNormalised)
+  }
+
+  it should "handle a type alias with nested types" in {
+    val a = TSType.alias("A", TSNumber)
+    val b = TSType.alias("B", TSString)
+    val aOrB = TSType.alias("AOrB", a | b)
+
+    val typescript = TypescriptTypeSerializer.emit(aOrB).trim
+
+    typescript should include("type A = number")
+    typescript should include("type B = string")
+    typescript should include("type AOrB = (A | B)")
   }
 
   it should "serialize a named indexed interface" in {
@@ -167,4 +181,65 @@ class TypescriptTypeSerializerTests
         |  [ as: string ]: string
         |}""".stripMargin)(after being whiteSpaceNormalised)
   }
+
+  it should "handle string literal types" in {
+
+    // How we define the Point in our typescript interface
+    val expectedPoint = """interface Point {
+                          |  type: "Point"
+                          |  coords: [number, number]
+                          |}""".stripMargin
+
+    // How we define the polygon in our typescript interface
+    val expectedPolygon = """interface Polygon {
+                            |  type: "Polygon"
+                            |  coords: [number, number][]
+                            |}""".stripMargin
+
+    sealed trait Geometry
+    case class Point(lat: Double, lon: Double) extends Geometry
+    case class Polygon(coords: Seq[Point]) extends Geometry
+
+    implicit val pointTSType: TSNamedType[Point] =
+      TSType.interface("Point",
+                       "type" -> ("Point": TypescriptType),
+                       "coords" -> classOf[(Double, Double)])
+    implicit val polygonTSType: TSNamedType[Polygon] =
+      TSType.interface("Polygon",
+                       "type" -> ("Polygon": TypescriptType),
+                       "coords" -> classOf[Seq[(Double, Double)]])
+    implicit val geometryTSType: TSNamedType[Geometry] =
+      TSType.alias("Geometry",
+                   implicitly[TSType[Point]] | implicitly[TSType[Polygon]])
+
+    val typescript: String =
+      TypescriptTypeSerializer.emits(implicitly[TSNamedType[Geometry]].get).trim
+
+    TypescriptTypeSerializer.emit[Point].trim should equal(expectedPoint)
+    typescript should include(expectedPoint)
+
+    TypescriptTypeSerializer.emit[Polygon].trim should equal(expectedPolygon)
+    typescript should include(expectedPolygon)
+
+    typescript.trim should include("type Geometry = (Point | Polygon)")
+  }
+
+  it should "handle number literals" in {
+    val expected = "type FourtyTwo = 42"
+    val fourtyTwo = TSType.alias("FourtyTwo", 42)
+
+    val typescript = TypescriptTypeSerializer.emit(fourtyTwo).trim
+
+    typescript should equal(expected)
+  }
+
+  it should "handle boolean literals" in {
+    val expected = "type MyBool = (true | false)"
+    val myBool = TSType.alias("MyBool", (true: TypescriptType) | false)
+
+    val typescript = TypescriptTypeSerializer.emit(myBool).trim
+
+    typescript should equal(expected)
+  }
+
 }

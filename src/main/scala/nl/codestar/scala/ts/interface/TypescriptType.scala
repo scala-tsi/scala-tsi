@@ -2,9 +2,18 @@ package nl.codestar.scala.ts.interface
 
 import java.util.regex.Pattern
 
+import nl.codestar.scala.ts.interface.TypescriptType.{TSArray, TSUnion}
+
 import scala.collection.immutable.ListMap
 
-sealed trait TypescriptType
+sealed trait TypescriptType {
+  def |(tt: TypescriptType): TSUnion = this match {
+    case TSUnion(of) => TSUnion(of :+ tt)
+    case _           => TSUnion.of(this, tt)
+  }
+
+  def array: TSArray = TSArray(this)
+}
 
 object TypescriptType {
   private[interface] def fromString(tpe: String): TypescriptType =
@@ -39,10 +48,20 @@ object TypescriptType {
 
   case class TSAlias(name: String, underlying: TypescriptType)
       extends TypescriptNamedType
+      with TypescriptAggregateType {
+    override def nested = Set(underlying)
+  }
   case object TSAny extends TypescriptType
   case class TSArray(elementType: TypescriptType)
       extends TypescriptAggregateType { def nested = Set(elementType) }
   case object TSBoolean extends TypescriptType
+
+  sealed trait TSLiteralType[T] extends TypescriptType { val value: T }
+  case class TSLiteralString(value: String) extends TSLiteralType[String]
+  case class TSLiteralNumber(value: BigDecimal)
+      extends TSLiteralType[BigDecimal]
+  case class TSLiteralBoolean(value: Boolean) extends TSLiteralType[Boolean]
+
   case class TSEnum(name: String,
                     const: Boolean,
                     entries: ListMap[String, Option[Int]])
