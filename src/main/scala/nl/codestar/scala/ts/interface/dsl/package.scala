@@ -7,15 +7,6 @@ import scala.collection.GenTraversableOnce
 package object dsl {
   import scala.language.implicitConversions
 
-  implicit class TypescriptTypeDSL(val t: TypescriptType) extends AnyVal {
-    def |(tt: TypescriptType): TSUnion = t match {
-      case TSUnion(of) => TSUnion(of :+ tt)
-      case _           => TSUnion.of(t, tt)
-    }
-
-    def array: TSArray = TSArray(t)
-  }
-
   // Implicit conversions to allow a more natural DSL
   implicit def classToType[T](cls: Class[T])(
       implicit tsType: TSType[T]): TypescriptType = tsType.get

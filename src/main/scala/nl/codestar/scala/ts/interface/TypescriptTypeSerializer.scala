@@ -24,6 +24,9 @@ object TypescriptTypeSerializer {
     case TSUnion(Seq(e))        => serialize(e)
     case TSUnion(of)            => s"(${of.map(serialize) mkString " | "})"
     case TSVoid                 => "void"
+    case TSLiteralBoolean(v)    => v.toString
+    case TSLiteralNumber(v)     => v.toString
+    case TSLiteralString(v)     => s""""${v.replaceAllLiterally("\"","\"\"")}""""
   }
 
   // Unfortunately no vararg generics in scala
