@@ -156,6 +156,18 @@ class TypescriptTypeSerializerTests
         |}""".stripMargin)(after being whiteSpaceNormalised)
   }
 
+  it should "handle a type alias with nested types" in {
+    val a = TSType.alias("A", TSNumber)
+    val b = TSType.alias("B", TSString)
+    val aOrB = TSType.alias("AOrB", a | b)
+
+    val typescript = TypescriptTypeSerializer.emit(aOrB).trim
+
+    typescript should contain("type A = number")
+    typescript should contain("type B = string")
+    typescript should contain("type AOrB = (A | B)")
+  }
+
   it should "serialize a named indexed interface" in {
     case class Something(
       values: Map[String, String] = Map("a" -> "b")
@@ -177,7 +189,7 @@ class TypescriptTypeSerializerTests
         |}""".stripMargin)(after being whiteSpaceNormalised)
   }
 
-  it should "be able to handle string literal types" in {
+  it should "handle string literal types" in {
 
     // How we define the Point in our typescript interface
     val expectedPoint = """interface Point {
@@ -217,7 +229,7 @@ class TypescriptTypeSerializerTests
     typescript.trim should contain("type Geometry = (Point | Polygon)")
   }
 
-  it should "be able to handle number literals" in {
+  it should "handle number literals" in {
     val expected = "type FourtyTwo = 42"
     val fourtyTwo = TSType.alias("FourtyTwo", 42)
 
@@ -226,7 +238,7 @@ class TypescriptTypeSerializerTests
     typescript should equal(expected)
   }
 
-  it should "be able to handle boolean literals" in {
+  it should "handle boolean literals" in {
     val expected = "type MyBool = (true | false)"
     val myBool = TSType.alias("MyBool", (true : TypescriptType) | false)
 
