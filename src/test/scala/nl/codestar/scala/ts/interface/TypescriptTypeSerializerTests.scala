@@ -12,7 +12,7 @@ class TypescriptTypeSerializerTests
   import org.scalactic._
 
   def whiteSpaceNormalised: Uniformity[String] =
-    return new AbstractStringUniformity{
+    new AbstractStringUniformity{
 
       /** Returns the string with all consecutive white spaces reduced to a single space, then removes empty lines. */
       def normalized(s: String): String = s.replaceAll("\\s+", " ")
@@ -163,9 +163,9 @@ class TypescriptTypeSerializerTests
 
     val typescript = TypescriptTypeSerializer.emit(aOrB).trim
 
-    typescript should contain("type A = number")
-    typescript should contain("type B = string")
-    typescript should contain("type AOrB = (A | B)")
+    typescript should include("type A = number")
+    typescript should include("type B = string")
+    typescript should include("type AOrB = (A | B)")
   }
 
   it should "serialize a named indexed interface" in {
@@ -221,12 +221,12 @@ class TypescriptTypeSerializerTests
 
 
     TypescriptTypeSerializer.emit[Point].trim should equal(expectedPoint)
-    typescript should contain(expectedPoint)
+    typescript should include(expectedPoint)
 
     TypescriptTypeSerializer.emit[Polygon].trim should equal(expectedPolygon)
-    typescript should contain(expectedPolygon)
+    typescript should include(expectedPolygon)
 
-    typescript.trim should contain("type Geometry = (Point | Polygon)")
+    typescript.trim should include("type Geometry = (Point | Polygon)")
   }
 
   it should "handle number literals" in {
