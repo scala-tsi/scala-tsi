@@ -17,11 +17,11 @@ trait CollectionTSTypes {
   // This chooses null union to represent Option types.
   // When defining interfaces however Option will be represented with undefined union
   implicit def tsOption[E](implicit e: TSType[E]): TSType[Option[E]] =
-    TSType(TSUnion.of(e.get, TSNull))
+    TSType(e | TSNull)
 
   implicit def tsEither[L, R](implicit tsLeft: TSType[L],
                               tsRight: TSType[R]): TSType[Either[L, R]] =
-    TSType(TSUnion.of(tsLeft.get, tsRight.get))
+    TSType(tsLeft | tsRight)
 
   implicit def tsStringMap[E](implicit e: TSType[E]): TSType[Map[String, E]] =
     TSType(TSIndexedInterface(indexType = TSString, valueType = e.get))
@@ -31,7 +31,7 @@ trait CollectionTSTypes {
 
   def tsTraversable[E, CC <: Traversable[E]](
       implicit e: TSType[E]): TSType[CC] =
-    TSType(TSArray(e.get))
+    TSType(e.get.array)
 }
 
 trait JavaTSTypes {

@@ -8,8 +8,7 @@ lazy val root = (project in file("."))
       organization := "nl.codestar",
       scalacOptions ++= compilerOptions,
       typescriptClassesToGenerateFor := Seq("Foo"),
-      typescriptGenerationImports := Seq("models._", "Foo._"),
-      typescriptOutputFile := baseDirectory.value / "model.ts"
+      typescriptGenerationImports := Seq("models._", "Foo._")
       //scalafmtOnCompile in Compile := true,
       //scalafmtTestOnCompile in Compile := true
     )
