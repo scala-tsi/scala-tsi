@@ -60,13 +60,15 @@ lazy val `scala-tsi-macros` = (project in file("macros"))
   )
 
 lazy val `scala-tsi` = (project in file("."))
-  .dependsOn(`scala-tsi-macros` % "compile-internal")
+  .dependsOn(`scala-tsi-macros` % "compile-internal, test-internal")
   .settings(commonSettings)
   .settings(publishSettings)
   .settings(
     name := "scala-tsi",
     description := "Generate Typescript interfaces from your scala classes",
-    libraryDependencies ++= dependencies
+    libraryDependencies := Seq(
+      "org.scalatest"        %% "scalatest"    % "3.0.5"     % "test"
+    )
   )
 
 lazy val `sbt-scala-tsi` = (project in file("plugin"))
@@ -80,9 +82,3 @@ lazy val `sbt-scala-tsi` = (project in file("plugin"))
     buildInfoKeys := Seq[BuildInfoKey](version),
     buildInfoPackage := "sbt.info"
   )
-
-lazy val dependencies = Seq(
-  // format: off
-  "org.scalatest"        %% "scalatest"    % "3.0.5"     % "test"
-  // format: on
-)
