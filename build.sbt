@@ -60,7 +60,7 @@ lazy val `scala-tsi-macros` = (project in file("macros"))
   )
 
 lazy val `scala-tsi` = (project in file("."))
-  .dependsOn(`scala-tsi-macros`)
+  .dependsOn(`scala-tsi-macros` % "compile-internal")
   .settings(commonSettings)
   .settings(publishSettings)
   .settings(
@@ -83,6 +83,6 @@ lazy val `sbt-scala-tsi` = (project in file("plugin"))
 
 lazy val dependencies = Seq(
   // format: off
-  "org.scalatest"        %% "scalatest"    % "3.0.1"     % "test"
+  "org.scalatest"        %% "scalatest"    % "3.0.5"     % "test"
   // format: on
 )
