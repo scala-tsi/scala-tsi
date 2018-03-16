@@ -49,7 +49,7 @@ interface MyClass {
 }
 ```
 
-See [Examples](#Examples) for more in-depth examples
+See [Example](#Example) for more a more in-depth example
 
 ## Configuration
 
