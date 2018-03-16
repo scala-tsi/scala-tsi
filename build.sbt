@@ -49,24 +49,38 @@ lazy val publishSettings = Seq(
   // format: on
 )
 
+lazy val scalaReflect = Def.setting { "org.scala-lang" % "scala-reflect" % scalaVersion.value }
+
 lazy val `scala-tsi-macros` = (project in file("macros"))
   .settings(
     commonSettings,
     name := "scala-tsi-macros",
     description := "Macros for scala-tsi",
-    libraryDependencies += Def.setting {
-      "org.scala-lang" % "scala-reflect" % scalaVersion.value
-    }.value
+    libraryDependencies += scalaReflect.value,
+    // Disable publishing
+    publish := {},
+    publishLocal := {}
   )
 
 lazy val `scala-tsi` = (project in file("."))
-  .dependsOn(`scala-tsi-macros`)
   .settings(commonSettings)
   .settings(publishSettings)
   .settings(
     name := "scala-tsi",
     description := "Generate Typescript interfaces from your scala classes",
-    libraryDependencies ++= dependencies
+    libraryDependencies := Seq(
+      "org.scalatest"        %% "scalatest"    % "3.0.5"     % "test"
+    )
+  )
+  // Depend and include the macro project, instead of having to publish a separate macro project
+  .dependsOn(`scala-tsi-macros` % "compile-internal, test-internal")
+  .settings(
+    // Add a dependency to scala-reflect from the macro project
+    libraryDependencies += scalaReflect.value,
+    // include the macro classes and resources in the main jar
+    mappings in (Compile, packageBin) ++= mappings.in(`scala-tsi-macros`, Compile, packageBin).value,
+    // include the macro sources in the main source jar
+    mappings in (Compile, packageSrc) ++= mappings.in(`scala-tsi-macros`, Compile, packageSrc).value
   )
 
 lazy val `sbt-scala-tsi` = (project in file("plugin"))
@@ -80,9 +94,3 @@ lazy val `sbt-scala-tsi` = (project in file("plugin"))
     buildInfoKeys := Seq[BuildInfoKey](version),
     buildInfoPackage := "sbt.info"
   )
-
-lazy val dependencies = Seq(
-  // format: off
-  "org.scalatest"        %% "scalatest"    % "3.0.1"     % "test"
-  // format: on
-)

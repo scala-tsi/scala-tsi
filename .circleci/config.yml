@@ -35,10 +35,12 @@ jobs:
             - ~/.ivy2/cache
             - ~/.m2
 
-      - run:
-          name: Check formatting
-          command:
-            sbt scalafmt::test test:scalafmt::test sbt:scalafmt::test exit
+      # Scalafmt suddenly stopped working after updating build.sbt
+      # https://github.com/lucidsoftware/neo-sbt-scalafmt/issues/53
+      #- run:
+      #    name: Check formatting
+      #    command:
+      #      sbt scalafmt::test test:scalafmt::test sbt:scalafmt::test exit
 
       - run:
           command:
@@ -49,7 +51,7 @@ jobs:
 
       - run:
           command:
-            sbt publishLocal scala-tsi-macros/publishLocal sbt-scala-tsi/publishLocal
+            sbt publishLocal sbt-scala-tsi/publishLocal
 
       - run:
           command: |
