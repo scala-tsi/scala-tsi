@@ -1,12 +1,12 @@
 # scala-tsi usage
 
-### TSType and TypescriptType
+### TypescriptType and TSType
 
 scala-tsi has two important types
 
  1. `TypescriptType` which represents a valid type in Typescript. <br />
      It is an [AST](https://en.wikipedia.org/wiki/Abstract_syntax_tree) of a typescript type. 
- 2. `TSType`, a [Type class](https://blog.scalac.io/2017/04/19/typeclasses-in-scala.html) that holds a link from a scala type to a `TypescriptType`. <br />
+ 2. `TSType`, a [type class](https://blog.scalac.io/2017/04/19/typeclasses-in-scala.html) that holds a link from a scala type to a `TypescriptType`. <br />
      A `TSType[T]` tells us how to transform `T` into a `TypescriptType`. <br />
      It fills a similar function as a `play-json` `Writes[T]` or a `circe` `Encoder[T]`, which tell how to transform an instance of a `T` into json. 
 
@@ -18,16 +18,16 @@ This table contains some examples of the different representations:
 | `Int`      | `TSNumber`      | `number`   |
 | `Double`   | `TSNumber`      | `number`   |
 | `Either[String,Int]` | `TSUnion(TSString, TSNumber)` | <code>string &#124; number</code> |
-| `case class A(foo: Int)`  | `TypescriptInterface("A", Map("foo" -> TSNumber))` | `interface A { foo: number }` |
+| `case class A(foo: Int)`  | `TypescriptInterface("A", Map("foo" -> TSNumber))` | `interface A {foo: number}` |
 | [`42.type`](http://docs.scala-lang.org/sips/pending/42.type.html) | `TSLiteralNumber(42)` | `42` |
 
-### Creating `TSType`s
+### Creating a `TSType`
 
 The link in the above table from scala type to `TypescriptType` is provided by an implicit `TSType`. <br />
 You will have to define these yourself and put these in scope.
 
 Of course scala-tsi helps you with this. The `DefaultTSTypes` trait and object contain a large number of definitions for built-in Java and Scala classes, e.g. it contains a `TSType[Int]`.
-For your own type the simplest case is a case class, you can use `implicit val myCaseClassTSType = TSType.fromCaseClass[MyCaseClass]` to generate a `TSType[MyCaseClass]` which scala-tsi can use to output your classes. 
+For your own types the simplest case is a case class, then you can use `implicit val myCaseClassTSType = TSType.fromCaseClass[MyCaseClass]` to generate a `TSType[MyCaseClass]` which scala-tsi can use to output your classes. 
 There are other ways to construct `TSType` defined in the companion object which we encourage you to check out. Most interesting are `TSType.fromCaseClass`, `TSType.alias` and `TSType.interface`.
 
 scala-tsi also defines a small DSL which you can use to construct custom definitions
@@ -45,7 +45,7 @@ implicit val fooTSType = TSType.external[Foo]("foo")
 
 // Using TSType.interface you can construct your own interface
 implicit val myClassTSType: TSType[MyClass] = TSType.interface("MyClass",
-  // Classes will automatically be converted to the typescriptType
+  // Classes will automatically be converted to the TypescriptType if an implicit TSType exists
   "foo" -> classOf[Foo],
   // Tuples will be converted into arrays of specific length and type
   "tuple3" -> classOf[(Int, String, Foo)], 
