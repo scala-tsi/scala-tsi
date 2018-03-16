@@ -30,3 +30,6 @@ lazy val compilerOptions = Seq(
   "-Ywarn-dead-code",
   "-language:experimental.macros"
 )
+
+resolvers += Opts.resolver.sonatypeReleases
+resolvers += Opts.resolver.sonatypeSnapshots
