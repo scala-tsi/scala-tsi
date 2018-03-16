@@ -124,14 +124,13 @@ interface IPerson {
 }
 ```
 
-## How does it work
+## Usage
 
-If this all seems like dark compiler magic to you (it kinda is) and you want to know it works, check out [this explanation](doc/workings.md)
-That section also 
+[This document](doc/workings.md) contains more detailed explanation of the library and usage
 
-## Isn't there already [Scala TS]()?
+## Isn't there already [Scala TS](https://github.com/miloszpp/scala-ts)?
 
-Scala TS is excellent if it can cover your usage-case, but its uage is very limited.
+Scala TS is good if it can cover your usage-case, but it functionality is very limited.
 Check out [this comparison](doc/scala-ts.md) 
 
 ## Features
