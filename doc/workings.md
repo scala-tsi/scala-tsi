@@ -50,7 +50,7 @@ implicit val myClassTSType: TSType[MyClass] = TSType.interface("MyClass",
   // Tuples will be converted into arrays of specific length and type
   "tuple3" -> classOf[(Int, String, Foo)], 
   // You can create unions with the | operator defined on TSType and TypescriptType
-  "numberOrString" -> (TSNumber | TSString),
+  "oneOf" -> (TSNumber | TSString | TSBoolean),
   // You can create an array of a type with .array
   "stringArray" -> TSString.array,
   // literal types
@@ -62,7 +62,7 @@ implicit val myClassTSType: TSType[MyClass] = TSType.interface("MyClass",
 interface MyClass {
   foo: Foo
   tuple3: [number, string, Foo]
-  numberOrString: number | string
+  oneOf: (number | string | boolean)
   stringArray: string[]
   fortyTwo: 42
 }
