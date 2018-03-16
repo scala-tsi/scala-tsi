@@ -17,7 +17,7 @@ This table contains some examples of the different representations:
 | ---------- | --------------- | ---------- |
 | `Int`      | `TSNumber`      | `number`   |
 | `Double`   | `TSNumber`      | `number`   |
-| `Either[String,Int]` | `TSUnion(TSString, TSNumber)` | `string | number` |
+| `Either[String,Int]` | `TSUnion(TSString, TSNumber)` | <code>string &#124; number</code> |
 | `case class A(foo: Int)`  | `TypescriptInterface("A", Map("foo" -> TSNumber))` | `interface A { foo: number }` |
 | [`42.type`](http://docs.scala-lang.org/sips/pending/42.type.html) | `TSLiteralNumber(42)` | `42` |
 
