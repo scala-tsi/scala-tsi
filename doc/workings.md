@@ -25,10 +25,15 @@ This table contains some examples of the different representations:
 
 The link in the above table from scala type to `TypescriptType` is provided by an implicit `TSType`. <br />
 You will have to define these yourself and put these in scope.
+Of course scala-tsi helps you with this.
 
-Of course scala-tsi helps you with this. The `DefaultTSTypes` trait and object contain a large number of definitions for built-in Java and Scala classes, e.g. it contains a `TSType[Int]`.
-For your own types the simplest case is a case class, then you can use `implicit val myCaseClassTSType = TSType.fromCaseClass[MyCaseClass]` to generate a `TSType[MyCaseClass]` which scala-tsi can use to output your classes. 
-There are other ways to construct `TSType` defined in the companion object which we encourage you to check out. Most interesting are `TSType.fromCaseClass`, `TSType.alias` and `TSType.interface`.
+The `DefaultTSTypes` trait and object contain a large number of definitions for built-in Java and Scala classes, e.g. it contains a `TSType[Int]`.
+
+The most important thing is to define an implicit `TSType` for your own types.
+If you want to convert a case class, then you can simply use `implicit val myCaseClassTSType = TSType.fromCaseClass[MyCaseClass]`.
+
+There are other ways to construct `TSType` defined in the companion object which we encourage you to check out.<br />
+Most interesting are `TSType.fromCaseClass`, `TSType.alias` and `TSType.interface`.
 
 scala-tsi also defines a small DSL which you can use to construct custom definitions
 
@@ -57,8 +62,7 @@ implicit val myClassTSType: TSType[MyClass] = TSType.interface("MyClass",
   "fortyTwo" -> 42
 )
 
-// Output:
-/*
+/* Output:
 interface MyClass {
   foo: Foo
   tuple3: [number, string, Foo]
