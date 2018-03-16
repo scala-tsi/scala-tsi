@@ -1,7 +1,7 @@
 # Scala-TSI
 
-[![Maven Central](https://img.shields.io/maven-central/v/nl.codestart/scala-tsi.svg)](https://mvnrepository.com/artifact/nl.codestar/scala-tsi)
-[![CircleCI](https://img.shields.io/circleci/project/github/code-star/scala-tsi.svg)](https://circleci.com/gh/code-star/scala-tsi/)
+[![Maven Central](https://img.shields.io/maven-central/v/nl.codestar/scala-tsi_2.12.svg)](https://mvnrepository.com/artifact/nl.codestar/scala-tsi)
+[![CircleCI](https://img.shields.io/circleci/project/github/code-star/scala-tsi/master.svg)](https://circleci.com/gh/code-star/scala-tsi/)
 
 Scala TSI can automatically generate Typescript Interfaces from your Scala classes.
 
