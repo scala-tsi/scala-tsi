@@ -2,7 +2,7 @@ package nl.codestar.scalatsi
 
 import nl.codestar.scalatsi.TypescriptType._
 
-import scala.collection.generic.CanBuildFrom
+import language.higherKinds
 
 trait DefaultTSTypes
     extends PrimitiveTSTypes
@@ -35,8 +35,6 @@ trait CollectionTSTypes extends LowPriorityCollectionTSType {
 }
 
 trait LowPriorityCollectionTSType {
-  import language.higherKinds
-
   // Provides a TSType for any scala collection of E to a typescript array of E
   implicit def tsTraversable[E, F[_]](
     implicit e: TSType[E],
@@ -46,8 +44,6 @@ trait LowPriorityCollectionTSType {
 }
 
 trait JavaTSTypes {
-  import language.higherKinds
-
   implicit val javaObjectTSType: TSType[Object] = TSType(TSObject)
 
   import java.time.temporal.Temporal
@@ -57,11 +53,9 @@ trait JavaTSTypes {
   // we could define more specific formats for the varying dates and times
   /** Type to serialize java.time.* dates/times and java.util.Date to, override this to change your representation */
   protected val java8TimeTSType: TSType[Temporal] = TSType(TSString)
-  implicit val javaDateTSType: TSType[java.util.Date] = TSType(java8TimeTSType.get)
+  implicit val javaDateTSType: TSType[java.util.Date] = java8TimeTSType.asInstanceOf[TSType[java.util.Date]]
 
-  // TODO: Consider making TSType covariant so that TSType[Temporal] can be used for Instant, ZonedDateTime etc
-  import language.implicitConversions
-  implicit def java8DateTSTypeConversion[T <: Temporal]: TSType[T] = TSType(java8TimeTSType.get)
+  implicit def java8DateTSTypeConversion[T <: Temporal]: TSType[T] = java8TimeTSType.asInstanceOf[TSType[T]]
 
   implicit def javaNumber[T <: java.lang.Number]: TSType[T] = TSType(TSNumber)
 
@@ -69,8 +63,7 @@ trait JavaTSTypes {
   implicit def tsJavaCollection[E, F[_]](
     implicit e: TSType[E],
     ev: F[E] <:< java.util.Collection[E]
-  ): TSType[F[E]] =
-    TSType(TSArray(e.get))
+  ): TSType[F[E]] = TSType(e.get.array)
 
   implicit val javaUriTSType: TSType[java.net.URI] = TSType(TSString)
   implicit val javaUrlTSType: TSType[java.net.URL] = TSType(TSString)
