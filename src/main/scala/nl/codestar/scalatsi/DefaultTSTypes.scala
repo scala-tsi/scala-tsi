@@ -13,7 +13,6 @@ object DefaultTSTypes extends DefaultTSTypes
 
 trait ScalaTSTypes {
   implicit val anyTSType: TSType[Any] = TSType(TSAny)
-  implicit val anyRefTSType: TSType[AnyRef] = TSType(TSObject)
 }
 
 trait CollectionTSTypes {
