@@ -246,10 +246,10 @@ class TypescriptTypeSerializerTests
   it should "handle object literals" in {
     val expected  = "type X = object"
     val x = TSType.alias[Nothing, AnyRef]("X")
+    val y = TSType.alias[Nothing, Object]("X")
 
-    val typescript = TypescriptTypeSerializer.emit(x).trim
-
-    typescript should equal(expected)
+    TypescriptTypeSerializer.emit(x).trim should equal(expected)
+    TypescriptTypeSerializer.emit(y).trim should equal(expected)
   }
 
 }

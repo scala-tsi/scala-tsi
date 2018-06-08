@@ -15,7 +15,6 @@ object DefaultTSTypes extends DefaultTSTypes
 
 trait ScalaTSTypes {
   implicit val anyTSType: TSType[Any] = TSType(TSAny)
-  implicit val anyRefTSType: TSType[AnyRef] = TSType(TSObject)
 }
 
 trait CollectionTSTypes extends LowPriorityCollectionTSType {
@@ -49,12 +48,22 @@ trait LowPriorityCollectionTSType {
 trait JavaTSTypes {
   import language.higherKinds
 
+  implicit val javaObjectTSType: TSType[Object] = TSType(TSObject)
+
+  import java.time.temporal.Temporal
   // Most JSON serializers write java.time times to a ISO8601-like string
   // Epoch (milli)seconds are also common, in this case users will need to provide their own TSType[TheirTimeRepresentation]
   // Should regex typescript types be implemented (https://github.com/Microsoft/TypeScript/issues/6579),
   // we could define more specific formats for the varying dates and times
-  implicit val Java8DataTSType: TSType[java.time.temporal.Temporal] = TSType(
-    TSString)
+  /** Type to serialize java.time.* dates/times and java.util.Date to, override this to change your representation */
+  protected val java8TimeTSType: TSType[Temporal] = TSType(TSString)
+  implicit val javaDateTSType: TSType[java.util.Date] = TSType(java8TimeTSType.get)
+
+  // TODO: Consider making TSType covariant so that TSType[Temporal] can be used for Instant, ZonedDateTime etc
+  import language.implicitConversions
+  implicit def java8DateTSTypeConversion[T <: Temporal]: TSType[T] = TSType(java8TimeTSType.get)
+
+  implicit def javaNumber[T <: java.lang.Number]: TSType[T] = TSType(TSNumber)
 
   // All java collection types implement Collection and are almost always translated to javascript arrays
   implicit def tsJavaCollection[E, F[_]](
@@ -63,9 +72,9 @@ trait JavaTSTypes {
   ): TSType[F[E]] =
     TSType(TSArray(e.get))
 
-  implicit val uriTSType: TSType[java.net.URI] = TSType(TSString)
-  implicit val urlTSType: TSType[java.net.URL] = TSType(TSString)
-  implicit val uuidTSType: TSType[java.util.UUID] = TSType(TSString)
+  implicit val javaUriTSType: TSType[java.net.URI] = TSType(TSString)
+  implicit val javaUrlTSType: TSType[java.net.URL] = TSType(TSString)
+  implicit val javaUuidTSType: TSType[java.util.UUID] = TSType(TSString)
 }
 
 trait TupleTSTypes {
