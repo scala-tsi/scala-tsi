@@ -21,7 +21,7 @@ lazy val compilerOptions = Seq(
 // Seq("-Ydelambdafy:method", "-Ybackend:GenBCode","-Xsource:2.12", "-Ywarn-unused", "-Ywarn-unused-import")
 
 lazy val commonSettings = Seq(
-  scalaVersion := "2.12.4",
+  scalaVersion := "2.12.6",
   organization := "nl.codestar",
   version := "0.1.2-SNAPSHOT",
   scalacOptions ++= compilerOptions
