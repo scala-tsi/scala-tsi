@@ -10,7 +10,7 @@ Scala TSI can automatically generate Typescript Interfaces from your Scala class
 To use the project add the SBT plugin dependency in `project/plugins.sbt`:
 
 ```scala
-addSbtPlugin("nl.codestar" % "sbt-scala-tsi" % "0.1.1")
+addSbtPlugin("nl.codestar" % "sbt-scala-tsi" % "0.1.2")
 ```
 
 And configure the plugin in your project:
