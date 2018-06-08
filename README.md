@@ -21,10 +21,9 @@ lazy val root = (project in file("."))
       // The classes that you want to generate typescript interfaces for
       typescriptClassesToGenerateFor := Seq("MyClass"),
       // The output file which will contain the typescript interfaces
-      typescriptOutputFile := baseDirectory.value / "model.ts"
+      typescriptOutputFile := baseDirectory.value / "model.ts",
       // Include the package(s) of the classes here, and make sure to import your typescript conversions
-      typescriptGenerationImports := Seq("mymodel._", "MyTypescript._"),
-      
+      typescriptGenerationImports := Seq("mymodel._", "MyTypescript._")
     )
 ```
 
