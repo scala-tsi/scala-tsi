@@ -23,7 +23,7 @@ lazy val compilerOptions = Seq(
 lazy val commonSettings = Seq(
   scalaVersion := "2.12.6",
   organization := "nl.codestar",
-  version := "0.1.2",
+  version := "0.1.3-SNAPSHOT",
   scalacOptions ++= compilerOptions
   // Code formatting
   //scalafmtOnCompile in Compile := true,
