@@ -2,6 +2,8 @@ package nl.codestar.scalatsi
 
 import nl.codestar.scalatsi.TypescriptType._
 
+import scala.collection.generic.CanBuildFrom
+
 trait DefaultTSTypes
     extends PrimitiveTSTypes
     with ScalaTSTypes
@@ -16,10 +18,7 @@ trait ScalaTSTypes {
   implicit val anyRefTSType: TSType[AnyRef] = TSType(TSObject)
 }
 
-trait CollectionTSTypes {
-  implicit def tsSeq[E: TSType]: TSType[scala.collection.Seq[E]] = tsTraversable
-  implicit def tsSet[E: TSType]: TSType[scala.collection.Set[E]] = tsTraversable
-
+trait CollectionTSTypes extends LowPriorityCollectionTSType {
   // This chooses null union to represent Option types.
   // When defining interfaces however Option will be represented with undefined union
   implicit def tsOption[E](implicit e: TSType[E]): TSType[Option[E]] =
@@ -34,13 +33,22 @@ trait CollectionTSTypes {
 
   implicit def tsIntMap[E](implicit e: TSType[E]): TSType[Map[Int, E]] =
     TSType(TSIndexedInterface(indexType = TSNumber, valueType = e.get))
+}
 
-  def tsTraversable[E, CC <: Traversable[E]](
-      implicit e: TSType[E]): TSType[CC] =
+trait LowPriorityCollectionTSType {
+  import language.higherKinds
+
+  // Provides a TSType for any scala collection of E to a typescript array of E
+  implicit def tsTraversable[E, F[_]](
+    implicit e: TSType[E],
+    ev: F[E] <:< Traversable[E]
+  ): TSType[F[E]] =
     TSType(e.get.array)
 }
 
 trait JavaTSTypes {
+  import language.higherKinds
+
   // Most JSON serializers write java.time times to a ISO8601-like string
   // Epoch (milli)seconds are also common, in this case users will need to provide their own TSType[TheirTimeRepresentation]
   // Should regex typescript types be implemented (https://github.com/Microsoft/TypeScript/issues/6579),
@@ -49,8 +57,10 @@ trait JavaTSTypes {
     TSString)
 
   // All java collection types implement Collection and are almost always translated to javascript arrays
-  implicit def tsJavaCollection[E](
-      implicit e: TSType[E]): TSType[java.util.Collection[E]] =
+  implicit def tsJavaCollection[E, F[_]](
+    implicit e: TSType[E],
+    ev: F[E] <:< java.util.Collection[E]
+  ): TSType[F[E]] =
     TSType(TSArray(e.get))
 
   implicit val uriTSType: TSType[java.net.URI] = TSType(TSString)
