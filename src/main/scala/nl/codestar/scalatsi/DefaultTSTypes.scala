@@ -10,6 +10,11 @@ trait DefaultTSTypes
 
 object DefaultTSTypes extends DefaultTSTypes
 
+trait ScalaTSTypes {
+  implicit val anyTSType: TSType[Any] = TSType(TSAny)
+  implicit val anyRefTSType: TSType[AnyRef] = TSType(TSObject)
+}
+
 trait CollectionTSTypes {
   implicit def tsSeq[E: TSType]: TSType[scala.collection.Seq[E]] = tsTraversable
   implicit def tsSet[E: TSType]: TSType[scala.collection.Set[E]] = tsTraversable

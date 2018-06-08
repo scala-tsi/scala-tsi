@@ -25,6 +25,7 @@ object TypescriptType {
       case "string"    => TSString
       case "undefined" => TSUndefined
       case "void"      => TSVoid
+      case "object"    => TSObject
       case _           => TSExternalName(tpe)
     }
 
@@ -108,6 +109,7 @@ object TypescriptType {
   case object TSNever extends TypescriptType
   case object TSNull extends TypescriptType
   case object TSNumber extends TypescriptType
+  case object TSObject extends TypescriptType
   case object TSString extends TypescriptType
   case class TSTuple[E](of: Seq[TypescriptType])
       extends TypescriptAggregateType { def nested = of.toSet }
