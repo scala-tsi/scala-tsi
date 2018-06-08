@@ -7,15 +7,13 @@ import sbt.info.BuildInfo
 object TypescriptGenPlugin extends AutoPlugin {
   object autoImport {
     val generateTypescript =
-      TaskKey[Unit]("generateTypescript", "Generate typescript this project")
-    val generateTypescriptGeneratorApplication = TaskKey[Seq[File]](
-      "generateTypescriptGeneratorApplication",
-      "Generate an application that will generate typescript from the classes that are configured")
+      taskKey[Unit]("Generate typescript this project")
+    val generateTypescriptGeneratorApplication = taskKey[Seq[File]]("Generate an application that will generate typescript from the classes that are configured")
     val typescriptClassesToGenerateFor =
-      SettingKey[Seq[String]]("Classes to generate typescript interfaces for")
-    val typescriptGenerationImports = SettingKey[Seq[String]](
+      settingKey[Seq[String]]("Classes to generate typescript interfaces for")
+    val typescriptGenerationImports = settingKey[Seq[String]](
       "Additional imports (i.e. your packages so you don't need to prefix your classes)")
-    val typescriptOutputFile = SettingKey[File](
+    val typescriptOutputFile = settingKey[File](
       "File where all typescript interfaces will be written to")
   }
 
