@@ -4,6 +4,7 @@ import nl.codestar.scalatsi.TypescriptType._
 
 trait DefaultTSTypes
     extends PrimitiveTSTypes
+    with ScalaTSTypes
     with CollectionTSTypes
     with TupleTSTypes
     with JavaTSTypes {}
