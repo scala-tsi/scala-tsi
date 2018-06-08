@@ -17,6 +17,7 @@ object TypescriptTypeSerializer {
     case TSNever                => "never"
     case TSNull                 => "null"
     case TSNumber               => "number"
+    case TSObject               => "object"
     case TSTuple(members)       => s"[${members.map(serialize) mkString ", "}]"
     case TSString               => "string"
     case TSUndefined            => "undefined"
