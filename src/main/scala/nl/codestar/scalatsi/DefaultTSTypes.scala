@@ -2,6 +2,8 @@ package nl.codestar.scalatsi
 
 import nl.codestar.scalatsi.TypescriptType._
 
+import language.higherKinds
+
 trait DefaultTSTypes
     extends PrimitiveTSTypes
     with ScalaTSTypes
@@ -15,10 +17,7 @@ trait ScalaTSTypes {
   implicit val anyTSType: TSType[Any] = TSType(TSAny)
 }
 
-trait CollectionTSTypes {
-  implicit def tsSeq[E: TSType]: TSType[scala.collection.Seq[E]] = tsTraversable
-  implicit def tsSet[E: TSType]: TSType[scala.collection.Set[E]] = tsTraversable
-
+trait CollectionTSTypes extends LowPriorityCollectionTSType {
   // This chooses null union to represent Option types.
   // When defining interfaces however Option will be represented with undefined union
   implicit def tsOption[E](implicit e: TSType[E]): TSType[Option[E]] =
@@ -33,9 +32,14 @@ trait CollectionTSTypes {
 
   implicit def tsIntMap[E](implicit e: TSType[E]): TSType[Map[Int, E]] =
     TSType(TSIndexedInterface(indexType = TSNumber, valueType = e.get))
+}
 
-  def tsTraversable[E, CC <: Traversable[E]](
-      implicit e: TSType[E]): TSType[CC] =
+trait LowPriorityCollectionTSType {
+  // Provides a TSType for any scala collection of E to a typescript array of E
+  implicit def tsTraversable[E, F[_]](
+    implicit e: TSType[E],
+    ev: F[E] <:< Traversable[E]
+  ): TSType[F[E]] =
     TSType(e.get.array)
 }
 
@@ -49,18 +53,17 @@ trait JavaTSTypes {
   // we could define more specific formats for the varying dates and times
   /** Type to serialize java.time.* dates/times and java.util.Date to, override this to change your representation */
   protected val java8TimeTSType: TSType[Temporal] = TSType(TSString)
-  implicit val javaDateTSType: TSType[java.util.Date] = TSType(java8TimeTSType.get)
+  implicit val javaDateTSType: TSType[java.util.Date] = java8TimeTSType.asInstanceOf[TSType[java.util.Date]]
 
-  // TODO: Consider making TSType covariant so that TSType[Temporal] can be used for Instant, ZonedDateTime etc
-  import language.implicitConversions
-  implicit def java8DateTSTypeConversion[T <: Temporal]: TSType[T] = TSType(java8TimeTSType.get)
+  implicit def java8DateTSTypeConversion[T <: Temporal]: TSType[T] = java8TimeTSType.asInstanceOf[TSType[T]]
 
   implicit def javaNumber[T <: java.lang.Number]: TSType[T] = TSType(TSNumber)
 
   // All java collection types implement Collection and are almost always translated to javascript arrays
-  implicit def tsJavaCollection[E](
-      implicit e: TSType[E]): TSType[java.util.Collection[E]] =
-    TSType(TSArray(e.get))
+  implicit def tsJavaCollection[E, F[_]](
+    implicit e: TSType[E],
+    ev: F[E] <:< java.util.Collection[E]
+  ): TSType[F[E]] = TSType(e.get.array)
 
   implicit val javaUriTSType: TSType[java.net.URI] = TSType(TSString)
   implicit val javaUrlTSType: TSType[java.net.URL] = TSType(TSString)
