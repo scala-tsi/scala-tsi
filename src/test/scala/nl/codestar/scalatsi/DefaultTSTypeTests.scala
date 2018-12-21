@@ -8,8 +8,10 @@ import org.scalatest.{Matchers, WordSpec}
 class DefaultTSTypeTests extends WordSpec with Matchers with DefaultTSTypes {
 
   "Default TS Types should be defined" forWord {
+    "String" in { "implicitly[TSType[String]]" should compile }
+    "Boolean" in { "implicitly[TSType[Boolean]]" should compile}
     "Int" in { "implicitly[TSType[Int]]" should compile }
-    "Long" in { "implicitly[TSType[Int]]" should compile }
+    "Long" in { "implicitly[TSType[Long]]" should compile }
     "Double" in { "implicitly[TSType[Double]]" should compile }
     "scala.math.BigDecimal" in { "implicitly[TSType[scala.math.BigDecimal]]" should compile }
     "java.math.BigDecimal" in { "implicitly[TSType[java.math.BigDecimal]]" should compile }
