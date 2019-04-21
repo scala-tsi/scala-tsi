@@ -22,7 +22,7 @@ lazy val compilerOptions = Seq(
 // Seq("-Ydelambdafy:method", "-Ybackend:GenBCode","-Xsource:2.12", "-Ywarn-unused", "-Ywarn-unused-import")
 
 lazy val commonSettings = Seq(
-  scalaVersion := "2.12.6",
+  scalaVersion := "2.12.8",
   organization := "nl.codestar",
   version := "0.1.3-SNAPSHOT",
   scalacOptions ++= compilerOptions
@@ -44,7 +44,7 @@ lazy val publishSettings = Seq(
   homepage := Some(url("https://github.com/code-star/scala-tsi")),
   scmInfo := Some(ScmInfo(url("https://github.com/code-star/scala-tsi"), "scm:git@github.com:code-star/scala-tsi.git")),
   developers := List(
-    Developer(id="dhoepelman", name="David Hoepelman", email="david.hoepelman@ordina.nl", url=url("https://github.com/dhoepelman")),
+    Developer(id="dhoepelman", name="David Hoepelman", email="dhoepelman@gmail.com", url=url("https://github.com/dhoepelman")),
     Developer(id="donovan", name="Donovan de Kuiper", email="donovan.de.kuiper@ordina.nl", url=url("https://github.com/Hayena"))
   )
   // format: on
@@ -69,7 +69,7 @@ lazy val `scala-tsi` = (project in file("."))
   .settings(
     name := "scala-tsi",
     description := "Generate Typescript interfaces from your scala classes",
-    libraryDependencies := Seq(
+    libraryDependencies ++= Seq(
       "org.scalatest"        %% "scalatest"    % "3.0.5"     % "test"
     )
   )
