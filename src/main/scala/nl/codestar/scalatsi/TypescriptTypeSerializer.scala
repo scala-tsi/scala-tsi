@@ -52,14 +52,14 @@ object TypescriptTypeSerializer {
 
   private def emitNamed(named: TypescriptNamedType): String = named match {
     case TSAlias(name, underlying) =>
-      s"type $name = ${serialize(underlying)}"
+      s"export type $name = ${serialize(underlying)}"
 
     case TSEnum(name, const, entries) =>
       val mbs = entries.map({
         case (entryName, Some(i)) => s"  $entryName = $i"
         case (entryName, None)    => s"  $entryName"
       })
-      s"""${if (const) "const " else ""}enum $name {
+      s"""export ${if (const) "const " else ""}enum $name {
          |${mbs.mkString(",\n")}
          |}
        """.stripMargin
@@ -67,7 +67,7 @@ object TypescriptTypeSerializer {
     case _: TSExternalName => ""
 
     case TSInterfaceIndexed(name, indexName, indexType, valueType) =>
-      s"""interface $name {
+      s"""export interface $name {
          |  [ $indexName: ${serialize(indexType)} ]: ${serialize(valueType)}
          |}
        """.stripMargin
@@ -81,7 +81,7 @@ object TypescriptTypeSerializer {
       })
 
       s"""
-         |interface $name {
+         |export interface $name {
          |${mbs.mkString("\n")}
          |}
        """.stripMargin
