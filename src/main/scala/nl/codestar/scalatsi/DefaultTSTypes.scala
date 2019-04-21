@@ -31,8 +31,8 @@ trait CollectionTSTypes extends LowPriorityCollectionTSType {
 trait LowPriorityCollectionTSType {
   // Provides a TSType for any scala collection of E to a typescript array of E
   implicit def tsTraversable[E, F[_]](
-      implicit e: TSType[E],
-      ev: F[E] <:< Traversable[E]
+    implicit e: TSType[E],
+    ev: F[E] <:< Traversable[E]
   ): TSType[F[E]] =
     TSType(e.get.array)
 }
@@ -55,8 +55,8 @@ trait JavaTSTypes {
 
   // All java collection types implement Collection and are almost always translated to javascript arrays
   implicit def tsJavaCollection[E, F[_]](
-      implicit e: TSType[E],
-      ev: F[E] <:< java.util.Collection[E]
+    implicit e: TSType[E],
+    ev: F[E] <:< java.util.Collection[E]
   ): TSType[F[E]] = TSType(e.get.array)
 
   implicit val javaUriTSType: TSType[java.net.URI] = TSType(TSString)
@@ -74,20 +74,20 @@ trait TupleTSTypes {
   implicit def tsTuple4[T1, T2, T3, T4](implicit t1: TSType[T1], t2: TSType[T2], t3: TSType[T3], t4: TSType[T4]): TSType[(T1, T2, T3, T4)] =
     TSType(TSTuple.of(t1.get, t2.get, t3.get, t4.get))
   implicit def tsTuple5[T1, T2, T3, T4, T5](
-      implicit t1: TSType[T1],
-      t2: TSType[T2],
-      t3: TSType[T3],
-      t4: TSType[T4],
-      t5: TSType[T5]
+    implicit t1: TSType[T1],
+    t2: TSType[T2],
+    t3: TSType[T3],
+    t4: TSType[T4],
+    t5: TSType[T5]
   ): TSType[(T1, T2, T3, T4, T5)] =
     TSType(TSTuple.of(t1.get, t2.get, t3.get, t4.get, t5.get))
   implicit def tsTuple6[T1, T2, T3, T4, T5, T6](
-      implicit t1: TSType[T1],
-      t2: TSType[T2],
-      t3: TSType[T3],
-      t4: TSType[T4],
-      t5: TSType[T5],
-      t6: TSType[T6]
+    implicit t1: TSType[T1],
+    t2: TSType[T2],
+    t3: TSType[T3],
+    t4: TSType[T4],
+    t5: TSType[T5],
+    t6: TSType[T6]
   ): TSType[(T1, T2, T3, T4, T5, T6)] =
     TSType(TSTuple.of(t1.get, t2.get, t3.get, t4.get, t5.get, t6.get))
   // TODO: Tuple7-21

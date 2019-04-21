@@ -98,16 +98,16 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
 
   it should "be able to handle all primitive types" in {
     case class PrimitiveTypes(
-        char: Char,
-        string: String,
-        byte: Byte,
-        short: Short,
-        int: Int,
-        long: Long,
-        float: Float,
-        double: Double,
-        boolean: Boolean,
-        stringSeq: Seq[String]
+      char: Char,
+      string: String,
+      byte: Byte,
+      short: Short,
+      int: Int,
+      long: Long,
+      float: Float,
+      double: Double,
+      boolean: Boolean,
+      stringSeq: Seq[String]
     )
 
     ignoreUnused(PrimitiveTypes(0, "", 1, 1, 1, 1, 1, 1, true, Seq.empty))
@@ -133,7 +133,7 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
 
   it should "serialize an indexed interface" in {
     case class Something(
-        values: Map[String, String] = Map("a" -> "b")
+      values: Map[String, String] = Map("a" -> "b")
     )
 
     ignoreUnused(Something())
@@ -161,7 +161,7 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
 
   it should "serialize a named indexed interface" in {
     case class Something(
-        values: Map[String, String] = Map("a" -> "b")
+      values: Map[String, String] = Map("a" -> "b")
     )
 
     ignoreUnused(Something())
