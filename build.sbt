@@ -1,4 +1,3 @@
-//import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.scalafmtTestOnCompile
 import sbt.Keys.scalacOptions
 
 // TODO: Different versions between 2.11 and 2.12
@@ -25,10 +24,9 @@ lazy val commonSettings = Seq(
   scalaVersion := "2.12.8",
   organization := "nl.codestar",
   version := "0.1.3-SNAPSHOT",
-  scalacOptions ++= compilerOptions
+  scalacOptions ++= compilerOptions,
   // Code formatting
-  //scalafmtOnCompile in Compile := true,
-  //scalafmtTestOnCompile in Compile := true
+  scalafmtOnCompile := true
 )
 
 /* Settings to publish to maven central */
@@ -50,7 +48,9 @@ lazy val publishSettings = Seq(
   // format: on
 )
 
-lazy val scalaReflect = Def.setting { "org.scala-lang" % "scala-reflect" % scalaVersion.value }
+lazy val scalaReflect = Def.setting {
+  "org.scala-lang" % "scala-reflect" % scalaVersion.value
+}
 
 lazy val `scala-tsi-macros` = (project in file("macros"))
   .settings(
@@ -70,7 +70,7 @@ lazy val `scala-tsi` = (project in file("."))
     name := "scala-tsi",
     description := "Generate Typescript interfaces from your scala classes",
     libraryDependencies ++= Seq(
-      "org.scalatest"        %% "scalatest"    % "3.0.5"     % "test"
+      "org.scalatest" %% "scalatest" % "3.0.5" % "test"
     )
   )
   // Depend and include the macro project, instead of having to publish a separate macro project
@@ -79,9 +79,13 @@ lazy val `scala-tsi` = (project in file("."))
     // Add a dependency to scala-reflect from the macro project
     libraryDependencies += scalaReflect.value,
     // include the macro classes and resources in the main jar
-    mappings in (Compile, packageBin) ++= mappings.in(`scala-tsi-macros`, Compile, packageBin).value,
+    mappings in (Compile, packageBin) ++= mappings
+      .in(`scala-tsi-macros`, Compile, packageBin)
+      .value,
     // include the macro sources in the main source jar
-    mappings in (Compile, packageSrc) ++= mappings.in(`scala-tsi-macros`, Compile, packageSrc).value
+    mappings in (Compile, packageSrc) ++= mappings
+      .in(`scala-tsi-macros`, Compile, packageSrc)
+      .value
   )
 
 lazy val `sbt-scala-tsi` = (project in file("plugin"))
