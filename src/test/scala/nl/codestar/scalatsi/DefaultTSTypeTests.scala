@@ -9,7 +9,7 @@ class DefaultTSTypeTests extends WordSpec with Matchers with DefaultTSTypes {
 
   "Default TS Types should be defined" forWord {
     "String" in { "implicitly[TSType[String]]" should compile }
-    "Boolean" in { "implicitly[TSType[Boolean]]" should compile}
+    "Boolean" in { "implicitly[TSType[Boolean]]" should compile }
     "Int" in { "implicitly[TSType[Int]]" should compile }
     "Long" in { "implicitly[TSType[Long]]" should compile }
     "Double" in { "implicitly[TSType[Double]]" should compile }
@@ -82,7 +82,7 @@ class DefaultTSTypeTests extends WordSpec with Matchers with DefaultTSTypes {
 
   trait HasWrapper {
     val leftSideString: String
-    val pos : source.Position
+    val pos: source.Position
 
     def forWord(right: => Unit)(implicit fun: StringVerbBlockRegistration): Unit = {
       fun(leftSideString, "for", pos, right _)

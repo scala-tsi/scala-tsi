@@ -46,10 +46,10 @@ object TypescriptType {
   }
 
   case class TSAlias(name: String, underlying: TypescriptType) extends TypescriptNamedType with TypescriptAggregateType {
-    override def nested = Set(underlying)
+    override def nested: Set[TypescriptType] = Set(underlying)
   }
   case object TSAny extends TypescriptType
-  case class TSArray(elementType: TypescriptType) extends TypescriptAggregateType { def nested = Set(elementType) }
+  case class TSArray(elementType: TypescriptType) extends TypescriptAggregateType { def nested: Set[TypescriptType] = Set(elementType) }
   case object TSBoolean extends TypescriptType
 
   sealed trait TSLiteralType[T] extends TypescriptType { val value: T }
@@ -60,7 +60,7 @@ object TypescriptType {
   case class TSEnum(name: String, const: Boolean, entries: ListMap[String, Option[Int]])
       extends TypescriptNamedType
       with TypescriptAggregateType {
-    def nested = Set(TSNumber)
+    def nested: Set[TypescriptType] = Set(TSNumber)
   }
   // Not really a typescript type, but a marker for us that it is a type with some name that is not known/defined by us
   case class TSExternalName(name: String) extends TypescriptNamedType
@@ -75,7 +75,7 @@ object TypescriptType {
       indexType == TSString || indexType == TSNumber,
       s"TypeScript indexed interface can only have index type string or number, not $indexType"
     )
-    def nested = Set(indexType, valueType)
+    def nested: Set[TypescriptType] = Set(indexType, valueType)
   }
   case class TSInterfaceIndexed(name: String, indexName: String = "key", indexType: TypescriptType, valueType: TypescriptType)
       extends TypescriptNamedType
@@ -84,12 +84,12 @@ object TypescriptType {
       indexType == TSString || indexType == TSNumber,
       s"TypeScript indexed interface $name can only have index type string or number, not $indexType"
     )
-    def nested = Set(indexType, valueType)
+    def nested: Set[TypescriptType] = Set(indexType, valueType)
   }
   case class TSInterface(name: String, members: ListMap[String, TypescriptType]) extends TypescriptNamedType with TypescriptAggregateType {
-    def nested = members.values.toSet
+    def nested: Set[TypescriptType] = members.values.toSet
   }
-  case class TSIntersection(of: Seq[TypescriptType]) extends TypescriptAggregateType { def nested = of.toSet }
+  case class TSIntersection(of: Seq[TypescriptType]) extends TypescriptAggregateType { def nested: Set[TypescriptType] = of.toSet }
   object TSIntersection {
     def of(of: TypescriptType*) = TSIntersection(of)
   }
@@ -98,13 +98,13 @@ object TypescriptType {
   case object TSNumber extends TypescriptType
   case object TSObject extends TypescriptType
   case object TSString extends TypescriptType
-  case class TSTuple[E](of: Seq[TypescriptType]) extends TypescriptAggregateType { def nested = of.toSet }
+  case class TSTuple[E](of: Seq[TypescriptType]) extends TypescriptAggregateType { def nested: Set[TypescriptType] = of.toSet }
   object TSTuple {
     def of(of: TypescriptType*) = TSTuple(of)
   }
   case object TSUndefined extends TypescriptType
   case class TSUnion(of: Seq[TypescriptType]) extends TypescriptAggregateType {
-    def nested = of.toSet
+    def nested: Set[TypescriptType] = of.toSet
   }
   object TSUnion {
     def of(of: TypescriptType*) = TSUnion(of)
