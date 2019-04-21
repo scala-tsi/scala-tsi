@@ -41,30 +41,23 @@ object TypescriptType {
     def nested: Set[TypescriptType]
   }
   object TypescriptAggregateType {
-    def unapply(
-        aggregateType: TypescriptAggregateType): Option[Set[TypescriptType]] =
+    def unapply(aggregateType: TypescriptAggregateType): Option[Set[TypescriptType]] =
       Some(aggregateType.nested)
   }
 
-  case class TSAlias(name: String, underlying: TypescriptType)
-      extends TypescriptNamedType
-      with TypescriptAggregateType {
+  case class TSAlias(name: String, underlying: TypescriptType) extends TypescriptNamedType with TypescriptAggregateType {
     override def nested = Set(underlying)
   }
   case object TSAny extends TypescriptType
-  case class TSArray(elementType: TypescriptType)
-      extends TypescriptAggregateType { def nested = Set(elementType) }
+  case class TSArray(elementType: TypescriptType) extends TypescriptAggregateType { def nested = Set(elementType) }
   case object TSBoolean extends TypescriptType
 
   sealed trait TSLiteralType[T] extends TypescriptType { val value: T }
   case class TSLiteralString(value: String) extends TSLiteralType[String]
-  case class TSLiteralNumber(value: BigDecimal)
-      extends TSLiteralType[BigDecimal]
+  case class TSLiteralNumber(value: BigDecimal) extends TSLiteralType[BigDecimal]
   case class TSLiteralBoolean(value: Boolean) extends TSLiteralType[Boolean]
 
-  case class TSEnum(name: String,
-                    const: Boolean,
-                    entries: ListMap[String, Option[Int]])
+  case class TSEnum(name: String, const: Boolean, entries: ListMap[String, Option[Int]])
       extends TypescriptNamedType
       with TypescriptAggregateType {
     def nested = Set(TSNumber)
@@ -76,33 +69,27 @@ object TypescriptType {
     * { [indexName:indexType]: valueType}
     * @param indexType index type, TSNumber or TSString
     **/
-  case class TSIndexedInterface(indexName: String = "key",
-                                indexType: TypescriptType,
-                                valueType: TypescriptType)
+  case class TSIndexedInterface(indexName: String = "key", indexType: TypescriptType, valueType: TypescriptType)
       extends TypescriptAggregateType {
     require(
       indexType == TSString || indexType == TSNumber,
-      s"TypeScript indexed interface can only have index type string or number, not $indexType")
+      s"TypeScript indexed interface can only have index type string or number, not $indexType"
+    )
     def nested = Set(indexType, valueType)
   }
-  case class TSInterfaceIndexed(name: String,
-                                indexName: String = "key",
-                                indexType: TypescriptType,
-                                valueType: TypescriptType)
+  case class TSInterfaceIndexed(name: String, indexName: String = "key", indexType: TypescriptType, valueType: TypescriptType)
       extends TypescriptNamedType
       with TypescriptAggregateType {
     require(
       indexType == TSString || indexType == TSNumber,
-      s"TypeScript indexed interface $name can only have index type string or number, not $indexType")
+      s"TypeScript indexed interface $name can only have index type string or number, not $indexType"
+    )
     def nested = Set(indexType, valueType)
   }
-  case class TSInterface(name: String, members: ListMap[String, TypescriptType])
-      extends TypescriptNamedType
-      with TypescriptAggregateType {
+  case class TSInterface(name: String, members: ListMap[String, TypescriptType]) extends TypescriptNamedType with TypescriptAggregateType {
     def nested = members.values.toSet
   }
-  case class TSIntersection(of: Seq[TypescriptType])
-      extends TypescriptAggregateType { def nested = of.toSet }
+  case class TSIntersection(of: Seq[TypescriptType]) extends TypescriptAggregateType { def nested = of.toSet }
   object TSIntersection {
     def of(of: TypescriptType*) = TSIntersection(of)
   }
@@ -111,8 +98,7 @@ object TypescriptType {
   case object TSNumber extends TypescriptType
   case object TSObject extends TypescriptType
   case object TSString extends TypescriptType
-  case class TSTuple[E](of: Seq[TypescriptType])
-      extends TypescriptAggregateType { def nested = of.toSet }
+  case class TSTuple[E](of: Seq[TypescriptType]) extends TypescriptAggregateType { def nested = of.toSet }
   object TSTuple {
     def of(of: TypescriptType*) = TSTuple(of)
   }
@@ -125,11 +111,9 @@ object TypescriptType {
   }
   case object TSVoid extends TypescriptType
 
-  private val tsIdentifierPattern = Pattern.compile(
-    "[_$\\p{L}\\p{Nl}][_$\\p{L}\\p{Nl}\\p{Nd}\\{Mn}\\{Mc}\\{Pc}]*")
+  private val tsIdentifierPattern = Pattern.compile("[_$\\p{L}\\p{Nl}][_$\\p{L}\\p{Nl}\\p{Nd}\\{Mn}\\{Mc}\\{Pc}]*")
   private[scalatsi] def isValidTSName(name: String): Boolean =
-    tsIdentifierPattern.matcher(name).matches() && !reservedKeywords.contains(
-      name)
+    tsIdentifierPattern.matcher(name).matches() && !reservedKeywords.contains(name)
 
   private[scalatsi] final val reservedKeywords: Set[String] = Set(
     "break",
