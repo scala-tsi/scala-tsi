@@ -12,17 +12,13 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
   "The case class to TypeScript type macro" should "be able to translate a simple case class" in {
     case class Person(name: String, age: Int)
     ignoreUnused(Person("", 1))
-    TSType.fromCaseClass[Person] shouldBe TSType.interface("IPerson",
-                                                           "name" -> TSString,
-                                                           "age" -> TSNumber)
+    TSType.fromCaseClass[Person] shouldBe TSType.interface("IPerson", "name" -> TSString, "age" -> TSNumber)
   }
 
   it should "handle optional types" in {
     case class TestOptional(opt: Option[Long])
     ignoreUnused(TestOptional(None))
-    TSType.fromCaseClass[TestOptional] shouldBe TSType.interface(
-      "ITestOptional",
-      "opt" -> TSUnion.of(TSNumber, TSUndefined))
+    TSType.fromCaseClass[TestOptional] shouldBe TSType.interface("ITestOptional", "opt" -> TSUnion.of(TSNumber, TSUndefined))
   }
 
   it should "handle nested definitions" in {

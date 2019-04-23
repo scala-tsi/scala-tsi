@@ -35,12 +35,10 @@ jobs:
             - ~/.ivy2/cache
             - ~/.m2
 
-      # Scalafmt suddenly stopped working after updating build.sbt
-      # https://github.com/lucidsoftware/neo-sbt-scalafmt/issues/53
-      #- run:
-      #    name: Check formatting
-      #    command:
-      #      sbt scalafmt::test test:scalafmt::test sbt:scalafmt::test exit
+      - run:
+          name: Check formatting
+          command:
+            sbt scalafmtSbtCheck scalafmtCheckAll exit
 
       - run:
           command:

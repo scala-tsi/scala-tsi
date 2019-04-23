@@ -42,8 +42,7 @@ object TypescriptTypeSerializer {
       .mkString("\n")
 
   private object TSInterfaceEntry {
-    def unapply(
-        typescriptType: TypescriptType): Option[(TypescriptType, Boolean)] =
+    def unapply(typescriptType: TypescriptType): Option[(TypescriptType, Boolean)] =
       typescriptType match {
         case TSUnion(members) if members.contains(TSUndefined) =>
           Some((TSUnion(members.filter(_ != TSUndefined)), false))
@@ -69,8 +68,8 @@ object TypescriptTypeSerializer {
 
     case TSInterfaceIndexed(name, indexName, indexType, valueType) =>
       s"""interface $name {
-        |  [ $indexName: ${serialize(indexType)} ]: ${serialize(valueType)}
-        |}
+         |  [ $indexName: ${serialize(indexType)} ]: ${serialize(valueType)}
+         |}
        """.stripMargin
 
     case TSInterface(name, members) =>
@@ -89,8 +88,7 @@ object TypescriptTypeSerializer {
   }
 
   // TODO: Optimize, Memoize or something, tail rec etc
-  private def discoverNestedNames(
-      tp: TypescriptType): Set[TypescriptNamedType] = {
+  private def discoverNestedNames(tp: TypescriptType): Set[TypescriptNamedType] = {
     val me: Set[TypescriptNamedType] = tp match {
       case named: TypescriptNamedType => Set(named)
       case _                          => Set()
