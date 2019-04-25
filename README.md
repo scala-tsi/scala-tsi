@@ -41,7 +41,7 @@ object MyTypescript {
 
 Into a typescript interface like
 ```typescript
-interface MyClass {
+export interface MyClass {
   a: string
   b: number
 }
@@ -115,7 +115,7 @@ lazy val root = (project in file("."))
 
 this will generate in your project root a `model.ts`:
 ```
-interface IPerson {
+export interface IPerson {
   name : string,
   email : string,
   age ?: number

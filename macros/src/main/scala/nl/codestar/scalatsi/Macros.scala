@@ -10,9 +10,7 @@ private class Macros(val c: blackbox.Context) {
     T.decls.collectFirst {
       case m: MethodSymbol if m.isPrimaryConstructor =>
         if (!m.isPublic)
-          c.error(
-            c.enclosingPosition,
-            s"Only classes with public primary constructor are supported. Found: $T")
+          c.error(c.enclosingPosition, s"Only classes with public primary constructor are supported. Found: $T")
         m
     }.get
 
@@ -21,8 +19,7 @@ private class Macros(val c: blackbox.Context) {
     val params = paramLists.head
 
     if (paramLists.size > 1)
-      c.error(c.enclosingPosition,
-              s"Only one parameter list classes are supported. Found: $T")
+      c.error(c.enclosingPosition, s"Only one parameter list classes are supported. Found: $T")
 
     params.foreach { p =>
       if (!p.isPublic)
@@ -67,6 +64,6 @@ private class Macros(val c: blackbox.Context) {
     symbol.asClass
   }
 
-  protected def isCaseClass(tpe: Type) =
+  protected def isCaseClass(tpe: Type): Boolean =
     tpe.typeSymbol.isClass && tpe.typeSymbol.asClass.isCaseClass
 }

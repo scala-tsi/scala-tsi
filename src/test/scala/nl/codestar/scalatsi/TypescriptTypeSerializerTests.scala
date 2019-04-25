@@ -29,7 +29,7 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
 
     val typescript = TypescriptTypeSerializer.emit[Person]
 
-    typescript.trim should equal("""interface IPerson {
+    typescript.trim should equal("""export interface IPerson {
                                    |  name: string
                                    |  age: number
                                    |}""".stripMargin)(after being whiteSpaceNormalised)
@@ -49,11 +49,11 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
 
     val typescript = TypescriptTypeSerializer.emit[ComplexCaseClass]
 
-    typescript.trim should equal("""interface INestedCaseClass {
+    typescript.trim should equal("""export interface INestedCaseClass {
                                    |  name: string
                                    |}
                                    |
-                                   |interface IComplexCaseClass {
+                                   |export interface IComplexCaseClass {
                                    |  nested: INestedCaseClass
                                    |}""".stripMargin)(after being whiteSpaceNormalised)
   }
@@ -68,7 +68,7 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
 
     val typescript = TypescriptTypeSerializer.emit[OptionCaseClass]
 
-    typescript.trim should equal("""interface IOptionCaseClass {
+    typescript.trim should equal("""export interface IOptionCaseClass {
                                    |  option?: string
                                    |}""".stripMargin)(after being whiteSpaceNormalised)
   }
@@ -87,11 +87,11 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
     TypescriptTypeSerializer
       .emit(tsAGenerated)
       .replaceAll("\\s", "") should equal("""
-                                            |interface IB {
+                                            |export interface IB {
                                             |  a: IA
                                             |}
                                             |
-                                            |interface IA {
+                                            |export interface IA {
                                             |  b: IB
                                             |}""".stripMargin.replaceAll("\\s", ""))
   }
@@ -117,7 +117,7 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
 
     val typescript = TypescriptTypeSerializer.emit[PrimitiveTypes]
 
-    typescript.trim should equal("""interface IPrimitiveTypes {
+    typescript.trim should equal("""export interface IPrimitiveTypes {
                                    |  char: number
                                    |  string: string
                                    |  byte: number
@@ -142,7 +142,7 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
 
     val typescript = TypescriptTypeSerializer.emit[Something]
 
-    typescript.trim should equal("""interface ISomething {
+    typescript.trim should equal("""export interface ISomething {
                                    |  values: { [ key: string ]: string }
                                    |}""".stripMargin)(after being whiteSpaceNormalised)
   }
@@ -171,7 +171,7 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
 
     val typescript = TypescriptTypeSerializer.emit[Something]
 
-    typescript.trim should equal("""interface ISomething {
+    typescript.trim should equal("""export interface ISomething {
                                    |  [ as: string ]: string
                                    |}""".stripMargin)(after being whiteSpaceNormalised)
   }
@@ -179,13 +179,13 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
   it should "handle string literal types" in {
 
     // How we define the Point in our typescript interface
-    val expectedPoint = """interface Point {
+    val expectedPoint = """export interface Point {
                           |  type: "Point"
                           |  coords: [number, number]
                           |}""".stripMargin
 
     // How we define the polygon in our typescript interface
-    val expectedPolygon = """interface Polygon {
+    val expectedPolygon = """export interface Polygon {
                             |  type: "Polygon"
                             |  coords: [number, number][]
                             |}""".stripMargin
@@ -214,7 +214,7 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
   }
 
   it should "handle number literals" in {
-    val expected = "type FourtyTwo = 42"
+    val expected = "export type FourtyTwo = 42"
     val fourtyTwo = TSType.alias("FourtyTwo", 42)
 
     val typescript = TypescriptTypeSerializer.emit(fourtyTwo).trim
@@ -223,7 +223,7 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
   }
 
   it should "handle boolean literals" in {
-    val expected = "type MyBool = (true | false)"
+    val expected = "export type MyBool = (true | false)"
     val myBool = TSType.alias("MyBool", (true: TypescriptType) | false)
 
     val typescript = TypescriptTypeSerializer.emit(myBool).trim
@@ -232,7 +232,7 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
   }
 
   it should "handle object literals" in {
-    val expected = "type X = object"
+    val expected = "export type X = object"
     val x = TSType.alias[Nothing, AnyRef]("X")
     val y = TSType.alias[Nothing, Object]("X")
 
