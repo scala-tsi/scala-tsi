@@ -131,6 +131,8 @@ export interface IPerson {
 Scala TS is good if it can cover your usage-case, but it functionality is very limited.
 Check out [this comparison](doc/scala-ts.md) 
 
+Additionaly, [it is unmaintained as of 2019-01-09](https://github.com/scala-ts/scala-ts/commit/64d26c8ac0729c8ef3664205d5360f6040efb3bc)
+
 ## Features
 
 See [this issue](https://github.com/code-star/scala-ts-interfaces/issues/1) for an overview of completed and planned features
