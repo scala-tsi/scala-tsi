@@ -135,4 +135,4 @@ Additionaly, [it is unmaintained as of 2019-01-09](https://github.com/scala-ts/s
 
 ## Features
 
-See [this issue](https://github.com/code-star/scala-ts-interfaces/issues/1) for an overview of completed and planned features
+See [this list](https://github.com/code-star/scala-ts-interfaces/issues/1) for an overview of completed features, and issues for open feature ideas.
