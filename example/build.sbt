@@ -3,7 +3,7 @@ import sbt.Keys._
 lazy val root = (project in file("."))
   .settings(
     Seq(
-      scalaVersion := "2.12.6",
+      scalaVersion := "2.12.8",
       organization := "nl.codestar",
       scalacOptions ++= compilerOptions,
       typescriptClassesToGenerateFor := Seq("Foo"),
