@@ -32,7 +32,7 @@ trait LowPriorityCollectionTSType {
   // Provides a TSType for any scala collection of E to a typescript array of E
   implicit def tsTraversable[E, F[_]](
     implicit e: TSType[E],
-    ev: F[E] <:< Traversable[E]
+    ev: F[E] <:< Iterable[E]
   ): TSType[F[E]] =
     TSType(e.get.array)
 }
@@ -46,7 +46,7 @@ trait JavaTSTypes {
   // Should regex typescript types be implemented (https://github.com/Microsoft/TypeScript/issues/6579),
   // we could define more specific formats for the varying dates and times
   /** Type to serialize java.time.* dates/times and java.util.Date to, override this to change your representation */
-  protected val java8TimeTSType: TSType[Temporal] = TSType(TSString)
+  protected val java8TimeTSType: TSType[Temporal]     = TSType(TSString)
   implicit val javaDateTSType: TSType[java.util.Date] = java8TimeTSType.asInstanceOf[TSType[java.util.Date]]
 
   implicit def java8DateTSTypeConversion[T <: Temporal]: TSType[T] = java8TimeTSType.asInstanceOf[TSType[T]]
@@ -59,8 +59,8 @@ trait JavaTSTypes {
     ev: F[E] <:< java.util.Collection[E]
   ): TSType[F[E]] = TSType(e.get.array)
 
-  implicit val javaUriTSType: TSType[java.net.URI] = TSType(TSString)
-  implicit val javaUrlTSType: TSType[java.net.URL] = TSType(TSString)
+  implicit val javaUriTSType: TSType[java.net.URI]    = TSType(TSString)
+  implicit val javaUrlTSType: TSType[java.net.URL]    = TSType(TSString)
   implicit val javaUuidTSType: TSType[java.util.UUID] = TSType(TSString)
 }
 

@@ -2,11 +2,11 @@ import sbt.Keys.scalacOptions
 
 lazy val commonSettings = Seq(
   organization := "nl.codestar",
-  version := "0.1.4-SNAPSHOT",
-  scalacOptions ++= compilerOptions,
-  scalafmtOnCompile := true, // format code on compile
+  version := "0.2.0-SNAPSHOT",
   scalaVersion := "2.13.0-RC1",
-  crossScalaVersions := Seq("2.12.8", "2.13.0-RC1")
+  crossScalaVersions := Seq("2.12.8", "2.13.0-RC1"),
+  compilerOptions,
+  scalafmtOnCompile := true  // format code on compile
 )
 
 /* Settings to publish to maven central */
@@ -21,13 +21,18 @@ lazy val publishSettings = Seq(
   homepage := Some(url("https://github.com/code-star/scala-tsi")),
   scmInfo := Some(ScmInfo(url("https://github.com/code-star/scala-tsi"), "scm:git@github.com:code-star/scala-tsi.git")),
   developers := List(
-    Developer(id="dhoepelman", name="David Hoepelman", email="992153+dhoepelman@users.noreply.github.com", url=url("https://github.com/dhoepelman")),
-    Developer(id="donovan", name="Donovan de Kuiper", email="donovan.de.kuiper@ordina.nl", url=url("https://github.com/Hayena"))
+    Developer(
+      id = "dhoepelman",
+      name = "David Hoepelman",
+      email = "992153+dhoepelman@users.noreply.github.com",
+      url = url("https://github.com/dhoepelman")
+    ),
+    Developer(id = "donovan", name = "Donovan de Kuiper", email = "donovan.de.kuiper@ordina.nl", url = url("https://github.com/Hayena"))
   )
 )
 
-lazy val compilerOptions = Seq(
-  "-Xsource:2.14",
+lazy val compilerOptions = scalacOptions := Seq(
+  "-Xsource:2.13",
   "-unchecked",
   "-feature",
   "-deprecation",
@@ -35,7 +40,6 @@ lazy val compilerOptions = Seq(
   "-encoding",
   "UTF8",
   "-target:jvm-1.8",
-  "-Xfuture",
   "-Ywarn-numeric-widen",
   "-Ywarn-value-discard",
   "-Ywarn-dead-code",
@@ -43,13 +47,15 @@ lazy val compilerOptions = Seq(
   "-language:experimental.macros"
 ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
   case Some((2, 13)) => Seq()
-  case Some((2, 12)) => Seq(
-    "-Yno-adapted-args",
-  )
+  case Some((2, 12)) =>
+    Seq(
+      "-Yno-adapted-args",
+      "-Xfuture"
+    )
+  case _ => throw new IllegalArgumentException(s"Unconfigured scala version ${scalaVersion.value}")
 })
 
-
- //
+//
 lazy val `scala-tsi-macros` = (project in file("macros"))
   .settings(
     commonSettings,
@@ -101,5 +107,5 @@ lazy val `sbt-scala-tsi` = (project in file("plugin"))
     buildInfoPackage := "sbt.info",
     // sbt 1 uses scala 2.12
     scalaVersion := "2.12.8",
-    crossScalaVersions := Seq("2.12.8"),
+    crossScalaVersions := Seq("2.12.8")
   )

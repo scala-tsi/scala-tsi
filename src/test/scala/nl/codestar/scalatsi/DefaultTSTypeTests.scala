@@ -20,28 +20,28 @@ class DefaultTSTypeTests extends WordSpec with Matchers with DefaultTSTypes {
     "Tuple2" in {
       "implicitly[TSType[(Int, String)]]" should compile
       val generated = implicitly[TSType[(Int, String)]].get
-      val manual = TSTuple.of(implicitly[TSType[Int]].get, implicitly[TSType[String]].get)
+      val manual    = TSTuple.of(implicitly[TSType[Int]].get, implicitly[TSType[String]].get)
       generated should ===(manual)
     }
 
     "Tuple3" in {
       "implicitly[TSType[(Int, String, Double)]]" should compile
       val generated = implicitly[TSType[(Int, String, Double)]].get
-      val manual = TSTuple.of(implicitly[TSType[Int]].get, implicitly[TSType[String]].get, implicitly[TSType[Double]].get)
+      val manual    = TSTuple.of(implicitly[TSType[Int]].get, implicitly[TSType[String]].get, implicitly[TSType[Double]].get)
       generated should ===(manual)
     }
 
     "Option" in {
       "implicitly[TSType[Option[Int]]]" should compile
       val generated = implicitly[TSType[Option[Int]]].get
-      val manual = implicitly[TSType[Int]] | TSNull
+      val manual    = implicitly[TSType[Int]] | TSNull
       generated should ===(manual)
     }
 
     "Either" in {
       "implicitly[TSType[Either[Int, String]]]" should compile
       val generated = implicitly[TSType[Either[Int, String]]].get
-      val manual = implicitly[TSType[Int]] | implicitly[TSType[String]]
+      val manual    = implicitly[TSType[Int]] | implicitly[TSType[String]]
       generated should ===(manual)
     }
 
@@ -77,7 +77,7 @@ class DefaultTSTypeTests extends WordSpec with Matchers with DefaultTSTypes {
   implicit def convertToStringHasWrapperForVerb(o: String)(implicit position: source.Position): HasWrapper =
     new HasWrapper {
       override val leftSideString = o.trim
-      override val pos = position
+      override val pos            = position
     }
 
   trait HasWrapper {

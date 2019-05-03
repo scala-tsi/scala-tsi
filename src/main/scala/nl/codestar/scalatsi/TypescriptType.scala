@@ -48,14 +48,14 @@ object TypescriptType {
   case class TSAlias(name: String, underlying: TypescriptType) extends TypescriptNamedType with TypescriptAggregateType {
     override def nested: Set[TypescriptType] = Set(underlying)
   }
-  case object TSAny extends TypescriptType
+  case object TSAny                               extends TypescriptType
   case class TSArray(elementType: TypescriptType) extends TypescriptAggregateType { def nested: Set[TypescriptType] = Set(elementType) }
-  case object TSBoolean extends TypescriptType
+  case object TSBoolean                           extends TypescriptType
 
-  sealed trait TSLiteralType[T] extends TypescriptType { val value: T }
-  case class TSLiteralString(value: String) extends TSLiteralType[String]
+  sealed trait TSLiteralType[T]                 extends TypescriptType { val value: T }
+  case class TSLiteralString(value: String)     extends TSLiteralType[String]
   case class TSLiteralNumber(value: BigDecimal) extends TSLiteralType[BigDecimal]
-  case class TSLiteralBoolean(value: Boolean) extends TSLiteralType[Boolean]
+  case class TSLiteralBoolean(value: Boolean)   extends TSLiteralType[Boolean]
 
   case class TSEnum(name: String, const: Boolean, entries: ListMap[String, Option[Int]])
       extends TypescriptNamedType
@@ -93,11 +93,11 @@ object TypescriptType {
   object TSIntersection {
     def of(of: TypescriptType*) = TSIntersection(of)
   }
-  case object TSNever extends TypescriptType
-  case object TSNull extends TypescriptType
-  case object TSNumber extends TypescriptType
-  case object TSObject extends TypescriptType
-  case object TSString extends TypescriptType
+  case object TSNever                            extends TypescriptType
+  case object TSNull                             extends TypescriptType
+  case object TSNumber                           extends TypescriptType
+  case object TSObject                           extends TypescriptType
+  case object TSString                           extends TypescriptType
   case class TSTuple[E](of: Seq[TypescriptType]) extends TypescriptAggregateType { def nested: Set[TypescriptType] = of.toSet }
   object TSTuple {
     def of(of: TypescriptType*) = TSTuple(of)
@@ -115,7 +115,7 @@ object TypescriptType {
   private[scalatsi] def isValidTSName(name: String): Boolean =
     tsIdentifierPattern.matcher(name).matches() && !reservedKeywords.contains(name)
 
-  private[scalatsi] final val reservedKeywords: Set[String] = Set(
+  final private[scalatsi] val reservedKeywords: Set[String] = Set(
     "break",
     "case",
     "catch",

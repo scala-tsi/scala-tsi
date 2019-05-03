@@ -17,13 +17,8 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
       override def toString: String = "whiteSpaceNormalised"
     }
 
-  // Scala 2.11.11 (maybe others) give false positive unused warnings if a class is used only as a generic
-  def ignoreUnused(o: Object): Unit = ()
-
   "The Typescript serializer" should "serialize to a simple interface" in {
     case class Person(name: String, age: Int)
-
-    ignoreUnused(Person("", 0))
 
     implicit val personTsWrites: TSIType[Person] = TSType.fromCaseClass
 
@@ -39,13 +34,8 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
     case class ComplexCaseClass(nested: NestedCaseClass)
     case class NestedCaseClass(name: String)
 
-    ignoreUnused(ComplexCaseClass(null))
-    ignoreUnused(NestedCaseClass(null))
-
-    implicit val nestedCaseClassTSType: TSIType[NestedCaseClass] =
-      TSType.fromCaseClass
-    implicit val complexCaseClassTSType: TSIType[ComplexCaseClass] =
-      TSType.fromCaseClass
+    implicit val nestedCaseClassTSType: TSIType[NestedCaseClass]   = TSType.fromCaseClass[NestedCaseClass]
+    implicit val complexCaseClassTSType: TSIType[ComplexCaseClass] = TSType.fromCaseClass[ComplexCaseClass]
 
     val typescript = TypescriptTypeSerializer.emit[ComplexCaseClass]
 
@@ -61,8 +51,6 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
   it should "be able to handle options in a case class" in {
     case class OptionCaseClass(option: Option[String])
 
-    ignoreUnused(OptionCaseClass(null))
-
     implicit val optionCaseClassTSType: TSIType[OptionCaseClass] =
       TSType.fromCaseClass
 
@@ -77,10 +65,7 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
     case class A(b: B)
     case class B(a: A)
 
-    ignoreUnused(A(null))
-    ignoreUnused(B(null))
-
-    implicit val tsA: TSType[A] = TSType.external("IA")
+    implicit val tsA: TSType[A]  = TSType.external("IA")
     implicit val tsB: TSIType[B] = TSType.fromCaseClass
     val tsAGenerated: TSIType[A] = TSType.fromCaseClass
 
@@ -110,8 +95,6 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
       stringSeq: Seq[String]
     )
 
-    ignoreUnused(PrimitiveTypes(0, "", 1, 1, 1, 1, 1, 1, true, Seq.empty))
-
     implicit val primitiveTypesTSType: TSIType[PrimitiveTypes] =
       TSType.fromCaseClass
 
@@ -136,8 +119,6 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
       values: Map[String, String] = Map("a" -> "b")
     )
 
-    ignoreUnused(Something())
-
     implicit val somethingTSType: TSIType[Something] = TSType.fromCaseClass
 
     val typescript = TypescriptTypeSerializer.emit[Something]
@@ -148,8 +129,8 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
   }
 
   it should "handle a type alias with nested types" in {
-    val a = TSType.alias("A", TSNumber)
-    val b = TSType.alias("B", TSString)
+    val a    = TSType.alias("A", TSNumber)
+    val b    = TSType.alias("B", TSString)
     val aOrB = TSType.alias("AOrB", a | b)
 
     val typescript = TypescriptTypeSerializer.emit(aOrB).trim
@@ -163,8 +144,6 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
     case class Something(
       values: Map[String, String] = Map("a" -> "b")
     )
-
-    ignoreUnused(Something())
 
     implicit val somethingTSType: TSNamedType[Something] =
       TSType.interfaceIndexed(name = "ISomething", indexName = "as", indexType = TSString, valueType = TSString)
@@ -192,7 +171,7 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
 
     sealed trait Geometry
     case class Point(lat: Double, lon: Double) extends Geometry
-    case class Polygon(coords: Seq[Point]) extends Geometry
+    case class Polygon(coords: Seq[Point])     extends Geometry
 
     implicit val pointTSType: TSNamedType[Point] =
       TSType.interface("Point", "type" -> ("Point": TypescriptType), "coords" -> classOf[(Double, Double)])
@@ -214,7 +193,7 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
   }
 
   it should "handle number literals" in {
-    val expected = "export type FourtyTwo = 42"
+    val expected  = "export type FourtyTwo = 42"
     val fourtyTwo = TSType.alias("FourtyTwo", 42)
 
     val typescript = TypescriptTypeSerializer.emit(fourtyTwo).trim
@@ -224,7 +203,7 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
 
   it should "handle boolean literals" in {
     val expected = "export type MyBool = (true | false)"
-    val myBool = TSType.alias("MyBool", (true: TypescriptType) | false)
+    val myBool   = TSType.alias("MyBool", (true: TypescriptType) | false)
 
     val typescript = TypescriptTypeSerializer.emit(myBool).trim
 
@@ -233,8 +212,8 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
 
   it should "handle object literals" in {
     val expected = "export type X = object"
-    val x = TSType.alias[Nothing, AnyRef]("X")
-    val y = TSType.alias[Nothing, Object]("X")
+    val x        = TSType.alias[Nothing, AnyRef]("X")
+    val y        = TSType.alias[Nothing, Object]("X")
 
     TypescriptTypeSerializer.emit(x).trim should equal(expected)
     TypescriptTypeSerializer.emit(y).trim should equal(expected)
