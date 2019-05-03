@@ -42,7 +42,7 @@ lazy val publishSettings = Seq(
   homepage := Some(url("https://github.com/code-star/scala-tsi")),
   scmInfo := Some(ScmInfo(url("https://github.com/code-star/scala-tsi"), "scm:git@github.com:code-star/scala-tsi.git")),
   developers := List(
-    Developer(id="dhoepelman", name="David Hoepelman", email="dhoepelman@gmail.com", url=url("https://github.com/dhoepelman")),
+    Developer(id="dhoepelman", name="David Hoepelman", email="992153+dhoepelman@users.noreply.github.com", url=url("https://github.com/dhoepelman")),
     Developer(id="donovan", name="Donovan de Kuiper", email="donovan.de.kuiper@ordina.nl", url=url("https://github.com/Hayena"))
   )
   // format: on
