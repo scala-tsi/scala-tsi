@@ -13,9 +13,14 @@ jobs:
             - scala-tsi-2
 
       - run:
-          name: Compile
+          name: Compile and test for 2.13
           command:
-            sbt compile test:compile scala-tsi-macros/compile scala-tsi-macros/test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
+            sbt ++2.13.0-RC0 compile test:compile scala-tsi-macros/compile scala-tsi-macros/test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
+
+      - run:
+          name: Compile and test for 2.12
+          command:
+            sbt ++2.12.8 compile test:compile scala-tsi-macros/compile scala-tsi-macros/test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
 
       - save_cache:
           key:  scala-tsi-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
