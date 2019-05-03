@@ -34,7 +34,7 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
 
   it should "handle sealed traits" in {
     sealed trait AB
-    case class A(a: Int) extends AB
+    case class A(a: Int)    extends AB
     case class B(b: String) extends AB
 
     // implicit val abType: TSType[AB] = ???
