@@ -8,17 +8,17 @@ package object dsl {
   import scala.language.implicitConversions
 
   // Implicit conversions to allow a more natural DSL
-  implicit def classToType[T](cls: Class[T])(implicit tsType: TSType[T]): TypescriptType = tsType.get
+  implicit def classToType[T](cls: Class[T])(implicit tsType: TSType[T]): TypescriptType                = tsType.get
   implicit def classToNamedType[T](cls: Class[T])(implicit tsType: TSNamedType[T]): TypescriptNamedType = tsType.get
   implicit def tupleToTSInterfaceEntry[T](entry: (String, Class[T]))(implicit tsType: TSType[T]): (String, TypescriptType) =
     (entry._1, tsType.get)
 
   // Literal types
-  implicit def stringToLiteral(s: String): TSLiteralString = TSLiteralString(s)
-  implicit def booleanToLiteral(bool: Boolean): TSLiteralBoolean = TSLiteralBoolean(bool)
-  implicit def intToLiteral(i: Int): TSLiteralNumber = TSLiteralNumber(BigDecimal(i))
-  implicit def longToLiteral(l: Long): TSLiteralNumber = TSLiteralNumber(BigDecimal(l))
-  implicit def doubleToLiteral(d: Double): TSLiteralNumber = TSLiteralNumber(BigDecimal(d))
+  implicit def stringToLiteral(s: String): TSLiteralString           = TSLiteralString(s)
+  implicit def booleanToLiteral(bool: Boolean): TSLiteralBoolean     = TSLiteralBoolean(bool)
+  implicit def intToLiteral(i: Int): TSLiteralNumber                 = TSLiteralNumber(BigDecimal(i))
+  implicit def longToLiteral(l: Long): TSLiteralNumber               = TSLiteralNumber(BigDecimal(l))
+  implicit def doubleToLiteral(d: Double): TSLiteralNumber           = TSLiteralNumber(BigDecimal(d))
   implicit def bigDecimalToLiteral(big: BigDecimal): TSLiteralNumber = TSLiteralNumber(big)
 
   // Implicit conversion from typescript types to the TSType typeclasss

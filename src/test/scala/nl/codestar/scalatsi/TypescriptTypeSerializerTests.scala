@@ -80,7 +80,7 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
     ignoreUnused(A(null))
     ignoreUnused(B(null))
 
-    implicit val tsA: TSType[A] = TSType.external("IA")
+    implicit val tsA: TSType[A]  = TSType.external("IA")
     implicit val tsB: TSIType[B] = TSType.fromCaseClass
     val tsAGenerated: TSIType[A] = TSType.fromCaseClass
 
@@ -148,8 +148,8 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
   }
 
   it should "handle a type alias with nested types" in {
-    val a = TSType.alias("A", TSNumber)
-    val b = TSType.alias("B", TSString)
+    val a    = TSType.alias("A", TSNumber)
+    val b    = TSType.alias("B", TSString)
     val aOrB = TSType.alias("AOrB", a | b)
 
     val typescript = TypescriptTypeSerializer.emit(aOrB).trim
@@ -192,7 +192,7 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
 
     sealed trait Geometry
     case class Point(lat: Double, lon: Double) extends Geometry
-    case class Polygon(coords: Seq[Point]) extends Geometry
+    case class Polygon(coords: Seq[Point])     extends Geometry
 
     implicit val pointTSType: TSNamedType[Point] =
       TSType.interface("Point", "type" -> ("Point": TypescriptType), "coords" -> classOf[(Double, Double)])
@@ -214,7 +214,7 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
   }
 
   it should "handle number literals" in {
-    val expected = "export type FourtyTwo = 42"
+    val expected  = "export type FourtyTwo = 42"
     val fourtyTwo = TSType.alias("FourtyTwo", 42)
 
     val typescript = TypescriptTypeSerializer.emit(fourtyTwo).trim
@@ -224,7 +224,7 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
 
   it should "handle boolean literals" in {
     val expected = "export type MyBool = (true | false)"
-    val myBool = TSType.alias("MyBool", (true: TypescriptType) | false)
+    val myBool   = TSType.alias("MyBool", (true: TypescriptType) | false)
 
     val typescript = TypescriptTypeSerializer.emit(myBool).trim
 
@@ -233,8 +233,8 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
 
   it should "handle object literals" in {
     val expected = "export type X = object"
-    val x = TSType.alias[Nothing, AnyRef]("X")
-    val y = TSType.alias[Nothing, Object]("X")
+    val x        = TSType.alias[Nothing, AnyRef]("X")
+    val y        = TSType.alias[Nothing, Object]("X")
 
     TypescriptTypeSerializer.emit(x).trim should equal(expected)
     TypescriptTypeSerializer.emit(y).trim should equal(expected)

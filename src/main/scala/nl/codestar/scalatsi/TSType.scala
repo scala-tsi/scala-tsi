@@ -27,12 +27,12 @@ trait TSType[T] { self =>
     case o: TSType[_] => get == o.get
     case _            => false
   }
-  override def hashCode(): Int = get.hashCode()
+  override def hashCode(): Int  = get.hashCode()
   override def toString: String = s"TSType($get)"
 
   // Forwarders to the underlying TypescriptType
   def |(other: TypescriptType): TSUnion = get | other
-  def |(other: TSType[_]): TSUnion = this | other.get
+  def |(other: TSType[_]): TSUnion      = this | other.get
 }
 
 object TSType {
