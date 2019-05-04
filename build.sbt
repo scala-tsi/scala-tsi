@@ -6,7 +6,7 @@ lazy val commonSettings = Seq(
   scalaVersion := "2.13.0-RC1",
   crossScalaVersions := Seq("2.12.8", "2.13.0-RC1"),
   compilerOptions,
-  scalafmtOnCompile := true  // format code on compile
+  scalafmtOnCompile := true // format code on compile
 )
 
 /* Settings to publish to maven central */
