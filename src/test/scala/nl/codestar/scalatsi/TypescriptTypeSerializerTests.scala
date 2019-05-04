@@ -17,13 +17,8 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
       override def toString: String = "whiteSpaceNormalised"
     }
 
-  // Scala 2.11.11 (maybe others) give false positive unused warnings if a class is used only as a generic
-  def ignoreUnused(o: Object): Unit = ()
-
   "The Typescript serializer" should "serialize to a simple interface" in {
     case class Person(name: String, age: Int)
-
-    ignoreUnused(Person("", 0))
 
     implicit val personTsWrites: TSIType[Person] = TSType.fromCaseClass
 
@@ -39,13 +34,8 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
     case class ComplexCaseClass(nested: NestedCaseClass)
     case class NestedCaseClass(name: String)
 
-    ignoreUnused(ComplexCaseClass(null))
-    ignoreUnused(NestedCaseClass(null))
-
-    implicit val nestedCaseClassTSType: TSIType[NestedCaseClass] =
-      TSType.fromCaseClass
-    implicit val complexCaseClassTSType: TSIType[ComplexCaseClass] =
-      TSType.fromCaseClass
+    implicit val nestedCaseClassTSType: TSIType[NestedCaseClass]   = TSType.fromCaseClass[NestedCaseClass]
+    implicit val complexCaseClassTSType: TSIType[ComplexCaseClass] = TSType.fromCaseClass[ComplexCaseClass]
 
     val typescript = TypescriptTypeSerializer.emit[ComplexCaseClass]
 
@@ -61,8 +51,6 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
   it should "be able to handle options in a case class" in {
     case class OptionCaseClass(option: Option[String])
 
-    ignoreUnused(OptionCaseClass(null))
-
     implicit val optionCaseClassTSType: TSIType[OptionCaseClass] =
       TSType.fromCaseClass
 
@@ -76,9 +64,6 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
   it should "handle recursive types" in {
     case class A(b: B)
     case class B(a: A)
-
-    ignoreUnused(A(null))
-    ignoreUnused(B(null))
 
     implicit val tsA: TSType[A]  = TSType.external("IA")
     implicit val tsB: TSIType[B] = TSType.fromCaseClass
@@ -110,8 +95,6 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
       stringSeq: Seq[String]
     )
 
-    ignoreUnused(PrimitiveTypes(0, "", 1, 1, 1, 1, 1, 1, true, Seq.empty))
-
     implicit val primitiveTypesTSType: TSIType[PrimitiveTypes] =
       TSType.fromCaseClass
 
@@ -135,8 +118,6 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
     case class Something(
       values: Map[String, String] = Map("a" -> "b")
     )
-
-    ignoreUnused(Something())
 
     implicit val somethingTSType: TSIType[Something] = TSType.fromCaseClass
 
@@ -163,8 +144,6 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
     case class Something(
       values: Map[String, String] = Map("a" -> "b")
     )
-
-    ignoreUnused(Something())
 
     implicit val somethingTSType: TSNamedType[Something] =
       TSType.interfaceIndexed(name = "ISomething", indexName = "as", indexType = TSString, valueType = TSString)

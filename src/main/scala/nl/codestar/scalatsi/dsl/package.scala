@@ -2,8 +2,6 @@ package nl.codestar.scalatsi
 
 import nl.codestar.scalatsi.TypescriptType._
 
-import scala.collection.GenTraversableOnce
-
 package object dsl {
   import scala.language.implicitConversions
 
@@ -31,11 +29,11 @@ package object dsl {
   implicit class TSInterfaceDSL(val interface: TSInterface) extends AnyVal {
     def +(member: (String, TypescriptType)): TSInterface =
       interface.copy(members = interface.members + member)
-    def ++(newMembers: GenTraversableOnce[(String, TypescriptType)]): TSInterface =
+    def ++(newMembers: Iterable[(String, TypescriptType)]): TSInterface =
       interface.copy(members = interface.members ++ newMembers)
     def -(member: String): TSInterface =
       interface.copy(members = interface.members - member)
-    def --(members: GenTraversableOnce[String]): TSInterface =
+    def --(members: Iterable[String]): TSInterface =
       interface.copy(members = interface.members -- members)
   }
 
@@ -45,7 +43,7 @@ package object dsl {
     def ++(newMembers: Seq[(String, TypescriptType)]): TSIType[T] =
       TSIType(tsiType.get ++ newMembers)
     def -(member: String): TSIType[T] = TSIType(tsiType.get - member)
-    def --(members: GenTraversableOnce[String]): TSIType[T] =
+    def --(members: Iterable[String]): TSIType[T] =
       TSIType(tsiType.get -- members)
   }
 }

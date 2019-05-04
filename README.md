@@ -1,7 +1,10 @@
 # Scala-TSI
 
-[![Maven Central](https://img.shields.io/maven-central/v/nl.codestar/scala-tsi_2.12.svg)](https://mvnrepository.com/artifact/nl.codestar/scala-tsi)
 [![CircleCI](https://img.shields.io/circleci/project/github/code-star/scala-tsi/master.svg)](https://circleci.com/gh/code-star/scala-tsi/)
+
+
+[![Maven Central](https://img.shields.io/maven-central/v/nl.codestar/scala-tsi_2.12.svg?label=2.12)](https://mvnrepository.com/artifact/nl.codestar/scala-tsi)
+[![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/https/oss.sonatype.org/nl.codestar/scala-tsi_2.13.0-RC1.svg?label=2.13.0-RC1)](https://oss.sonatype.org/content/repositories/snapshots/nl/codestar/scala-tsi_2.13.0-RC1/)
 
 Scala TSI can automatically generate Typescript Interfaces from your Scala classes.
 
@@ -10,6 +13,7 @@ Scala TSI can automatically generate Typescript Interfaces from your Scala class
 To use the project add the SBT plugin dependency in `project/plugins.sbt`:
 
 ```scala
+// See badge above for latest version number
 addSbtPlugin("nl.codestar" % "sbt-scala-tsi" % "0.1.3")
 ```
 

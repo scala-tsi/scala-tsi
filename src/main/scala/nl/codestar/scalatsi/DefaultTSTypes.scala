@@ -32,7 +32,7 @@ trait LowPriorityCollectionTSType {
   // Provides a TSType for any scala collection of E to a typescript array of E
   implicit def tsTraversable[E, F[_]](
     implicit e: TSType[E],
-    ev: F[E] <:< Traversable[E]
+    ev: F[E] <:< Iterable[E]
   ): TSType[F[E]] =
     TSType(e.get.array)
 }

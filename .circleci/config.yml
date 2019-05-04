@@ -10,12 +10,17 @@ jobs:
       - restore_cache:
           keys:
             - scala-tsi-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
-            - scala-tsi-2
+            - scala-tsi-3
 
       - run:
-          name: Compile
+          name: Compile and test for 2.13
           command:
-            sbt compile test:compile scala-tsi-macros/compile scala-tsi-macros/test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
+            sbt ++2.13.0-RC1 compile test:compile scala-tsi-macros/compile scala-tsi-macros/test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
+
+      - run:
+          name: Compile and test for 2.12
+          command:
+            sbt ++2.12.8 compile test:compile scala-tsi-macros/compile scala-tsi-macros/test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
 
       - save_cache:
           key:  scala-tsi-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
@@ -29,7 +34,7 @@ jobs:
             - ~/.m2
       - save_cache:
         # Changing this key/incrementing the number at the end is the only way to remove old dependencies and/or generate a more up-to-date cache
-          key: scala-tsi-2
+          key: scala-tsi-3
           paths:
             - ~/.sbt
             - ~/.ivy2/cache
