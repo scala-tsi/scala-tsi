@@ -40,7 +40,9 @@ object TSType {
   def apply[T](tt: TypescriptType): TSType[T] = new TSTypeImpl(tt)
 
   /** Generate a typescript interface for a case class */
-  def fromCaseClass[T]: TSIType[T] = macro Macros.generateInterface[T]
+  def fromCaseClass[T]: TSIType[T] = macro Macros.generateInterfaceFromCaseClass[T]
+
+  def fromSealedTrait[T]: TSNamedType[T] = macro Macros.generateTypeFromCaseClass[T]
 
   /** Uses the typescript type of Target whenever we're looking for the typescript type of Source
     * This will not generate a `type Source = Target` line like alias

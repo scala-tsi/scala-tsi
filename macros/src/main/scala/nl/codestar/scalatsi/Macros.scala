@@ -16,7 +16,7 @@ private class Macros(val c: blackbox.Context) {
 
   private def caseClassFieldsTypes(T: Type): ListMap[String, Type] = {
     val paramLists = primaryConstructor(T).paramLists
-    val params = paramLists.head
+    val params     = paramLists.head
 
     if (paramLists.size > 1)
       c.error(c.enclosingPosition, s"Only one parameter list classes are supported. Found: $T")
@@ -34,8 +34,8 @@ private class Macros(val c: blackbox.Context) {
     }: _*)
   }
 
-  def generateInterface[T: c.WeakTypeTag]: Tree = {
-    val T = c.weakTypeOf[T]
+  def generateInterfaceFromCaseClass[T: c.WeakTypeTag]: Tree = {
+    val T      = c.weakTypeOf[T]
     val symbol = getClassSymbol(T)
 
     if (!symbol.isCaseClass)
@@ -66,4 +66,6 @@ private class Macros(val c: blackbox.Context) {
 
   protected def isCaseClass(tpe: Type): Boolean =
     tpe.typeSymbol.isClass && tpe.typeSymbol.asClass.isCaseClass
+
+  def generateTypeFromCaseClass[T: c.WeakTypeTag]: Tree = ???
 }

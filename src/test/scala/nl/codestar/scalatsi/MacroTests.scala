@@ -53,4 +53,11 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
        TSIType.fromCaseClass[B]
     }""".stripMargin shouldNot compile
   }
+
+  it should "handle sealed traits" in {
+    sealed trait AOrB
+    case class A(tag: "A", foo: String) extends AOrB
+    case class B(tag: "B", bar: String) extends AOrB
+
+  }
 }
