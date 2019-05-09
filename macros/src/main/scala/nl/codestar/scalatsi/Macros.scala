@@ -76,12 +76,12 @@ private class Macros(val c: blackbox.Context) {
     val operands = children map { symbol =>
       val tpe = symbol.asType
       // use .serialize so TSInterface("XXX", ... ) becomes "XXX", and TSNumber becomes "number" etc
-      q"TSTypeReference(TypescriptTypeSerializer.serialize(implicitly[TSType[$tpe]].get))"
+      q"TypescriptType.nameOrType(implicitly[TSType[$tpe]].get)"
     }
 
     q"""{
        import nl.codestar.scalatsi.TypescriptType.{TSAlias, TSUnion}
-       import nl.codestar.scalatsi.{ TSNamedType, TSIType }
+       import nl.codestar.scalatsi.TypescriptType
        import scala.collection.immutable.Vector
        TSNamedType(TSAlias(${symbol.name.toString}, TSUnion(Vector(..$operands))))
       }"""

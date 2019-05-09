@@ -29,10 +29,18 @@ object TypescriptType {
       case _           => TSTypeReference(tpe)
     }
 
+  /** Get a reference to a named type, or the type itself if it is unnamed or builtin */
+  def nameOrType(tpe: TypescriptType): TypescriptType = tpe match {
+    case named: TypescriptNamedType => named.asReference
+    case anonymous                  => anonymous
+  }
+
   /** A marker trait for a TS type that has a name */
   sealed trait TypescriptNamedType extends TypescriptType {
     def name: String
     require(isValidTSName(name), s"Not a valid TypeScript identifier: $name")
+
+    def asReference: TSTypeReference = TSTypeReference(name)
   }
   object TypescriptNamedType
 
@@ -74,7 +82,9 @@ object TypescriptType {
     * this type is used as a marker that a type with this name exists and is either already defined or externally defined
     * @note name takes from [Typescript specification](https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#3.8.2)
     * */
-  case class TSTypeReference(name: String) extends TypescriptNamedType
+  case class TSTypeReference(name: String) extends TypescriptNamedType {
+    override def asReference: TSTypeReference = this
+  }
 
   /** Typescript indexed interfaces
     * { [indexName:indexType]: valueType}

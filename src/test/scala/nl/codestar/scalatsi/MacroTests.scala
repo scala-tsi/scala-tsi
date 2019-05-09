@@ -34,12 +34,10 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     implicit val tsFoo = TSType.fromCaseClass[Foo] + ("type" -> "Foo")
     implicit val tsBar = TSType.fromCaseClass[Bar] + ("type" -> "Bar")
 
-    implicit val tsFooOrBar: TSNamedType[FooOrBar] = TSType.fromSealed[FooOrBar]
+    tsFoo shouldBe TSType.interface("IFoo", "foo" -> TSString, "type" -> TSLiteralString("Foo"))
+    tsBar shouldBe TSType.interface("IBar", "bar" -> TSNumber, "type" -> TSLiteralString("Bar"))
 
-    tsFoo.get shouldBe TSType.interface("IFoo", "foo" -> TSString, "type" -> TSLiteralString("Foo"))
-    tsFoo.get shouldBe TSType.interface("IBar", "bar" -> TSNumber, "type" -> TSLiteralString("Bar"))
-
-    tsFooOrBar shouldBe TSType.alias("FooOrBar", TSTypeReference("Foo") | TSTypeReference("Bar"))
+    TSType.fromSealed[FooOrBar] shouldBe TSType.alias("FooOrBar", TSTypeReference("IFoo") | TSTypeReference("IBar"))
   }
 
   it should "handle sealed traits with a non-named mapping" in {
@@ -51,23 +49,21 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     implicit val tsFoo = TSType.fromCaseClass[Foo]
     implicit val tsBar = TSType.sameAs[Bar, Int]
 
-    implicit val tsFooOrBar = TSType.fromSealed[FooOrBar]
+    tsFoo shouldBe TSType.interface("IFoo", "foo" -> TSString)
+    tsBar.get shouldBe TSNumber
 
-    tsFoo.get shouldBe TSType.interface("IFoo", "foo" -> TSString)
-    tsFoo.get shouldBe TSNumber
-
-    tsFooOrBar shouldBe TSType.alias("FooOrBar", TSTypeReference("Foo") | TSNumber)
+    TSType.fromSealed[FooOrBar] shouldBe TSType.alias("FooOrBar", TSTypeReference("IFoo") | TSNumber)
   }
 
-  it should "handle recursive definitions" in {
+  it should "handle sealed traits with recursive definitions" in {
     sealed trait LinkedList
     case object Nil extends LinkedList
     case class Node(value: Int, next: LinkedList = Nil)
 
-    // TODO: Determine this automatically: [#35](https://github.com/code-star/scala-tsi/issues/35)
-    implicit val llType: TSType[LinkedList] = TSType(TSType.external("INil").get | TSType.external("INode").get)
+    implicit val nilType: TSType[Nil.type] = TSType(TSNull)
+    implicit val llType: TSType[Node]      = TSType(TSNull | TSTypeReference("ILinkedList"))
 
-    TSType.fromCaseClass[Node] shouldBe TSType.interface("INode", "value" -> TSNumber, "next" -> llType.get)
+    TSType.fromSealed[LinkedList] shouldBe TSType.alias("LinkedList", TSNull | TSTypeReference("INode"))
   }
 
   it should "not compile if a nested definition is missing" in {
