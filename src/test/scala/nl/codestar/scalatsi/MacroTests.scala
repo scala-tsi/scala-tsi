@@ -31,6 +31,18 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     case class Bar(bar: Int)    extends FooOrBar
 
     import nl.codestar.scalatsi.dsl._
+    implicit val tsFoo = TSType.fromCaseClass[Foo]
+    implicit val tsBar = TSType.fromCaseClass[Bar]
+
+    TSType.fromSealed[FooOrBar] shouldBe TSType.alias("FooOrBar", TSTypeReference("IFoo") | TSTypeReference("IBar"))
+  }
+
+  it should "handle sealed abstract classes" in {
+    sealed abstract class FooOrBar(tpe: String)
+    case class Foo(foo: String) extends FooOrBar("Foo")
+    case class Bar(bar: Int)    extends FooOrBar("Bar")
+
+    import nl.codestar.scalatsi.dsl._
     implicit val tsFoo = TSType.fromCaseClass[Foo] + ("type" -> "Foo")
     implicit val tsBar = TSType.fromCaseClass[Bar] + ("type" -> "Bar")
 

@@ -74,9 +74,7 @@ private class Macros(val c: blackbox.Context) {
     val children = symbol.knownDirectSubclasses.toSeq
 
     val operands = children map { symbol =>
-      val tpe = symbol.asType
-      // use .serialize so TSInterface("XXX", ... ) becomes "XXX", and TSNumber becomes "number" etc
-      q"TypescriptType.nameOrType(implicitly[TSType[$tpe]].get)"
+      q"TypescriptType.nameOrType(implicitly[TSType[${symbol.asType}]].get)"
     }
 
     q"""{

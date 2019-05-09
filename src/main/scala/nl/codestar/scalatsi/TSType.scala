@@ -49,10 +49,7 @@ object TSType {
     * case class A(foo: Int) extends AorB
     * case class B(bar: Int) extends AorB
     *
-    * implicit val tsA = ...
-    * implicit val tsB = ...
-    *
-    * implicit val tsAorB = TSType.fromSealedTrait[AorB]
+    * implicit val tsAorB = TSType.fromSealed[AorB]
     * ```
     *
     * wil produce

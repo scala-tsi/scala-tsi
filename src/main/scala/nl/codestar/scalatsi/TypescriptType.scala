@@ -29,7 +29,7 @@ object TypescriptType {
       case _           => TSTypeReference(tpe)
     }
 
-  /** Get a reference to a named type, or the type itself if it is unnamed or builtin */
+  /** Get a reference to a named type, or the type itself if it is unnamed or built-in */
   def nameOrType(tpe: TypescriptType): TypescriptType = tpe match {
     case named: TypescriptNamedType => named.asReference
     case anonymous                  => anonymous
@@ -58,14 +58,9 @@ object TypescriptType {
     override def nested: Set[TypescriptType] = Set(underlying)
   }
 
-  /** Typescript `any` */
-  case object TSAny extends TypescriptType
-
-  /** Typscript array: `elementType[]` */
+  case object TSAny                               extends TypescriptType
   case class TSArray(elementType: TypescriptType) extends TypescriptAggregateType { def nested: Set[TypescriptType] = Set(elementType) }
-
-  /** Typescript `boolean` */
-  case object TSBoolean extends TypescriptType
+  case object TSBoolean                           extends TypescriptType
 
   sealed trait TSLiteralType[T]                 extends TypescriptType { val value: T }
   case class TSLiteralString(value: String)     extends TSLiteralType[String]
@@ -78,8 +73,8 @@ object TypescriptType {
     def nested: Set[TypescriptType] = Set(TSNumber)
   }
 
-  /** Not really a typescript type,
-    * this type is used as a marker that a type with this name exists and is either already defined or externally defined
+  /** This type is used as a marker that a type with this name exists and is either already defined or externally defined
+    * Not a real Typescript type
     * @note name takes from [Typescript specification](https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#3.8.2)
     * */
   case class TSTypeReference(name: String) extends TypescriptNamedType {
@@ -108,13 +103,6 @@ object TypescriptType {
     def nested: Set[TypescriptType] = Set(indexType, valueType)
   }
 
-  /** Typescript interface
-    * ```
-    * interface name {
-    *    member.name: member.type
-    * }
-    * ```
-    */
   case class TSInterface(name: String, members: ListMap[String, TypescriptType]) extends TypescriptNamedType with TypescriptAggregateType {
     def nested: Set[TypescriptType] = members.values.toSet
   }
@@ -128,7 +116,7 @@ object TypescriptType {
   case object TSObject extends TypescriptType
   case object TSString extends TypescriptType
 
-  /** Typescript tuple: `[0.type, 1.type, ... n.type]`*/
+  /** Typescript tuple: `[0.type, 1.type, ... n.type]` */
   case class TSTuple[E](of: Seq[TypescriptType]) extends TypescriptAggregateType { def nested: Set[TypescriptType] = of.toSet }
   object TSTuple {
     def of(of: TypescriptType*) = TSTuple(of)
