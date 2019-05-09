@@ -34,12 +34,29 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     implicit val tsFoo = TSType.fromCaseClass[Foo] + ("type" -> "Foo")
     implicit val tsBar = TSType.fromCaseClass[Bar] + ("type" -> "Bar")
 
-    implicit val tsFooOrBar = TSType.fromSealedTrait[FooOrBar]
+    implicit val tsFooOrBar: TSNamedType[FooOrBar] = TSType.fromSealed[FooOrBar]
 
     tsFoo.get shouldBe TSType.interface("IFoo", "foo" -> TSString, "type" -> TSLiteralString("Foo"))
     tsFoo.get shouldBe TSType.interface("IBar", "bar" -> TSNumber, "type" -> TSLiteralString("Bar"))
 
-    tsFooOrBar shouldBe TSType.alias("FooOrBar", TSExternalName("Foo") | TSExternalName("Bar"))
+    tsFooOrBar shouldBe TSType.alias("FooOrBar", TSTypeReference("Foo") | TSTypeReference("Bar"))
+  }
+
+  it should "handle sealed traits with a non-named mapping" in {
+    sealed trait FooOrBar
+    case class Foo(foo: String) extends FooOrBar
+    case class Bar(bar: Int)    extends FooOrBar
+
+    import nl.codestar.scalatsi.dsl._
+    implicit val tsFoo = TSType.fromCaseClass[Foo]
+    implicit val tsBar = TSType.sameAs[Bar, Int]
+
+    implicit val tsFooOrBar = TSType.fromSealed[FooOrBar]
+
+    tsFoo.get shouldBe TSType.interface("IFoo", "foo" -> TSString)
+    tsFoo.get shouldBe TSNumber
+
+    tsFooOrBar shouldBe TSType.alias("FooOrBar", TSTypeReference("Foo") | TSNumber)
   }
 
   it should "handle recursive definitions" in {

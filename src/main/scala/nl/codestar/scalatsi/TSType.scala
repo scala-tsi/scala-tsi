@@ -61,7 +61,7 @@ object TSType {
     *
     * @see [Typescript docs on Discrimintated Unions](https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions)
     **/
-  def fromSealedTrait[T]: TSNamedType[T] = macro Macros.generateUnionFromSealedTrait[T]
+  def fromSealed[T]: TSNamedType[T] = macro Macros.generateUnionFromSealedTrait[T]
 
   /** Uses the typescript type of Target whenever we're looking for the typescript type of Source
     * This will not generate a `type Source = Target` line like alias
@@ -96,7 +96,7 @@ object TSType {
     */
   def external[T](name: String): TSNamedType[T] =
     TypescriptType.fromString(name) match {
-      case t: TSExternalName => TSNamedType(t)
+      case t: TSTypeReference => TSNamedType(t)
       case t =>
         throw new IllegalArgumentException(s"String $name is a predefined type $t")
     }
