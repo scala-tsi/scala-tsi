@@ -67,5 +67,7 @@ private class Macros(val c: blackbox.Context) {
   protected def isCaseClass(tpe: Type): Boolean =
     tpe.typeSymbol.isClass && tpe.typeSymbol.asClass.isCaseClass
 
-  def generateTypeFromCaseClass[T: c.WeakTypeTag]: Tree = ???
+  def generateUnionFromSealedTrait[T: c.WeakTypeTag]: Tree = {
+    ???
+  }
 }

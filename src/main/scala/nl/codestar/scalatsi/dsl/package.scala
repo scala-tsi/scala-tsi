@@ -29,6 +29,8 @@ package object dsl {
   implicit class TSInterfaceDSL(val interface: TSInterface) extends AnyVal {
     def +(member: (String, TypescriptType)): TSInterface =
       interface.copy(members = interface.members + member)
+    def +(member: (String, String)): TSInterface =
+      interface + (member._1 -> TSLiteralString(member._2))
     def ++(newMembers: Iterable[(String, TypescriptType)]): TSInterface =
       interface.copy(members = interface.members ++ newMembers)
     def -(member: String): TSInterface =
@@ -39,6 +41,8 @@ package object dsl {
 
   implicit class TSITypeDSL[T](val tsiType: TSIType[T]) extends AnyVal {
     def +(member: (String, TypescriptType)): TSIType[T] =
+      TSIType(tsiType.get + member)
+    def +(member: (String, String)): TSIType[T] =
       TSIType(tsiType.get + member)
     def ++(newMembers: Seq[(String, TypescriptType)]): TSIType[T] =
       TSIType(tsiType.get ++ newMembers)

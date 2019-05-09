@@ -26,12 +26,20 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
   }
 
   it should "handle sealed traits" in {
-    sealed trait AB
-    case class A(a: Int)    extends AB
-    case class B(b: String) extends AB
+    sealed trait FooOrBar
+    case class Foo(foo: String) extends FooOrBar
+    case class Bar(bar: Int)    extends FooOrBar
 
-    // implicit val abType: TSType[AB] = ???
-    pending
+    import nl.codestar.scalatsi.dsl._
+    implicit val tsFoo = TSType.fromCaseClass[Foo] + ("type" -> "Foo")
+    implicit val tsBar = TSType.fromCaseClass[Bar] + ("type" -> "Bar")
+
+    implicit val tsFooOrBar = TSType.fromSealedTrait[FooOrBar]
+
+    tsFoo.get shouldBe TSType.interface("IFoo", "foo" -> TSString, "type" -> TSLiteralString("Foo"))
+    tsFoo.get shouldBe TSType.interface("IBar", "bar" -> TSNumber, "type" -> TSLiteralString("Bar"))
+
+    tsFooOrBar shouldBe TSType.alias("FooOrBar", TSExternalName("Foo") | TSExternalName("Bar"))
   }
 
   it should "handle recursive definitions" in {
@@ -52,12 +60,5 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
        case class B(a: A)
        TSIType.fromCaseClass[B]
     }""".stripMargin shouldNot compile
-  }
-
-  it should "handle sealed traits" in {
-    sealed trait AOrB
-    case class A(tag: "A", foo: String) extends AOrB
-    case class B(tag: "B", bar: String) extends AOrB
-
   }
 }
