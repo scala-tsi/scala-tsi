@@ -57,11 +57,11 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
 
   it should "handle sealed traits with recursive definitions" in {
     sealed trait LinkedList
-    case object Nil extends LinkedList
-    case class Node(value: Int, next: LinkedList = Nil)
+    case object Nil                                     extends LinkedList
+    case class Node(value: Int, next: LinkedList = Nil) extends LinkedList
 
     implicit val nilType: TSType[Nil.type] = TSType(TSNull)
-    implicit val llType: TSType[Node]      = TSType(TSNull | TSTypeReference("ILinkedList"))
+    implicit val llType: TSType[Node]      = TSType.alias("INode", TSNull | TSTypeReference("ILinkedList"))
 
     TSType.fromSealed[LinkedList] shouldBe TSType.alias("LinkedList", TSNull | TSTypeReference("INode"))
   }
