@@ -39,6 +39,18 @@ object TSType {
   private class TSTypeImpl[T](override val get: TypescriptType) extends TSType[T]
   def apply[T](tt: TypescriptType): TSType[T] = new TSTypeImpl(tt)
 
+  /** Use an available mapping or use the default mapping for a type
+    * Case class will use [[fromCaseClass]]
+    * Sealed traits/classes will use [[fromSealed]]
+    * */
+  def getMappingOrUseDefault[T](available: TSType[T] = null): TypescriptType = macro Macros.defaultMapping[T]
+
+  /** Use an available mapping or use the default mapping for a type
+    * Case class will use [[fromCaseClass]]
+    * Sealed traits/classes will use [[fromSealed]]
+    * */
+  def getNamedMappingOrUseDefault[T](available: TSNamedType[T] = null): TypescriptNamedType = macro Macros.defaultNamedMapping[T]
+
   /** Generate a typescript interface for a case class */
   def fromCaseClass[T]: TSIType[T] = macro Macros.generateInterface[T]
 

@@ -6,6 +6,8 @@ import scala.reflect.macros.blackbox
 private class Macros(val c: blackbox.Context) {
   import c.universe._
 
+  def
+
   private def primaryConstructor(T: Type): MethodSymbol =
     T.decls.collectFirst {
       case m: MethodSymbol if m.isPrimaryConstructor =>

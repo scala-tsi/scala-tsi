@@ -16,10 +16,9 @@ object ApplicationTypescriptGeneration {
   // If you get a implicit not found error here, make sure you have defined a TSType[T] implicit and imported it
   val toOutput: Seq[TypescriptNamedType] = Seq(
     @for(userClass <- classes) {
-      implicitly[TSNamedType[@userClass]].get,
+      getNamedMappingOrUseDefault[@userClass].get
     }
   )
-  // TODO: If we want to support scala 2.11 the last must not have a trailing comma
 
   val options = _root_.nl.codestar.scalatsi.output.OutputOptions(
     targetFile = new File("@targetFile")
