@@ -40,7 +40,25 @@ object TSType {
   def apply[T](tt: TypescriptType): TSType[T] = new TSTypeImpl(tt)
 
   /** Generate a typescript interface for a case class */
-  def fromCaseClass[T]: TSIType[T] = macro Macros.generateInterface[T]
+  def fromCaseClass[T]: TSIType[T] = macro Macros.generateInterfaceFromCaseClass[T]
+
+  /** Generate a Typescript discriminated union from a scala sealed trait
+    * @example
+    * ```
+    * sealed trait AorB
+    * case class A(foo: Int) extends AorB
+    * case class B(bar: Int) extends AorB
+    *
+    * implicit val tsAorB = TSType.fromSealed[AorB]
+    * ```
+    *
+    * wil produce
+    *
+    * `type AorB = A | B`
+    *
+    * @see [Typescript docs on Discrimintated Unions](https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions)
+    **/
+  def fromSealed[T]: TSNamedType[T] = macro Macros.generateUnionFromSealedTrait[T]
 
   /** Uses the typescript type of Target whenever we're looking for the typescript type of Source
     * This will not generate a `type Source = Target` line like alias
@@ -75,7 +93,7 @@ object TSType {
     */
   def external[T](name: String): TSNamedType[T] =
     TypescriptType.fromString(name) match {
-      case t: TSExternalName => TSNamedType(t)
+      case t: TSTypeReference => TSNamedType(t)
       case t =>
         throw new IllegalArgumentException(s"String $name is a predefined type $t")
     }

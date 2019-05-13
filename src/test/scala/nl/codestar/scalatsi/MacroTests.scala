@@ -26,23 +26,56 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
   }
 
   it should "handle sealed traits" in {
-    sealed trait AB
-    case class A(a: Int)    extends AB
-    case class B(b: String) extends AB
+    sealed trait FooOrBar
+    case class Foo(foo: String) extends FooOrBar
+    case class Bar(bar: Int)    extends FooOrBar
 
-    // implicit val abType: TSType[AB] = ???
-    pending
+    import nl.codestar.scalatsi.dsl._
+    implicit val tsFoo = TSType.fromCaseClass[Foo]
+    implicit val tsBar = TSType.fromCaseClass[Bar]
+
+    TSType.fromSealed[FooOrBar] shouldBe TSType.alias("FooOrBar", TSTypeReference("IFoo") | TSTypeReference("IBar"))
   }
 
-  it should "handle recursive definitions" in {
+  it should "handle sealed abstract classes" in {
+    sealed abstract class FooOrBar(tpe: String)
+    case class Foo(foo: String) extends FooOrBar("Foo")
+    case class Bar(bar: Int)    extends FooOrBar("Bar")
+
+    import nl.codestar.scalatsi.dsl._
+    implicit val tsFoo = TSType.fromCaseClass[Foo] + ("type" -> "Foo")
+    implicit val tsBar = TSType.fromCaseClass[Bar] + ("type" -> "Bar")
+
+    tsFoo shouldBe TSType.interface("IFoo", "foo" -> TSString, "type" -> TSLiteralString("Foo"))
+    tsBar shouldBe TSType.interface("IBar", "bar" -> TSNumber, "type" -> TSLiteralString("Bar"))
+
+    TSType.fromSealed[FooOrBar] shouldBe TSType.alias("FooOrBar", TSTypeReference("IFoo") | TSTypeReference("IBar"))
+  }
+
+  it should "handle sealed traits with a non-named mapping" in {
+    sealed trait FooOrBar
+    case class Foo(foo: String) extends FooOrBar
+    case class Bar(bar: Int)    extends FooOrBar
+
+    import nl.codestar.scalatsi.dsl._
+    implicit val tsFoo = TSType.fromCaseClass[Foo]
+    implicit val tsBar = TSType.sameAs[Bar, Int]
+
+    tsFoo shouldBe TSType.interface("IFoo", "foo" -> TSString)
+    tsBar.get shouldBe TSNumber
+
+    TSType.fromSealed[FooOrBar] shouldBe TSType.alias("FooOrBar", TSTypeReference("IFoo") | TSNumber)
+  }
+
+  it should "handle sealed traits with recursive definitions" in {
     sealed trait LinkedList
-    case object Nil extends LinkedList
-    case class Node(value: Int, next: LinkedList = Nil)
+    case object Nil                                     extends LinkedList
+    case class Node(value: Int, next: LinkedList = Nil) extends LinkedList
 
-    // TODO: Determine this automatically: [#35](https://github.com/code-star/scala-tsi/issues/35)
-    implicit val llType: TSType[LinkedList] = TSType(TSType.external("INil").get | TSType.external("INode").get)
+    implicit val nilType: TSType[Nil.type] = TSType(TSNull)
+    implicit val llType: TSType[Node]      = TSType.alias("INode", TSNull | TSTypeReference("ILinkedList"))
 
-    TSType.fromCaseClass[Node] shouldBe TSType.interface("INode", "value" -> TSNumber, "next" -> llType.get)
+    TSType.fromSealed[LinkedList] shouldBe TSType.alias("LinkedList", TSNull | TSTypeReference("INode"))
   }
 
   it should "not compile if a nested definition is missing" in {
