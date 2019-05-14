@@ -64,7 +64,7 @@ object TypescriptTypeSerializer {
          |}
        """.stripMargin
 
-    case _: TSExternalName => ""
+    case _: TSTypeReference => ""
 
     case TSInterfaceIndexed(name, indexName, indexType, valueType) =>
       s"""export interface $name {
