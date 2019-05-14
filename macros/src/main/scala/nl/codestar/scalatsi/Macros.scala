@@ -6,7 +6,11 @@ import scala.reflect.macros.blackbox
 private class Macros(val c: blackbox.Context) {
   import c.universe._
 
-  def
+  def generateDefaultMapping[T: c.WeakTypeTag]: Tree = {
+    val T      = c.weakTypeOf[T]
+    val symbol = getClassSymbol(T)
+
+  }
 
   private def primaryConstructor(T: Type): MethodSymbol =
     T.decls.collectFirst {
@@ -18,7 +22,7 @@ private class Macros(val c: blackbox.Context) {
 
   private def caseClassFieldsTypes(T: Type): ListMap[String, Type] = {
     val paramLists = primaryConstructor(T).paramLists
-    val params = paramLists.head
+    val params     = paramLists.head
 
     if (paramLists.size > 1)
       c.error(c.enclosingPosition, s"Only one parameter list classes are supported. Found: $T")
@@ -37,7 +41,7 @@ private class Macros(val c: blackbox.Context) {
   }
 
   def generateInterface[T: c.WeakTypeTag]: Tree = {
-    val T = c.weakTypeOf[T]
+    val T      = c.weakTypeOf[T]
     val symbol = getClassSymbol(T)
 
     if (!symbol.isCaseClass)

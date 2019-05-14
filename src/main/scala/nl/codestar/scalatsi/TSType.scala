@@ -40,6 +40,7 @@ object TSType {
   def apply[T](tt: TypescriptType): TSType[T] = new TSTypeImpl(tt)
 
   /** Use an available mapping or use the default mapping for a type
+    * If an implicit TSType[T] is in scope, that will be used
     * Case class will use [[fromCaseClass]]
     * Sealed traits/classes will use [[fromSealed]]
     * */
