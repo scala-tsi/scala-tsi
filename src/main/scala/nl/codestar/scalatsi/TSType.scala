@@ -39,18 +39,25 @@ object TSType {
   private class TSTypeImpl[T](override val get: TypescriptType) extends TSType[T]
   def apply[T](tt: TypescriptType): TSType[T] = new TSTypeImpl(tt)
 
-  /** Use an available mapping or use the default mapping for a type
-    * If an implicit TSType[T] is in scope, that will be used
-    * Case class will use [[fromCaseClass]]
-    * Sealed traits/classes will use [[fromSealed]]
-    * */
-  def getMappingOrUseDefault[T](available: TSType[T] = null): TypescriptType = macro Macros.defaultMapping[T]
+  /** Get an implicit mapping or generator one */
+  def mappingOrElse[T](generator: => TSType[T])(implicit inScopeMapping: TSType[T] = null): TSType[T] =
+    if (inScopeMapping != null) inScopeMapping else generator
 
-  /** Use an available mapping or use the default mapping for a type
+  /** Get an implicit named mapping or generator one */
+  def mappingNamedOrElse[T](generator: => TSNamedType[T])(implicit inScopeMapping: TSNamedType[T] = null): TSNamedType[T] =
+    if (inScopeMapping != null) inScopeMapping else generator
+
+  /** Generate a mapping for a type
     * Case class will use [[fromCaseClass]]
     * Sealed traits/classes will use [[fromSealed]]
     * */
-  def getNamedMappingOrUseDefault[T](available: TSNamedType[T] = null): TypescriptNamedType = macro Macros.defaultNamedMapping[T]
+  def generateMapping[T]: TSType[T] = macro Macros.generateDefaultMapping[T]
+
+  /** Generate a named mapping for a type
+    * Case class will use [[fromCaseClass]]
+    * Sealed traits/classes will use [[fromSealed]]
+    * */
+  def generateNamedMapping[T]: TSNamedType[T] = macro Macros.generateDefaultMapping[T]
 
   /** Generate a typescript interface for a case class */
   def fromCaseClass[T]: TSIType[T] = macro Macros.generateInterfaceFromCaseClass[T]

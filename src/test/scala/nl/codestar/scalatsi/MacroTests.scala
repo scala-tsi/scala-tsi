@@ -25,12 +25,20 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     TSType.fromCaseClass[B] shouldBe TSType.interface("IB", "a" -> tsA.get)
   }
 
-  it should "handle sealed traits" in {
+  it should "not compile if a nested definition is missing" in {
+
+    """{
+       case class A(foo: Boolean)
+       case class B(a: A)
+       TSIType.fromCaseClass[B]
+    }""".stripMargin shouldNot compile
+  }
+
+  "The sealed trait/class to Typescript type macro" should "handle sealed traits" in {
     sealed trait FooOrBar
     case class Foo(foo: String) extends FooOrBar
     case class Bar(bar: Int)    extends FooOrBar
 
-    import nl.codestar.scalatsi.dsl._
     implicit val tsFoo = TSType.fromCaseClass[Foo]
     implicit val tsBar = TSType.fromCaseClass[Bar]
 
@@ -57,7 +65,6 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     case class Foo(foo: String) extends FooOrBar
     case class Bar(bar: Int)    extends FooOrBar
 
-    import nl.codestar.scalatsi.dsl._
     implicit val tsFoo = TSType.fromCaseClass[Foo]
     implicit val tsBar = TSType.sameAs[Bar, Int]
 
@@ -78,12 +85,50 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     TSType.fromSealed[LinkedList] shouldBe TSType.alias("LinkedList", TSNull | TSTypeReference("INode"))
   }
 
-  it should "not compile if a nested definition is missing" in {
+  it should "handle sealed traits without subclasses" in {
+    sealed trait Empty
 
-    """{
-       case class A(foo: Boolean)
-       case class B(a: A)
-       TSIType.fromCaseClass[B]
-    }""".stripMargin shouldNot compile
+    // Expect a warning here
+    TSType.fromSealed[Empty] shouldBe TSNamedType[Empty](TSAlias("IEmpty", TSNever))
+  }
+
+  "The default mapping construct" should "use available implicit if in scope" in {
+    case class A(foo: String)
+
+    implicit val tsA = TSType[A](TSNumber)
+
+    TSType.mappingOrElse[A](TSType.generateMapping[A]) shouldBe TSType[A](TSNumber)
+  }
+
+  it should "use available implicit TSNamedType if in scope" in {
+    case class A(foo: String)
+
+    import dsl._
+    implicit val tsA: TSNamedType[A] = TSType.fromCaseClass[A] + ("type" -> "A")
+
+    TSType.mappingNamedOrElse[A](TSType.generateNamedMapping[A]) shouldBe TSType.interface(
+      "IA",
+      "foo"  -> TSString,
+      "type" -> TSLiteralString("A")
+    )
+  }
+
+  it should "use case class generator for case classes" in {
+    case class A(foo: String)
+
+    TSType.mappingOrElse[A](TSType.generateMapping[A]) shouldBe TSType.fromCaseClass[A].get
+  }
+
+  it should "use sealed trait generator for sealed traits" in {
+    sealed trait A
+    case class B(foo: String) extends A
+
+    TSType.mappingOrElse[A](TSType.generateMapping[A]) shouldBe TSType.fromSealed[A]
+  }
+
+  it should "give a compile error for unsupported types" in {
+    class A
+
+    "TSType.getMappingOrUseDefault[A]" shouldNot compile
   }
 }
