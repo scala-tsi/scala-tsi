@@ -3,22 +3,36 @@ package nl.codestar.scalatsi
 import scala.collection.immutable.ListMap
 import scala.reflect.macros.blackbox
 
-private class Macros(val c: blackbox.Context) {
+private[scalatsi] class Macros(val c: blackbox.Context) {
   import c.universe._
 
   /** Look up an implicit mapping or generate the default */
-  private def lookupMapping(T: TypeSymbol) =
+  private def lookupMapping(T: TypeSymbol): Tree =
+    q"""nl.codestar.scalatsi.TSType.getMappingOrGenerateDefault[$T]"""
+
+  private def mapToNever[T: c.WeakTypeTag]: Tree =
     q"""{
-       import nl.codestar.scalatsi.TSType
-       import nl.codestar.scalatsi.DefaultTSTypes._
-       TSType.mappingOrElse[$T](TSType.generateMapping[$T])
-    }"""
+       import nl.codestar.scalatsi.TSNamedType
+       import nl.codestar.scalatsi.TypescriptType.{TSAlias, TSNever}
+       TSNamedType(TSAlias(${tsName[T]}, TSNever))
+     }"""
 
-  private def mapToNever(T: String) =
-    q"nl.codestar.scalatsi.TSNamedType(nl.codestar.scalatsi.TypescriptType.TSAlias($T, nl.codestar.scalatsi.TypescriptType.TSNever))"
+  /** Change a Type into a "IType" for a class/trait, and "Type" otherwise */
+  private def tsName[T: c.WeakTypeTag]: String = {
+    val symbol = c.weakTypeOf[T].typeSymbol
+    (if (symbol.isClass) "I" else "") + symbol.name.toString
+  }
 
-  // Use AnyRef because TSType[T] is not available in the macro
-  def generateDefaultMapping[T: c.WeakTypeTag]: Tree = {
+  private def eval[E](expr: Expr[E]): E = c.eval(c.Expr[E](c.untypecheck(expr.tree.duplicate)))
+
+  def getMappingOrGenerateDefault[T: c.WeakTypeTag, TSType](mapping: c.Expr[OptionalImplicit[TSType]]): Tree = {
+    /*eval(mapping).value*/ None match {
+      //case Some(_) => mapToNever[T] //reify(mapping.value.value.get).tree
+      case None    => mapToNever[T] //generateDefaultMapping[T]
+    }
+  }
+
+  private def generateDefaultMapping[T: c.WeakTypeTag]: Tree = {
     val T      = c.weakTypeOf[T]
     val symbol = T.typeSymbol
 
@@ -108,18 +122,18 @@ private class Macros(val c: blackbox.Context) {
     if (!symbol.isSealed)
       c.abort(c.enclosingPosition, s"Expected sealed trait or class, but found: $T")
 
-    val children = symbol.knownDirectSubclasses.toSeq
+    val children = symbol.knownDirectSubclasses
 
-    val operands = children map { symbol =>
-      q"TypescriptType.nameOrType(${lookupMapping(symbol.asType)}.get)"
-    }
-
-    val name = symbol.name.toString
-
-    if (operands.isEmpty) {
+    if(children.isEmpty) {
       c.warning(c.enclosingPosition, s"Sealed $T has no known subclasses, could not generate union")
-      mapToNever(name)
+      mapToNever[T]
     } else {
+      val operands = children map { symbol =>
+        q"TypescriptType.nameOrType(${lookupMapping(symbol.asType)}.get)"
+      }
+
+      val name = symbol.name.toString
+
       q"""{
        import nl.codestar.scalatsi.TypescriptType.{TSAlias, TSUnion}
        import nl.codestar.scalatsi.TSNamedType

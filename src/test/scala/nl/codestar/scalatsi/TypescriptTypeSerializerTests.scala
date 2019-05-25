@@ -96,7 +96,7 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
     )
 
     implicit val primitiveTypesTSType: TSIType[PrimitiveTypes] =
-      TSType.fromCaseClass
+      TSType.fromCaseClass[PrimitiveTypes]
 
     val typescript = TypescriptTypeSerializer.emit[PrimitiveTypes]
 
