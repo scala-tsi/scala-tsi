@@ -40,7 +40,7 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
   def getImplicitInterfaceMappingOrGenerateDefault[T: c.WeakTypeTag, TSType[_]](implicit tsTypeTag: c.WeakTypeTag[TSType[_]]): Tree =
     macroUtil.lookupOptionalGenericImplicit[T, TSType] match {
       case Some(value) => value
-      case None => generateInterfaceFromCaseClass[T]
+      case None        => generateInterfaceFromCaseClass[T]
     }
 
   private def generateDefaultMapping[T: c.WeakTypeTag]: Tree = {
