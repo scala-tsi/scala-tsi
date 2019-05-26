@@ -20,29 +20,29 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
   /** Change a Type into a "IType" for a class/trait, and "Type" otherwise */
   private def tsName[T: c.WeakTypeTag]: String = {
     val symbol = c.weakTypeOf[T].typeSymbol
-    val prefix = for {
-      clsSymbol <- if (symbol.isClass) Some(symbol.asClass) else None
-      if !clsSymbol.isDerivedValueClass
-    } yield "I"
+
+    val prefix = Option(symbol)
+      .filter(_.isClass)
+      .map(_.asClass)
+      .filterNot(_.isDerivedValueClass)
+      .map(_ => "I")
 
     prefix.getOrElse("") + symbol.name.toString
   }
 
-  def macroUtil = new MacroUtil[c.type](c)
+  private def macroUtil = new MacroUtil[c.type](c)
 
-  //private def eval[E](expr: Expr[E]): E = c.eval(c.Expr[E](c.untypecheck(expr.tree.duplicate)))
-
-  def getImplicitMappingOrGenerateDefault[T: c.WeakTypeTag, TSType[_]](implicit tsTypeTag: c.WeakTypeTag[TSType[_]]): Tree = {
-    // Get the T => TSType[T] function
-    val typeConstructor = c.weakTypeOf[TSType[_]].typeConstructor
-    // Construct the TSType[T] type we need to look up
-    val lookupType = appliedType(typeConstructor, c.weakTypeOf[T])
-    //c.abort(pos = c.enclosingPosition, s"Looking up ${c.weakTypeOf[T]} ${tsTypeTag.tpe} ${tsTypeTag.tpe.typeArgs.head} ${mockType} ${mockType.typeArgs.head}")
-    macroUtil.safeLookupOptionalImplicit(lookupType) match {
+  def getImplicitMappingOrGenerateDefault[T: c.WeakTypeTag, TSType[_]](implicit tsTypeTag: c.WeakTypeTag[TSType[_]]): Tree =
+    macroUtil.lookupOptionalGenericImplicit[T, TSType] match {
       case Some(value) => value
       case None        => generateDefaultMapping[T]
     }
-  }
+
+  def getImplicitInterfaceMappingOrGenerateDefault[T: c.WeakTypeTag, TSType[_]](implicit tsTypeTag: c.WeakTypeTag[TSType[_]]): Tree =
+    macroUtil.lookupOptionalGenericImplicit[T, TSType] match {
+      case Some(value) => value
+      case None => generateInterfaceFromCaseClass[T]
+    }
 
   private def generateDefaultMapping[T: c.WeakTypeTag]: Tree = {
     val T      = c.weakTypeOf[T]

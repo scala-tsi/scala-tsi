@@ -42,6 +42,8 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     implicit val tsFoo = TSType.fromCaseClass[Foo]
     implicit val tsBar = TSType.fromCaseClass[Bar]
 
+    // TODO: This will probably not emit Foo or Bar, when used, test this
+
     TSType.fromSealed[FooOrBar] shouldBe TSType.alias("FooOrBar", TSTypeReference("IFoo") | TSTypeReference("IBar"))
   }
 
@@ -93,14 +95,14 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
   }
 
   // TODO: Do not generate invalid 1-element union if sealed trait has single element
-  it should "handle seale traits with a single subclass" in pendingUntilFixed {
+  it should "handle sealed traits with a single subclass" in pendingUntilFixed {
     sealed trait Single
     case class A(foo: Int) extends Single
 
     TSType.fromSealed[Single] shouldBe TSType.alias("ISingle", TSTypeReference("IA"))
   }
 
-  "The default mapping construct" should "use available implicit if in scope" in {
+  "TSType.getOrGenerate" should "use available implicit if in scope" in {
     case class A(foo: String)
 
     implicit val tsA = TSType[A](TSNumber)
@@ -114,7 +116,7 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     import dsl._
     implicit val tsA: TSNamedType[A] = TSType.fromCaseClass[A] + ("type" -> "A")
 
-    TSType.getOrGenerateNamed[A] shouldBe TSType.interface(
+    TSNamedType.getOrGenerate[A] shouldBe TSType.interface(
       "IA",
       "foo"  -> TSString,
       "type" -> TSLiteralString("A")
@@ -146,5 +148,29 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     class A
 
     "TSType.getOrGenerate[A]" shouldNot compile
+  }
+
+  "TSIType.getOrGenerate" should "use available implicit if in scope" in {
+    case class A(foo: String)
+
+    implicit val tsA: TSIType[A] = TSType.interface("Hi", "bar" -> TSNumber)
+
+    TSType.getOrGenerate[A] shouldBe theSameInstanceAs(tsA)
+  }
+
+  it should "use case class generator for case classes" in {
+    case class A(foo: String)
+
+    val generated = TSIType.getOrGenerate[A]
+    val fromCaseClass = TSType.fromCaseClass[A]
+
+    generated shouldBe fromCaseClass
+    fromCaseClass shouldBe TSType.interface("IA", "foo" -> TSString)
+  }
+
+  it should "give a compile error for unsupported types if no implicit is available" in {
+    sealed trait A
+
+    "TSIType.getOrGenerate[A]" shouldNot compile
   }
 }

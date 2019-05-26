@@ -50,15 +50,6 @@ object TSType {
     * */
   def getOrGenerate[T]: TSType[T] = macro Macros.getImplicitMappingOrGenerateDefault[T, TSType]
 
-  /** Get an implicit `TSNamedType[T]` */
-  def getNamed[T](implicit tsType: TSNamedType[T]): TSNamedType[T] = tsType
-
-  /** Get an implicit `TSNamedType[T]` or generate a default one
-    *
-    * @see [[getOrGenerate]]
-    * */
-  def getOrGenerateNamed[T]: TSNamedType[T] = macro Macros.getImplicitMappingOrGenerateDefault[T, TSNamedType]
-
   /** Generate a typescript interface for a case class */
   def fromCaseClass[T]: TSIType[T] = macro Macros.generateInterfaceFromCaseClass[T]
 
@@ -159,6 +150,15 @@ object TSNamedType {
   private class TSNamedTypeImpl[T](override val get: TypescriptNamedType) extends TSNamedType[T]
   def apply[T](tt: TypescriptNamedType): TSNamedType[T] =
     new TSNamedTypeImpl(tt)
+
+  /** Get an implicit `TSNamedType[T]` */
+  def get[T](implicit tsType: TSNamedType[T]): TSNamedType[T] = tsType
+
+  /** Get an implicit `TSNamedType[T]` or generate a default one
+    *
+    * @see [[TSType.getOrGenerate]]
+    **/
+  def getOrGenerate[T]: TSNamedType[T] = macro Macros.getImplicitMappingOrGenerateDefault[T, TSNamedType]
 }
 
 @implicitNotFound(
@@ -172,4 +172,13 @@ trait TSIType[T] extends TSNamedType[T] { self =>
 object TSIType {
   private class TSITypeImpl[T](override val get: TSInterface) extends TSIType[T]
   def apply[T](tt: TSInterface): TSIType[T] = new TSITypeImpl(tt)
+
+  /** Get an implicit TSIType[T] */
+  def get[T](implicit tsType: TSIType[T]): TSIType[T] = tsType
+
+  /** Get an implicit `TSIType[T]` or generate a default one
+    *
+    * @see [[TSType.getOrGenerate]]
+    */
+  def getOrGenerate[T]: TSIType[T] = macro Macros.getImplicitInterfaceMappingOrGenerateDefault[T, TSIType]
 }
