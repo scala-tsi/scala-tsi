@@ -139,7 +139,7 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     val fromSealed = TSType.fromSealed[A]
 
     generated shouldBe fromSealed
-    fromSealed.get shouldBe TSType.alias("A", TSUnion.of(TSTypeReference("IB")))
+    fromSealed shouldBe TSType.alias("A", TSUnion.of(TSTypeReference("IB")))
   }
 
   it should "give a compile error for unsupported types if no implicit is available" in {
