@@ -3,6 +3,7 @@ package nl.codestar.scalatsi
 import scala.language.higherKinds
 import scala.reflect.macros.blackbox
 
+/** Generic Macro utility not really related to specific scala-tsi logic */
 private[scalatsi] class MacroUtil[C <: blackbox.Context](val c: C) {
 
   private[this] var lookingUpList = List[c.Type]()

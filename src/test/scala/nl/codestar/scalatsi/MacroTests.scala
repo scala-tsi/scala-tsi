@@ -94,12 +94,11 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     TSType.fromSealed[Empty] shouldBe TSNamedType[Empty](TSAlias("IEmpty", TSNever))
   }
 
-  // TODO: Do not generate invalid 1-element union if sealed trait has single element
-  it should "handle sealed traits with a single subclass" in pendingUntilFixed {
+  it should "handle sealed traits with a single subclass" in {
     sealed trait Single
     case class A(foo: Int) extends Single
 
-    TSType.fromSealed[Single] shouldBe TSType.alias("ISingle", TSTypeReference("IA"))
+    TSType.fromSealed[Single] shouldBe TSType.alias("Single", TSTypeReference("IA"))
   }
 
   "TSType.getOrGenerate" should "use available implicit if in scope" in {
@@ -141,7 +140,7 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     val fromSealed = TSType.fromSealed[A]
 
     generated shouldBe fromSealed
-    fromSealed shouldBe TSType.alias("A", TSUnion.of(TSTypeReference("IB")))
+    fromSealed shouldBe TSType.alias("A", TSTypeReference("IB"))
   }
 
   it should "give a compile error for unsupported types if no implicit is available" in {

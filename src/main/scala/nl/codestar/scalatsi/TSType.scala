@@ -20,7 +20,7 @@ import scala.collection.immutable.ListMap
     )
  */
 
-@implicitNotFound("Could not find an implicit TSType[${T}] in scope. Make sure you created and imported a typescript mapping for the type.")
+@implicitNotFound("Could not find an implicit TSType[${T}] in scope. Did you create and import it?")
 trait TSType[T] { self =>
   def get: TypescriptType
   override def equals(obj: scala.Any): Boolean = obj match {

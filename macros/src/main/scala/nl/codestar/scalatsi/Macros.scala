@@ -6,8 +6,8 @@ import scala.reflect.macros.blackbox
 private[scalatsi] class Macros(val c: blackbox.Context) {
   import c.universe._
 
-  /** Look up an implicit mapping or generate the default */
-  private def lookupMapping(T: Type): Tree =
+  /** Tree to use to get a TSType[T] */
+  private def getTSType(T: Type): Tree =
     q"""_root_.nl.codestar.scalatsi.TSType.getOrGenerate[$T]"""
 
   private def mapToNever[T: c.WeakTypeTag]: Tree =
@@ -22,8 +22,7 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
     val symbol = c.weakTypeOf[T].typeSymbol
 
     val prefix = Option(symbol)
-      .filter(_.isClass)
-      .map(_.asClass)
+      .collect({ case clsSymbol if clsSymbol.isClass => clsSymbol.asClass })
       .filterNot(_.isDerivedValueClass)
       .map(_ => "I")
 
@@ -48,24 +47,22 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
     val T      = c.weakTypeOf[T]
     val symbol = T.typeSymbol
 
-    def err(code: Int) = {
+    def err() = {
       c.abort(
         c.enclosingPosition,
-        s"Could not find an implicit TSType[$T] in scope. " +
-          s"Could not generate one because it is not a case class or sealed trait. " +
-          s"Make sure you created and imported a typescript mapping for the type. (err $code)"
+        s"Could not find an implicit TSType[$T] in scope and could not generate one. Did you create and import it?"
       )
     }
 
     if (!symbol.isClass) {
-      err(1)
+      err()
     } else {
       val classSymbol = symbol.asClass
       if (classSymbol.isCaseClass)
         generateInterfaceFromCaseClass[T]
       else if (classSymbol.isSealed)
         generateUnionFromSealedTrait[T]
-      else err(2)
+      else err()
     }
   }
 
@@ -107,19 +104,19 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
     val members = caseClassFieldsTypes(T) map {
       case (name, optional) if optional <:< typeOf[Option[_]] =>
         val typeArg = optional.typeArgs.head
-        q"($name, ${lookupMapping(typeArg)} | TSUndefined)"
+        q"($name, ${getTSType(typeArg)} | TSUndefined)"
       case (name, tpe) =>
-        q"($name, ${lookupMapping(tpe)}.get)"
+        q"($name, ${getTSType(tpe)}.get)"
     }
 
     q"""{
-       import _root_.nl.codestar.scalatsi.TypescriptType.TSUndefined
-       import _root_.nl.codestar.scalatsi.{TSNamedType, TSIType}
-       import _root_.scala.collection.immutable.ListMap
-       TSIType(TSInterface("I" + ${symbol.name.toString}, ListMap(
-         ..$members
-       )))
-      }"""
+     import _root_.nl.codestar.scalatsi.TypescriptType.TSUndefined
+     import _root_.nl.codestar.scalatsi.{TSNamedType, TSIType}
+     import _root_.scala.collection.immutable.ListMap
+     TSIType(TSInterface("I" + ${symbol.name.toString}, ListMap(
+       ..$members
+     )))
+    }"""
   }
 
   private def getClassOrTraitSymbol(T: Type): ClassSymbol = {
@@ -134,25 +131,31 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
     val symbol = getClassOrTraitSymbol(T)
 
     if (!symbol.isSealed)
-      c.abort(c.enclosingPosition, s"Expected sealed trait or class, but found: $T")
+      c.abort(c.enclosingPosition, s"Expected sealed trait or sealed class, but found: $T")
 
-    val children = symbol.knownDirectSubclasses
+    val name = symbol.name.toString
 
-    if (children.isEmpty) {
-      c.warning(c.enclosingPosition, s"Sealed $T has no known subclasses, could not generate union")
-      mapToNever[T]
-    } else {
-      val operands = children map { symbol =>
-        q"TypescriptType.nameOrType(${lookupMapping(symbol.asType.toType)}.get)"
-      }
+    symbol.knownDirectSubclasses.toSeq match {
+      case Seq() =>
+        c.warning(c.enclosingPosition, s"Sealed $T has no known subclasses, could not generate union")
+        mapToNever[T]
+      case Seq(singleChild) =>
+        q"""{
+         import _root_.nl.codestar.scalatsi.TypescriptType
+         import _root_.nl.codestar.scalatsi.TSNamedType
+         TSNamedType(TSAlias($name, TypescriptType.nameOrType(${getTSType(singleChild.asType.toType)}.get)))
+        }"""
+      case children =>
+        val operands = children map { symbol =>
+          q"TypescriptType.nameOrType(${getTSType(symbol.asType.toType)}.get)"
+        }
 
-      val name = symbol.name.toString
-
-      q"""{
-       import _root_.nl.codestar.scalatsi.TypescriptType.{TSAlias, TSUnion}
-       import _root_.nl.codestar.scalatsi.TSNamedType
-       import _root_.scala.collection.immutable.Vector
-       TSNamedType(TSAlias($name, TSUnion(Vector(..$operands))))
+        q"""{
+        import _root_.nl.codestar.scalatsi.TypescriptType
+        import TypescriptType.{TSAlias, TSUnion}
+        import _root_.nl.codestar.scalatsi.TSNamedType
+        import _root_.scala.collection.immutable.Vector
+        TSNamedType(TSAlias($name, TSUnion(Vector(..$operands))))
       }"""
     }
   }
