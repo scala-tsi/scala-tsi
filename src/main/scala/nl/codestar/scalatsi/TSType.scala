@@ -39,21 +39,25 @@ object TSType {
   private class TSTypeImpl[T](override val get: TypescriptType) extends TSType[T]
   def apply[T](tt: TypescriptType): TSType[T] = new TSTypeImpl(tt)
 
-  /** Get an implicit mapping or generate a default one
+  /** Get an implicit `TSType[T]` */
+  def get[T](implicit tsType: TSType[T]): TSType[T] = tsType
+
+  /** Get an implicit `TSType[T]` or generate a default one
     *
     * By default
     * Case class will use [[fromCaseClass]]
     * Sealed traits/classes will use [[fromSealed]]
     * */
-  def getMappingOrGenerateDefault[T](implicit mapping: OptionalImplicit[TSType[T]]): TSType[T] =
-    macro Macros.getMappingOrGenerateDefault[T, TSType[T]]
+  def getOrGenerate[T]: TSType[T] = macro Macros.getImplicitMappingOrGenerateDefault[T, TSType]
 
-  /** Get an implicit named mapping or generate a default one
+  /** Get an implicit `TSNamedType[T]` */
+  def getNamed[T](implicit tsType: TSNamedType[T]): TSNamedType[T] = tsType
+
+  /** Get an implicit `TSNamedType[T]` or generate a default one
     *
-    * @see [[getMappingOrGenerateDefault]]
+    * @see [[getOrGenerate]]
     * */
-  def getNamedMappingOrGenerateDefault[T](implicit mapping: OptionalImplicit[TSNamedType[T]]): TSNamedType[T] =
-    macro Macros.getMappingOrGenerateDefault[T, TSNamedType[T]]
+  def getOrGenerateNamed[T]: TSNamedType[T] = macro Macros.getImplicitMappingOrGenerateDefault[T, TSNamedType]
 
   /** Generate a typescript interface for a case class */
   def fromCaseClass[T]: TSIType[T] = macro Macros.generateInterfaceFromCaseClass[T]
@@ -141,13 +145,6 @@ object TSType {
     valueType: TypescriptType
   ): TSNamedType[T] =
     TSNamedType(TSInterfaceIndexed(name, indexName, indexType, valueType))
-
-  implicit def optionalImplicitTSType[T](implicit tsType: TSType[T] = null): OptionalImplicit[TSType[T]] =
-    OptionalImplicit(Option(tsType))
-  implicit def optionalImplicitTSNamedType[T](implicit tsNamedType: TSNamedType[T] = null): OptionalImplicit[TSNamedType[T]] =
-    OptionalImplicit(Option(tsNamedType))
-  implicit def optionalImplicitTSIType[T](implicit tsiType: TSIType[T] = null): OptionalImplicit[TSIType[T]] =
-    OptionalImplicit(Option(tsiType))
 }
 
 @implicitNotFound(

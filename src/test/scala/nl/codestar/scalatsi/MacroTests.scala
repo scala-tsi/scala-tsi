@@ -97,7 +97,7 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
 
     implicit val tsA = TSType[A](TSNumber)
 
-    TSType.getMappingOrGenerateDefault[A] shouldBe theSameInstanceAs (tsA)
+    TSType.getOrGenerate[A] shouldBe theSameInstanceAs(tsA)
   }
 
   it should "use available implicit TSNamedType if in scope" in {
@@ -106,7 +106,7 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     import dsl._
     implicit val tsA: TSNamedType[A] = TSType.fromCaseClass[A] + ("type" -> "A")
 
-    TSType.getNamedMappingOrGenerateDefault[A] shouldBe TSType.interface(
+    TSType.getOrGenerateNamed[A] shouldBe TSType.interface(
       "IA",
       "foo"  -> TSString,
       "type" -> TSLiteralString("A")
@@ -116,19 +116,19 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
   it should "use case class generator for case classes" in {
     case class A(foo: String)
 
-    TSType.getMappingOrGenerateDefault[A] shouldBe TSType.fromCaseClass[A]
+    TSType.getOrGenerate[A] shouldBe TSType.fromCaseClass[A]
   }
 
   it should "use sealed trait generator for sealed traits" in {
     sealed trait A
     case class B(foo: String) extends A
 
-    TSType.getMappingOrGenerateDefault[A]shouldBe TSType.fromSealed[A]
+    TSType.getOrGenerate[A] shouldBe TSType.fromSealed[A]
   }
 
   it should "give a compile error for unsupported types" in {
     class A
 
-    "TSType.getMappingOrGenerateDefault[A]" shouldNot compile
+    "TSType.getOrGenerate[A]" shouldNot compile
   }
 }

@@ -6,6 +6,7 @@ lazy val commonSettings = Seq(
   scalaVersion := "2.13.0-RC1",
   crossScalaVersions := Seq("2.12.8", "2.13.0-RC1"),
   compilerOptions,
+  //expandMacros,
   scalafmtOnCompile := true // format code on compile
 )
 
@@ -54,6 +55,8 @@ lazy val compilerOptions = scalacOptions := Seq(
     )
   case _ => throw new IllegalArgumentException(s"Unconfigured scala version ${scalaVersion.value}")
 })
+
+lazy val expandMacros = scalacOptions += "-Ymacro-debug-lite"
 
 //
 lazy val `scala-tsi-macros` = (project in file("macros"))
