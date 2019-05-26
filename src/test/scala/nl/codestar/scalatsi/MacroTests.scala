@@ -92,6 +92,14 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     TSType.fromSealed[Empty] shouldBe TSNamedType[Empty](TSAlias("IEmpty", TSNever))
   }
 
+  // TODO: Do not generate invalid 1-element union if sealed trait has single element
+  it should "handle seale traits with a single subclass" in pendingUntilFixed {
+    sealed trait Single
+    case class A(foo: Int) extends Single
+
+    TSType.fromSealed[Single] shouldBe TSType.alias("ISingle", TSTypeReference("IA"))
+  }
+
   "The default mapping construct" should "use available implicit if in scope" in {
     case class A(foo: String)
 
@@ -116,17 +124,25 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
   it should "use case class generator for case classes" in {
     case class A(foo: String)
 
-    TSType.getOrGenerate[A] shouldBe TSType.fromCaseClass[A]
+    val generated = TSType.getOrGenerate[A]
+    val fromCaseClass = TSType.fromCaseClass[A]
+
+    generated shouldBe fromCaseClass
+    fromCaseClass shouldBe TSType.interface("IA", "foo" -> TSString)
   }
 
   it should "use sealed trait generator for sealed traits" in {
     sealed trait A
     case class B(foo: String) extends A
 
-    TSType.getOrGenerate[A] shouldBe TSType.fromSealed[A]
+    val generated = TSType.getOrGenerate[A]
+    val fromSealed = TSType.fromSealed[A]
+
+    generated shouldBe fromSealed
+    fromSealed.get shouldBe TSType.alias("A", TSUnion.of(TSTypeReference("IB")))
   }
 
-  it should "give a compile error for unsupported types" in {
+  it should "give a compile error for unsupported types if no implicit is available" in {
     class A
 
     "TSType.getOrGenerate[A]" shouldNot compile

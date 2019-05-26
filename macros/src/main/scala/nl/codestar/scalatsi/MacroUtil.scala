@@ -13,7 +13,6 @@ private[scalatsi] class MacroUtil[C <: blackbox.Context](val c: C) {
 
     val found = try {
       if (orLookingUpList.exists(alreadyLookingUp => T <:< alreadyLookingUp)) {
-        println(s"Aborting on $T")
         // We've entered this type before => we've entered a recursive loop and must stop
         c.universe.EmptyTree
       } else {
@@ -22,8 +21,7 @@ private[scalatsi] class MacroUtil[C <: blackbox.Context](val c: C) {
         c.inferImplicitValue(T, silent = true)
       }
     } catch {
-      case e: Exception =>
-        c.abort(c.enclosingPosition, s"Encountered exception: $e")
+      case _: Exception =>
         c.universe.EmptyTree
     } finally {
       lookingUpList = orLookingUpList
