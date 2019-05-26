@@ -20,18 +20,9 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     case class A(foo: Boolean)
     case class B(a: A)
 
-    implicit val tsA: TSIType[A] = TSType.fromCaseClass
+    val tsA: TSIType[A] = TSType.fromCaseClass
 
     TSType.fromCaseClass[B] shouldBe TSType.interface("IB", "a" -> tsA.get)
-  }
-
-  it should "not compile if a nested definition is missing" in {
-
-    """{
-       case class A(foo: Boolean)
-       case class B(a: A)
-       TSIType.fromCaseClass[B]
-    }""".stripMargin shouldNot compile
   }
 
   "The sealed trait/class to Typescript type macro" should "handle sealed traits" in {
