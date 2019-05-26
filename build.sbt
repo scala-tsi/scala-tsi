@@ -3,8 +3,8 @@ import sbt.Keys.scalacOptions
 lazy val commonSettings = Seq(
   organization := "nl.codestar",
   version := "0.2.0-SNAPSHOT",
-  scalaVersion := "2.13.0-RC1",
-  crossScalaVersions := Seq("2.12.8", "2.13.0-RC1"),
+  scalaVersion := "2.13.0-RC2",
+  crossScalaVersions := Seq("2.12.8", "2.13.0-RC2"),
   compilerOptions,
   scalafmtOnCompile := true // format code on compile
 )
@@ -75,7 +75,7 @@ lazy val `scala-tsi` = (project in file("."))
     description := "Generate Typescript interfaces from your scala classes",
     libraryDependencies ++= Seq(
       // testing framework
-      "org.scalatest" %% "scalatest" % "3.0.8-RC2" % "test"
+      "org.scalatest" %% "scalatest" % "3.0.8-RC4" % "test"
     )
   )
   // Depend and include the macro project, instead of having to publish a separate macro project
