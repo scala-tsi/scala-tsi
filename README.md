@@ -26,7 +26,8 @@ lazy val root = (project in file("."))
       typescriptClassesToGenerateFor := Seq("MyClass"),
       // The output file which will contain the typescript interfaces
       typescriptOutputFile := baseDirectory.value / "model.ts",
-      // Include the package(s) of the classes here, and make sure to import your typescript conversions
+      // Include the package(s) of the classes here
+      // Optionally import your own TSType implicits to override default default generated
       typescriptGenerationImports := Seq("mymodel._", "MyTypescript._")
     )
 ```
@@ -37,10 +38,6 @@ package mymodel
 import nl.codestar.scalatsi._
 
 case class MyClass(foo: String, bar: Int)
-
-object MyTypescript {
-  implicit val myClassTs = TSType.fromCaseClass[MyClass]
-}
 ```
 
 Into a typescript interface like
@@ -58,7 +55,7 @@ See [Example](#Example) for more a more in-depth example
 | Key | Type | Description |
 | --- | ---- | ----------- |
 | typescriptClassesToGenerateFor | Seq[String] | A list of all your (top-level) classes that you want to generate interfaces for |
-| typescriptGenerationImports | Seq[String] | A list of all imports. This should import all classes you defined above, as well as all implicit `TSType`'s for those classes |
+| typescriptGenerationImports | Seq[String] | A list of all imports. This should import all classes you defined above, as well as custom `TSType` implicits |
 | typescriptOutputFile | File | The output file with generated typescript interfaces
 
 ## Example
@@ -70,7 +67,11 @@ Say we have the following JSON:
 {
    "name": "person name",
    "email": "abc@example.org",
-   "age": 25
+   "age": 25,
+   "job": {
+      "tasks": ["Be in the office", "Drink coffee"],
+      "boss": "Johnson"
+   }
 }
 ```
 
@@ -78,9 +79,19 @@ Generated from this Scala domain model:
 ```scala
 package myproject
 
-case class Person(name: String, email: Email, age: Option[Int])
-// This type will get erased when serializing to JSON
+case class Person(
+  name: String,
+  email: Email,
+  age: Option[Int],
+  // for privacy reasons, we do not put this social security number in the JSON
+  ssn: Option[Int],
+  job: Job
+)
+// This type will get erased when serializing to JSON, only the string remains
 case class Email(address: String)
+
+case class Job(tasks: Seq[String], boss: String)
+
 ```
 
 With [Typescript](https://www.typescriptlang.org/), your frontend can know what data is available in what format.
@@ -103,7 +114,8 @@ object MyModelTSTypes extends DefaultTSTypes {
   implicit val tsEmail = TSType.sameAs[Email, String]
   
   // TSType.fromCaseClass will convert your case class to a typescript definition
-  implicit val tsPerson = TSType.fromCaseClass[Person]
+  // `- ssn` indicated the ssn field should be removed
+  implicit val tsPerson = TSType.fromCaseClass[Person] - "ssn"
 }
 ```
 
@@ -123,19 +135,18 @@ export interface IPerson {
   name : string,
   email : string,
   age ?: number
+  job: IJob
+}
+
+export interface IJob {
+  tasks: string[]
+  boss: string
 }
 ```
 
 ## Usage
 
 [This document](doc/workings.md) contains more detailed explanation of the library and usage
-
-## Isn't there already [Scala TS](https://github.com/miloszpp/scala-ts)?
-
-Scala TS is good if it can cover your usage-case, but it functionality is very limited.
-Check out [this comparison](doc/scala-ts.md) 
-
-Additionaly, [it is unmaintained as of 2019-01-09](https://github.com/scala-ts/scala-ts/commit/64d26c8ac0729c8ef3664205d5360f6040efb3bc)
 
 ## Features
 

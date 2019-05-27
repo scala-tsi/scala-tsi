@@ -20,19 +20,20 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     case class A(foo: Boolean)
     case class B(a: A)
 
-    implicit val tsA: TSIType[A] = TSType.fromCaseClass
+    val tsA: TSIType[A] = TSType.fromCaseClass
 
     TSType.fromCaseClass[B] shouldBe TSType.interface("IB", "a" -> tsA.get)
   }
 
-  it should "handle sealed traits" in {
+  "The sealed trait/class to Typescript type macro" should "handle sealed traits" in {
     sealed trait FooOrBar
     case class Foo(foo: String) extends FooOrBar
     case class Bar(bar: Int)    extends FooOrBar
 
-    import nl.codestar.scalatsi.dsl._
     implicit val tsFoo = TSType.fromCaseClass[Foo]
     implicit val tsBar = TSType.fromCaseClass[Bar]
+
+    // TODO: This will probably not emit Foo or Bar, when used, test this
 
     TSType.fromSealed[FooOrBar] shouldBe TSType.alias("FooOrBar", TSTypeReference("IFoo") | TSTypeReference("IBar"))
   }
@@ -57,7 +58,6 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     case class Foo(foo: String) extends FooOrBar
     case class Bar(bar: Int)    extends FooOrBar
 
-    import nl.codestar.scalatsi.dsl._
     implicit val tsFoo = TSType.fromCaseClass[Foo]
     implicit val tsBar = TSType.sameAs[Bar, Int]
 
@@ -78,12 +78,89 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     TSType.fromSealed[LinkedList] shouldBe TSType.alias("LinkedList", TSNull | TSTypeReference("INode"))
   }
 
-  it should "not compile if a nested definition is missing" in {
+  it should "handle sealed traits without subclasses" in {
+    sealed trait Empty
 
-    """{
-       case class A(foo: Boolean)
-       case class B(a: A)
-       TSIType.fromCaseClass[B]
-    }""".stripMargin shouldNot compile
+    // Expect a warning here
+    TSType.fromSealed[Empty] shouldBe TSNamedType[Empty](TSAlias("IEmpty", TSNever))
+  }
+
+  it should "handle sealed traits with a single subclass" in {
+    sealed trait Single
+    case class A(foo: Int) extends Single
+
+    TSType.fromSealed[Single] shouldBe TSType.alias("Single", TSTypeReference("IA"))
+  }
+
+  "TSType.getOrGenerate" should "use available implicit if in scope" in {
+    case class A(foo: String)
+
+    implicit val tsA = TSType[A](TSNumber)
+
+    TSType.getOrGenerate[A] shouldBe theSameInstanceAs(tsA)
+  }
+
+  it should "use available implicit TSNamedType if in scope" in {
+    case class A(foo: String)
+
+    import dsl._
+    implicit val tsA: TSNamedType[A] = TSType.fromCaseClass[A] + ("type" -> "A")
+
+    TSNamedType.getOrGenerate[A] shouldBe TSType.interface(
+      "IA",
+      "foo"  -> TSString,
+      "type" -> TSLiteralString("A")
+    )
+  }
+
+  it should "use case class generator for case classes" in {
+    case class A(foo: String)
+
+    val generated = TSType.getOrGenerate[A]
+    val fromCaseClass = TSType.fromCaseClass[A]
+
+    generated shouldBe fromCaseClass
+    fromCaseClass shouldBe TSType.interface("IA", "foo" -> TSString)
+  }
+
+  it should "use sealed trait generator for sealed traits" in {
+    sealed trait A
+    case class B(foo: String) extends A
+
+    val generated = TSType.getOrGenerate[A]
+    val fromSealed = TSType.fromSealed[A]
+
+    generated shouldBe fromSealed
+    fromSealed shouldBe TSType.alias("A", TSTypeReference("IB"))
+  }
+
+  it should "give a compile error for unsupported types if no implicit is available" in {
+    class A
+
+    "TSType.getOrGenerate[A]" shouldNot compile
+  }
+
+  "TSIType.getOrGenerate" should "use available implicit if in scope" in {
+    case class A(foo: String)
+
+    implicit val tsA: TSIType[A] = TSType.interface("Hi", "bar" -> TSNumber)
+
+    TSType.getOrGenerate[A] shouldBe theSameInstanceAs(tsA)
+  }
+
+  it should "use case class generator for case classes" in {
+    case class A(foo: String)
+
+    val generated = TSIType.getOrGenerate[A]
+    val fromCaseClass = TSType.fromCaseClass[A]
+
+    generated shouldBe fromCaseClass
+    fromCaseClass shouldBe TSType.interface("IA", "foo" -> TSString)
+  }
+
+  it should "give a compile error for unsupported types if no implicit is available" in {
+    sealed trait A
+
+    "TSIType.getOrGenerate[A]" shouldNot compile
   }
 }
