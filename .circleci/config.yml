@@ -76,27 +76,24 @@ jobs:
             - scala-tsi-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
             - scala-tsi-3
 
-      - run:
-          name: Install GPG
-          command:
-            sudo apt-get install -y gnupg
+      #- run:
+      #    name: Install GPG
+      #    command:
+      #      sudo apt-get install -y gnupg
 
-      - run:
-          name: Import GPG key
-          command:
-            gpg --batch --passphrase "$GPG_passphrase" --pinentry-mode loopback --import .circleci/circleci.key.asc
+      #- run:
+      #    name: Import GPG key
+      #    command:
+      #      gpg --batch --passphrase "$GPG_passphrase" --pinentry-mode loopback --import .circleci/circleci.key.asc
 
       - run:
           command:
             sbt +publishSigned +sbt-scala-tsi/publishSigned
 
+      # releases everything from nl.codestar, look into releasing only this project
       - run:
           command:
-            sbt "project scala-tsi" +sonatypeRelease
-
-      - run:
-          command:
-            sbt "project sbt-scala-tsi" +sonatypeRelease
+            sbt "sonatypeReleaseAll nl.codestar"
 
 workflows:
   version: 2
