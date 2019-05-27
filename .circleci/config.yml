@@ -63,3 +63,42 @@ jobs:
 
       - store_test_results:
           path: example/target/test-reports
+
+  publish:
+    branches:
+      only:
+        - master
+        - circleci_publish
+
+    working_directory: ~/scala-tsi
+    docker:
+      - image: circleci/openjdk:8
+    steps:
+      - checkout
+
+      - restore_cache:
+        keys:
+          - scala-tsi-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
+          - scala-tsi-3
+
+      - run:
+          name: Install GPG
+          command:
+            sudo apt-get install -y gnupg
+
+      - run:
+          name: Import GPG key
+          command:
+            echo "$GPG_passphrase" | gpg --import .circleci/circleci.key.asc
+
+      - run:
+          command:
+            sbt +publishSigned +sbt-scala-tsi/publishSigned
+
+      - run:
+          command:
+            sbt "project scala-tsi" +sonatypeRelease
+
+      - run:
+          command:
+            sbt "project sbt-scala-tsi" +sonatypeRelease
