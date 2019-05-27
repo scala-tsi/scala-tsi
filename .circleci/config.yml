@@ -84,7 +84,7 @@ jobs:
       - run:
           name: Import GPG key
           command:
-            echo "$GPG_passphrase" | gpg --import .circleci/circleci.key.asc
+            echo gpg --no-tty --batch --passphrase "$GPG_passphrase" --pinentry-mode loopback --import .circleci/circleci.key.asc
 
       - run:
           command:
@@ -102,7 +102,7 @@ workflows:
   version: 2
   build_and_publish:
     jobs:
-      - build
+      #- build
       - publish:
           requires:
             - build
