@@ -84,7 +84,7 @@ jobs:
       - run:
           name: Import GPG key
           command:
-            echo gpg --batch --passphrase "$GPG_passphrase" --pinentry-mode loopback --import .circleci/circleci.key.asc
+            gpg --batch --passphrase "$GPG_passphrase" --pinentry-mode loopback --import .circleci/circleci.key.asc
 
       - run:
           command:

@@ -17,7 +17,7 @@ lazy val publishSettings = Seq(
     case Some(user) => Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, sys.env("MAVEN_CENTRAL_PASSWORD"))
     case None       => Credentials(Path.userHome / ".ivy2" / ".nl-codestar-maven-central-credentials")
   }),
-  useGpg := sys.env.get("CIRCLECI").isDefined,
+  //useGpg := sys.env.get("CIRCLECI").isDefined,
   licenses := Seq("MIT" -> url("https://github.com/code-star/scala-tsi/blob/master/LICENSE")),
   homepage := Some(url("https://github.com/code-star/scala-tsi")),
   scmInfo := Some(ScmInfo(url("https://github.com/code-star/scala-tsi"), "scm:git@github.com:code-star/scala-tsi.git")),
