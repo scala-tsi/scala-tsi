@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 jobs:
   build:
     working_directory: ~/scala-tsi
@@ -63,3 +63,37 @@ jobs:
 
       - store_test_results:
           path: example/target/test-reports
+
+  publish:
+    working_directory: ~/scala-tsi
+    docker:
+      - image: circleci/openjdk:8
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - scala-tsi-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
+            - scala-tsi-3
+
+      - run:
+          command:
+            sbt +publishSigned +sbt-scala-tsi/publishSigned
+
+      # releases everything from nl.codestar, look into releasing only this project
+      - run:
+          command:
+            sbt "sonatypeReleaseAll nl.codestar"
+
+workflows:
+  version: 2
+  build_and_publish:
+    jobs:
+      - build
+      - publish:
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - master

@@ -30,7 +30,20 @@ lazy val publishSettings = Seq(
     ),
     Developer(id = "donovan", name = "Donovan de Kuiper", email = "donovan.de.kuiper@ordina.nl", url = url("https://github.com/Hayena"))
   )
-)
+) ++
+  // CI-only settings, enabled if $CI env variable is set to "true"
+  sys.env
+    .get("CI")
+    .collect({
+      case "true" =>
+        Seq(
+          usePgpKeyHex("6044257F427C2854A6F9A0C211A02377A6DD0E59"),
+          pgpSecretRing := file(".circleci/circleci.key.asc"),
+          pgpPublicRing := file(".circleci/circleci.pub.asc"),
+          pgpPassphrase := sys.env.get("GPG_passphrase").map(_.toCharArray)
+        )
+    })
+    .getOrElse(Seq())
 
 lazy val compilerOptions = scalacOptions := Seq(
   "-Xsource:2.13",
@@ -67,7 +80,8 @@ lazy val `scala-tsi-macros` = (project in file("macros"))
     libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value,
     // Disable publishing
     publish := {},
-    publishLocal := {}
+    publishLocal := {},
+    skip in publish := true
   )
 
 lazy val `scala-tsi` = (project in file("."))
