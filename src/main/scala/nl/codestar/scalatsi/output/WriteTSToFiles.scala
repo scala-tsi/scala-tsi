@@ -5,13 +5,14 @@ import java.io.FileWriter
 import nl.codestar.scalatsi.TypescriptType.TypescriptNamedType
 import nl.codestar.scalatsi.TypescriptTypeSerializer
 
+/** Write the typescript interfaces to files */
 object WriteTSToFiles {
   def write(options: OutputOptions)(types: Seq[TypescriptNamedType]): Unit = {
     val output = TypescriptTypeSerializer.emits(types: _*)
-    if (!options.targetFile.exists()) {
-      options.targetFile.createNewFile()
+    if (!options.targetLocation.exists()) {
+      options.targetLocation.createNewFile()
     }
-    val writer = new FileWriter(options.targetFile)
+    val writer = new FileWriter(options.targetLocation)
     writer.write(output)
     writer.close()
   }

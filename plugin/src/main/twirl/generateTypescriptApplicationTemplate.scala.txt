@@ -1,4 +1,4 @@
-@(imports: Seq[String], classes: Seq[String], targetFile: String)
+@(imports: Seq[String], classes: Seq[String], targetLocation: String)
 
 package nl.codestar.scalatsi.generator
 
@@ -21,7 +21,7 @@ object ApplicationTypescriptGeneration {
   )
 
   val options = _root_.nl.codestar.scalatsi.output.OutputOptions(
-    targetFile = new File("@targetFile")
+    targetLocation = new File("@targetLocation")
   )
 
   def main(args: Array[String]): Unit = {
