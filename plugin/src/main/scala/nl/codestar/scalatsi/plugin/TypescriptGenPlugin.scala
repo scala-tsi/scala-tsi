@@ -8,14 +8,13 @@ object TypescriptGenPlugin extends AutoPlugin {
   object autoImport {
     // User settings
     val typescriptClassesToGenerateFor = settingKey[Seq[String]]("Classes to generate typescript interfaces for")
-    val typescriptGenerationImports = settingKey[Seq[String]]("Additional imports (i.e. your packages)")
-    val typescriptOutputLocation = settingKey[File]("Directory or file where all typescript interfaces will be written to")
+    val typescriptGenerationImports    = settingKey[Seq[String]]("Additional imports (i.e. your packages)")
+    val typescriptOutputLocation       = settingKey[File]("Directory or file where all typescript interfaces will be written to")
     @deprecated("Use typescriptOutputLocation", "0.2.0")
     val typescriptOutputFile = typescriptOutputLocation
 
     val generateTypescript = taskKey[Unit]("Generate typescript this project")
 
-    //
     val generateTypescriptGeneratorApplication = taskKey[Seq[File]]("Generate an app to generate typescript interfaces")
   }
 
