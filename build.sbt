@@ -114,6 +114,7 @@ lazy val `sbt-scala-tsi` = (project in file("plugin"))
   .enablePlugins(SbtTwirl, BuildInfoPlugin)
   .settings(commonSettings)
   .settings(publishSettings)
+  .dependsOn(`scala-tsi`)
   .settings(
     name := "sbt-scala-tsi",
     description := "SBT plugin to generate Typescript interfaces from your scala classes as part of your build",
