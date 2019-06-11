@@ -24,11 +24,15 @@ object TypescriptGenPlugin extends AutoPlugin {
 
   private val scala_ts_compiler_version = BuildInfo.version
 
-  override lazy val projectSettings = Seq(
-    // User settings
+  /** User settings */
+  private lazy val defaults = Seq(
     typescriptGenerationImports := Seq(),
     typescriptClassesToGenerateFor := Seq(),
-    typescriptOutputLocation := target.value / "typescript-interfaces",
+    typescriptOutputLocation := target.value / "typescript-interfaces"
+  )
+
+  /** Settings for the plugin, should generally not be modified by the user */
+  private lazy val pluginSettings = Seq(
     // Add the library to the dependencies
     libraryDependencies += "nl.codestar" %% "scala-tsi" % scala_ts_compiler_version,
     // Task settings
@@ -41,6 +45,8 @@ object TypescriptGenPlugin extends AutoPlugin {
     ),
     sourceGenerators in Compile += generateTypescriptGeneratorApplication in Compile
   )
+
+  override lazy val projectSettings: Seq[Def.Setting[_]] = defaults ++ pluginSettings
 
   def createTypescriptGenerationTemplate(
     imports: Seq[String],
