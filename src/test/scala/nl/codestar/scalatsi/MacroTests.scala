@@ -116,7 +116,7 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
   it should "use case class generator for case classes" in {
     case class A(foo: String)
 
-    val generated = TSType.getOrGenerate[A]
+    val generated     = TSType.getOrGenerate[A]
     val fromCaseClass = TSType.fromCaseClass[A]
 
     generated shouldBe fromCaseClass
@@ -127,7 +127,7 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     sealed trait A
     case class B(foo: String) extends A
 
-    val generated = TSType.getOrGenerate[A]
+    val generated  = TSType.getOrGenerate[A]
     val fromSealed = TSType.fromSealed[A]
 
     generated shouldBe fromSealed
@@ -151,7 +151,7 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
   it should "use case class generator for case classes" in {
     case class A(foo: String)
 
-    val generated = TSIType.getOrGenerate[A]
+    val generated     = TSIType.getOrGenerate[A]
     val fromCaseClass = TSType.fromCaseClass[A]
 
     generated shouldBe fromCaseClass
