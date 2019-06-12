@@ -10,6 +10,12 @@ object TypescriptGenPlugin extends AutoPlugin {
     val typescriptClassesToGenerateFor = settingKey[Seq[String]]("Classes to generate typescript interfaces for")
     val typescriptGenerationImports    = settingKey[Seq[String]]("Additional imports (i.e. your packages)")
     val typescriptOutputLocation       = settingKey[File]("Directory or file where all typescript interfaces will be written to")
+    val typescriptMapping              = settingKey[Map[String, String]](
+      """Translation table of the JVM namespaces to the typescript modules.
+        | an entry like `company.myservice.api -> backend.api`.
+        | will emit the "company.myservice.api.MyClass" JVM class as a "backend.api.MyClass" typescript interface.
+      """.stripMargin
+    )
     @deprecated("Use typescriptOutputLocation", "0.2.0")
     val typescriptOutputFile = typescriptOutputLocation
 
@@ -24,11 +30,12 @@ object TypescriptGenPlugin extends AutoPlugin {
 
   private val scala_ts_compiler_version = BuildInfo.version
 
-  /** User settings */
+  /** Default user settings */
   private lazy val defaults = Seq(
     typescriptGenerationImports := Seq(),
     typescriptClassesToGenerateFor := Seq(),
-    typescriptOutputLocation := target.value / "typescript-interfaces"
+    typescriptOutputLocation := target.value / "typescript-interfaces",
+    typescriptMapping := Map()
   )
 
   /** Settings for the plugin, should generally not be modified by the user */

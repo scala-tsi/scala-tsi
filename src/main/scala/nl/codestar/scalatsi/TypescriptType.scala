@@ -1,8 +1,7 @@
 package nl.codestar.scalatsi
 
-import java.util.regex.Pattern
-
 import scala.collection.immutable.ListMap
+import scala.util.Try
 import TypescriptType._
 
 sealed trait TypescriptType {
@@ -26,21 +25,20 @@ object TypescriptType {
       case "undefined" => TSUndefined
       case "void"      => TSVoid
       case "object"    => TSObject
-      case _           => TSTypeReference(tpe)
+      case _           => TSTypeReference.parse(tpe).get
     }
 
   /** Get a reference to a named type, or the type itself if it is unnamed or built-in */
   def nameOrType(tpe: TypescriptType): TypescriptType = tpe match {
-    case named: TypescriptNamedType => named.asReference
+    case named: TypescriptNamedType => named.ref
     case anonymous                  => anonymous
   }
 
   /** A marker trait for a TS type that has a name */
   sealed trait TypescriptNamedType extends TypescriptType {
-    def name: String
-    require(isValidTSName(name), s"Not a valid TypeScript identifier: $name")
 
-    def asReference: TSTypeReference = TSTypeReference(name)
+    /** A reference to the type */
+    val ref: TSTypeReference
   }
   object TypescriptNamedType
 
@@ -54,7 +52,9 @@ object TypescriptType {
   }
 
   /** `type name = underlying` */
-  case class TSAlias(name: String, underlying: TypescriptType) extends TypescriptNamedType with TypescriptAggregateType {
+  case class TSAlias(override val ref: TSTypeReference, underlying: TypescriptType)
+      extends TypescriptNamedType
+      with TypescriptAggregateType {
     override def nested: Set[TypescriptType] = Set(underlying)
   }
 
@@ -67,18 +67,31 @@ object TypescriptType {
   case class TSLiteralNumber(value: BigDecimal) extends TSLiteralType[BigDecimal]
   case class TSLiteralBoolean(value: Boolean)   extends TSLiteralType[Boolean]
 
-  case class TSEnum(name: String, const: Boolean, entries: ListMap[String, Option[Int]])
+  case class TSEnum(ref: TSTypeReference, const: Boolean, entries: ListMap[String, Option[Int]])
       extends TypescriptNamedType
       with TypescriptAggregateType {
     def nested: Set[TypescriptType] = Set(TSNumber)
   }
 
   /** This type is used as a marker that a type with this name exists and is either already defined or externally defined
-    * Not a real Typescript type
     * @note name takes from [Typescript specification](https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#3.8.2)
     * */
-  case class TSTypeReference(name: String) extends TypescriptNamedType {
-    override def asReference: TSTypeReference = this
+  sealed case class TSTypeReference(identifier: TSIdentifier, namespace: TSNamespace) extends TypescriptNamedType {
+    override val ref: TSTypeReference = this
+
+    override def toString: String = {
+      val nss = namespace.toString
+      s"TSTypeReference($nss${if (nss != "") "." else ""}${identifier.id})"
+    }
+
+  }
+  object TSTypeReference {
+
+    /** Transforms "name.space.id" into TSTypeReference */
+    def parse(s: String): Try[TSTypeReference] = Try {
+      val split = s.split(".")
+      TSTypeReference(TSIdentifier(split.last), TSNamespace(split.dropRight(1)))
+    }
   }
 
   /** Typescript indexed interfaces
@@ -93,17 +106,19 @@ object TypescriptType {
     )
     def nested: Set[TypescriptType] = Set(indexType, valueType)
   }
-  case class TSInterfaceIndexed(name: String, indexName: String = "key", indexType: TypescriptType, valueType: TypescriptType)
+  case class TSInterfaceIndexed(ref: TSTypeReference, indexName: String = "key", indexType: TypescriptType, valueType: TypescriptType)
       extends TypescriptNamedType
       with TypescriptAggregateType {
     require(
       indexType == TSString || indexType == TSNumber,
-      s"TypeScript indexed interface $name can only have index type string or number, not $indexType"
+      s"TypeScript indexed interface ${ref.identifier} can only have index type string or number, not $indexType"
     )
     def nested: Set[TypescriptType] = Set(indexType, valueType)
   }
 
-  case class TSInterface(name: String, members: ListMap[String, TypescriptType]) extends TypescriptNamedType with TypescriptAggregateType {
+  case class TSInterface(ref: TSTypeReference, members: ListMap[String, TypescriptType])
+      extends TypescriptNamedType
+      with TypescriptAggregateType {
     def nested: Set[TypescriptType] = members.values.toSet
   }
   case class TSIntersection(of: Seq[TypescriptType]) extends TypescriptAggregateType { def nested: Set[TypescriptType] = of.toSet }
@@ -119,7 +134,7 @@ object TypescriptType {
   /** Typescript tuple: `[0.type, 1.type, ... n.type]` */
   case class TSTuple[E](of: Seq[TypescriptType]) extends TypescriptAggregateType { def nested: Set[TypescriptType] = of.toSet }
   object TSTuple {
-    def of(of: TypescriptType*) = TSTuple(of)
+    def of(of: TypescriptType*) = TSTuple(of.to(Seq))
   }
 
   case object TSUndefined extends TypescriptType
@@ -127,61 +142,8 @@ object TypescriptType {
     def nested: Set[TypescriptType] = of.toSet
   }
   object TSUnion {
-    def of(of: TypescriptType*) = TSUnion(of)
+    def of(of: TypescriptType*) = TSUnion(of.toSeq)
   }
   case object TSVoid extends TypescriptType
 
-  private val tsIdentifierPattern = Pattern.compile("[_$\\p{L}\\p{Nl}][_$\\p{L}\\p{Nl}\\p{Nd}\\{Mn}\\{Mc}\\{Pc}]*")
-  private[scalatsi] def isValidTSName(name: String): Boolean =
-    tsIdentifierPattern.matcher(name).matches() && !reservedKeywords.contains(name)
-
-  final private[scalatsi] val reservedKeywords: Set[String] = Set(
-    "break",
-    "case",
-    "catch",
-    "class",
-    "const",
-    "continue",
-    "debugger",
-    "default",
-    "delete",
-    "do",
-    "else",
-    "enum",
-    "export",
-    "extends",
-    "false",
-    "finally",
-    "for",
-    "function",
-    "if",
-    "import",
-    "in",
-    "instanceof",
-    "new",
-    "null",
-    "return",
-    "super",
-    "switch",
-    "this",
-    "throw",
-    "true",
-    "try",
-    "typeof",
-    "var",
-    "void",
-    "while",
-    "with",
-    // Strict mode
-    "as",
-    "implements",
-    "interface",
-    "let",
-    "package",
-    "private",
-    "protected",
-    "public",
-    "static",
-    "yield"
-  )
 }

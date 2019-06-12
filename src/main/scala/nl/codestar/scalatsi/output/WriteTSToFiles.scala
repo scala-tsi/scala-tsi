@@ -16,4 +16,7 @@ object WriteTSToFiles {
     writer.write(output)
     writer.close()
   }
+
+  // TODO: Write to separate files
+  // TODO: Use the translation map
 }

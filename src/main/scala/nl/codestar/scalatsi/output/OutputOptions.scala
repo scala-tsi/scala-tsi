@@ -3,5 +3,6 @@ package nl.codestar.scalatsi.output
 import java.io.File
 
 case class OutputOptions(
-        targetLocation: File
+  targetLocation: File,
+  namespaceMapping: Map[String, String]
 )
