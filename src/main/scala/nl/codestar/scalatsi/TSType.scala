@@ -3,8 +3,7 @@ package nl.codestar.scalatsi
 import nl.codestar.scalatsi.TypescriptType._
 
 import scala.annotation.implicitNotFound
-import scala.collection.immutable.ListMap
-import scala.reflect.ClassTag
+import scala.reflect.runtime.universe.WeakTypeTag
 
 /* TODO: Move this somewhere to the docs
  * To define an implicit TSType[T]:
@@ -85,7 +84,7 @@ object TSType {
     * @example alias[Foo, String]() will generate typescript `type Foo = string`
     * @see sameAs
     */
-  def alias[T: ClassTag, Alias]()(implicit tsType: TSType[Alias]): TSNamedType[T] =
+  def alias[T: WeakTypeTag, Alias]()(implicit tsType: TSType[Alias]): TSNamedType[T] =
     alias[T](tsType.get)
 
   /** Create a Typescript alias "name" for type T, with the definition of tsType
@@ -93,7 +92,7 @@ object TSType {
     * @example alias[Foo](TSString) will generate typescript `type Foo = string`
     * @see sameAs
     */
-  def alias[T: ClassTag](tsType: TypescriptType): TSNamedType[T] =
+  def alias[T: WeakTypeTag](tsType: TypescriptType): TSNamedType[T] =
     TSNamedType(TSAlias(TSRef[T], tsType))
 
   /** Create "name" as the typescript type for T, with "name" being defined elsewhere
@@ -110,14 +109,14 @@ object TSType {
     * @example
     * interface[Foo]("bar" -> TSString) will output "interface Foo { bar: string }" in the package of Foo
     **/
-  def interface[T: ClassTag](members: (String, TypescriptType)*): TSIType[T] =
+  def interface[T: WeakTypeTag](members: (String, TypescriptType)*): TSIType[T] =
     TSIType(TSInterface(TSRef[T], members: _*))
 
   /** Create an indexed interface for T
     *
     * @example interfaceIndexed[Foo]("key", TSString, TSInt) will output "interface Foo { [key: string] : Int }"
     */
-  def interfaceIndexed[T: ClassTag](
+  def interfaceIndexed[T: WeakTypeTag](
     indexName: String = "key",
     indexType: TypescriptType = TSString,
     valueType: TypescriptType

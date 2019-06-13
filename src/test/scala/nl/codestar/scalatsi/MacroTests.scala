@@ -6,7 +6,7 @@ import nl.codestar.scalatsi.TypescriptType._
 case class Person(name: String, age: Int)
 
 class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
-  def ref(s: String) = TSRef(TSIdentifier(s), TSNamespace[TypescriptTypeSerializerTests])
+  def ref(s: String) = TSRef(TSIdentifier(s), TSNamespace[MacroTests] append TSIdentifier("MacroTests"))
 
   "The case class to TypeScript type macro" should "be able to translate a simple case class" in {
     case class Person(name: String, age: Int)
@@ -49,10 +49,10 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     implicit val tsFoo = TSType.fromCaseClass[Foo] + ("type" -> "Foo")
     implicit val tsBar = TSType.fromCaseClass[Bar] + ("type" -> "Bar")
 
-    tsFoo shouldBe TSInterface(ref("Foo"), "foo" -> TSString, "type" -> TSLiteralString("Foo"))
-    tsBar shouldBe TSInterface(ref("Bar"), "bar" -> TSNumber, "type" -> TSLiteralString("Bar"))
+    tsFoo.get shouldBe TSInterface(ref("Foo"), "foo" -> TSString, "type" -> TSLiteralString("Foo"))
+    tsBar.get shouldBe TSInterface(ref("Bar"), "bar" -> TSNumber, "type" -> TSLiteralString("Bar"))
 
-    TSType.fromSealed[FooOrBar] shouldBe TSAlias(ref("FooOrBar"), tsFoo.get.asReference | tsBar.get.asReference)
+    TSType.fromSealed[FooOrBar].get shouldBe TSAlias(ref("FooOrBar"), tsFoo.get.asReference | tsBar.get.asReference)
   }
 
   it should "handle sealed traits with a non-named mapping" in {
@@ -63,21 +63,31 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     implicit val tsFoo = TSType.fromCaseClass[Foo]
     implicit val tsBar = TSType.sameAs[Bar, Int]
 
-    tsFoo shouldBe TSInterface(ref("Foo"), "foo" -> TSString)
+    tsFoo.get shouldBe TSInterface(ref("Foo"), "foo" -> TSString)
     tsBar.get shouldBe TSNumber
 
-    TSType.fromSealed[FooOrBar] shouldBe TSAlias(ref("FooOrBar"), tsFoo.get.asReference | TSNumber)
+    TSType.fromSealed[FooOrBar].get shouldBe TSAlias(ref("FooOrBar"), tsFoo.get.asReference | TSNumber)
   }
 
   it should "handle sealed traits with recursive definitions" in {
+
+    // Package goes wrong when
     sealed trait LinkedList
     case object Nil                                     extends LinkedList
     case class Node(value: Int, next: LinkedList = Nil) extends LinkedList
 
-    implicit val nilType: TSType[Nil.type] = TSType(TSNull)
-    implicit val llType: TSType[Node]      = TSType.alias[Node](TSNull | TSTypeReference(ref("LinkedList")))
+    // TODO: Unit tests for UNKNOWN
 
-    TSType.fromSealed[LinkedList] shouldBe TSType.alias[LinkedList](TSNull | TSTypeReference(ref("Node")))
+    implicit val nilType: TSType[Nil.type] = TSType(TSNull)
+    implicit val llType: TSNamedType[Node] = TSType.alias[Node](TSNull | TSTypeReference(ref("LinkedList")))
+
+    val fromSealed = TSType.fromSealed[LinkedList]
+    val expected   = TSType.alias[LinkedList](TSNull | TSTypeReference(ref("Node")))
+
+    llType.get.ref shouldBe ref("Node")
+    fromSealed.get.ref shouldBe ref("LinkedList")
+
+    fromSealed shouldBe expected
   }
 
   it should "handle sealed traits without subclasses" in {

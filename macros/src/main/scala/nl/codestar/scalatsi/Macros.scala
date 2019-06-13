@@ -18,7 +18,7 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
      }"""
 
   private def ref[T](implicit tt: c.WeakTypeTag[T]): Tree =
-    q""" _root_.nl.codestar.scalatsi.TSRef[${tt.tpe.typeSymbol}]"""
+    q""" _root_.nl.codestar.scalatsi.TSRef(${tt.tpe.typeSymbol.fullName})"""
 
   private def macroUtil = new MacroUtil[c.type](c)
 
