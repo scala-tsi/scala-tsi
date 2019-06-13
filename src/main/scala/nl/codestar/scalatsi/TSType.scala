@@ -94,7 +94,7 @@ object TSType {
     * @see sameAs
     */
   def alias[T: ClassTag](tsType: TypescriptType): TSNamedType[T] =
-    TSNamedType(TSAlias(TSTypeReference[T], tsType))
+    TSNamedType(TSAlias(TSRef[T], tsType))
 
   /** Create "name" as the typescript type for T, with "name" being defined elsewhere
     * external[Foo]("IXyz") will use "IXyz" as the typescript type every time something contains a Foo
@@ -111,7 +111,7 @@ object TSType {
     * interface[Foo]("bar" -> TSString) will output "interface Foo { bar: string }" in the package of Foo
     **/
   def interface[T: ClassTag](members: (String, TypescriptType)*): TSIType[T] =
-    TSIType(TSInterface(TSTypeReference[T], ListMap(members: _*)))
+    TSIType(TSInterface(TSRef[T], ListMap(members: _*)))
 
   /** Create an indexed interface for T
     *
@@ -122,14 +122,15 @@ object TSType {
     indexType: TypescriptType = TSString,
     valueType: TypescriptType
   ): TSNamedType[T] =
-    TSNamedType(TSInterfaceIndexed(TSTypeReference[T], indexName, indexType, valueType))
+    TSNamedType(TSNamedIndexedInterface(TSRef[T], TSIndexedInterface(indexName, indexType, valueType)))
 }
 
 @implicitNotFound(
   "Could not find an implicit TSNamedType[${T}] in scope. Make sure you created and imported a named typescript mapping for the type."
 )
-trait TSNamedType[T] extends TSType[T] { self =>
+trait TSNamedType[T] extends TSType[T] {
   def get: TypescriptNamedType
+
   override def toString: String = s"TSNamedType($get)"
 }
 

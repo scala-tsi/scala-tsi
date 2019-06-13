@@ -29,13 +29,15 @@ object TypescriptType {
 
   /** Get a reference to a named type, or the type itself if it is unnamed or built-in */
   def nameOrType(tpe: TypescriptType): TypescriptType = tpe match {
-    case named: TypescriptNamedType[_] => named.asReference
-    case anonymous                     => anonymous
+    case named: TypescriptNamedType => named.asReference
+    case anonymous                  => anonymous
   }
 
-  /** A marker trait for a TS type that has a name
-    * @tparam Self concrete implementation type (e.g. TSInterface) */
-  sealed trait TypescriptNamedType[Self <: TypescriptNamedType[Self]] extends TypescriptType {
+  /** A marker trait for a TS type that has a name */
+  sealed trait TypescriptNamedType extends TypescriptType {
+
+    /** concrete implementation type (e.g. TSInterface) */
+    type Self <: TypescriptNamedType
 
     /** A reference to the type */
     val ref: TSRef
@@ -45,12 +47,12 @@ object TypescriptType {
 
     /** Change the name of this type */
     def withName(name: String): Self = withRef(ref.withName(name))
+
     /** Change the namespace of this type */
     def withNamespace(namespace: String): Self = withRef(ref.withNamespace(namespace))
 
     protected def withRef(ref: TSRef): Self
   }
-  object TypescriptNamedType
 
   /** A marker trait for a TS type that can contain nested types */
   sealed trait TypescriptAggregateType extends TypescriptType {
@@ -62,9 +64,9 @@ object TypescriptType {
   }
 
   /** `type name = underlying` */
-  case class TSAlias(override val ref: TSRef, underlying: TypescriptType)
-      extends TypescriptNamedType[TSAlias]
-      with TypescriptAggregateType {
+  final case class TSAlias(override val ref: TSRef, underlying: TypescriptType) extends TypescriptNamedType with TypescriptAggregateType {
+    override type Self = TSAlias
+
     override def nested: Set[TypescriptType] = Set(underlying)
 
     override protected def withRef(ref: TSRef): TSAlias = this.copy(ref = ref)
@@ -80,18 +82,20 @@ object TypescriptType {
   case class TSLiteralBoolean(value: Boolean)   extends TSLiteralType[Boolean]
 
   case class TSEnum(ref: TSRef, const: Boolean, entries: ListMap[String, Option[Int]])
-      extends TypescriptNamedType[TSEnum]
+      extends TypescriptNamedType
       with TypescriptAggregateType {
+    override type Self = TSEnum
 
-    override def nested: Set[TypescriptType] = Set(TSNumber)
-    override protected def withRef(ref: TSRef): TSEnum = this.
+    override def nested: Set[TypescriptType]           = Set(TSNumber)
+    override protected def withRef(ref: TSRef): TSEnum = this.copy(ref = ref)
   }
 
   /** A reference to a typescript type
     * @see https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#3.8.2
     * */
-  sealed case class TSTypeReference(ref: TSRef) extends TypescriptNamedType[TSTypeReference] {
-    override def asReference: TSTypeReference = this
+  sealed case class TSTypeReference(ref: TSRef) extends TypescriptNamedType {
+    override type Self = TSTypeReference
+    override def asReference: TSTypeReference                   = this
     override protected def withRef(ref: TSRef): TSTypeReference = TSTypeReference(ref)
   }
 
@@ -107,18 +111,17 @@ object TypescriptType {
     )
     def nested: Set[TypescriptType] = Set(indexType, valueType)
   }
-  case class TSNamedIndexedInterface(ref: TSRef, interface: TSIndexedInterface)
-      extends TypescriptNamedType[TSNamedIndexedInterface]
-      with TypescriptAggregateType {
+  case class TSNamedIndexedInterface(ref: TSRef, interface: TSIndexedInterface) extends TypescriptNamedType with TypescriptAggregateType {
+    override type Self = TSNamedIndexedInterface
 
-    override def nested: Set[TypescriptType] = interface.nested
+    override def nested: Set[TypescriptType]                            = interface.nested
     override protected def withRef(ref: TSRef): TSNamedIndexedInterface = this.copy(ref = ref)
   }
 
-  case class TSInterface(ref: TSRef, members: ListMap[String, TypescriptType])
-      extends TypescriptNamedType[TSInterface]
-      with TypescriptAggregateType {
-    override def nested: Set[TypescriptType] = members.values.toSet
+  case class TSInterface(ref: TSRef, members: ListMap[String, TypescriptType]) extends TypescriptNamedType with TypescriptAggregateType {
+    override type Self = TSInterface
+
+    override def nested: Set[TypescriptType]                = members.values.toSet
     override protected def withRef(ref: TSRef): TSInterface = this.copy(ref = ref)
   }
   case class TSIntersection(of: Seq[TypescriptType]) extends TypescriptAggregateType { def nested: Set[TypescriptType] = of.toSet }
