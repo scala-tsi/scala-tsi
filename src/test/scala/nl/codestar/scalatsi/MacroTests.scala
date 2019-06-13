@@ -95,11 +95,10 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     TSType.fromSealed[Empty] shouldBe TSNamedType[Empty](TSAlias(ref("Empty"), TSNever))
   }
 
+  sealed trait Single
+  case class A1(foo: Int) extends Single
   it should "handle sealed traits with a single subclass" in {
-    sealed trait Single
-    case class A(foo: Int) extends Single
-
-    TSType.fromSealed[Single] shouldBe TSType.alias[Single](TSTypeReference(ref("A")))
+    TSType.fromSealed[Single] shouldBe TSType.alias[Single](TSTypeReference(ref("A1")))
   }
 
   "TSType.getOrGenerate" should "use available implicit if in scope" in {
@@ -110,37 +109,35 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     TSType.getOrGenerate[A] shouldBe theSameInstanceAs(tsA)
   }
 
+  case class A2(foo: String)
   it should "use available implicit TSNamedType if in scope" in {
-    case class A(foo: String)
-
     import dsl._
-    implicit val tsA: TSNamedType[A] = TSType.fromCaseClass[A] + ("type" -> "A")
+    implicit val tsA: TSNamedType[A2] = TSType.fromCaseClass[A2] + ("type" -> "A")
 
-    TSNamedType.getOrGenerate[A] shouldBe TSType.interface[A](
+    TSNamedType.getOrGenerate[A2] shouldBe TSType.interface[A2](
       "foo"  -> TSString,
       "type" -> TSLiteralString("A")
     )
   }
 
+  case class A3(foo: String)
   it should "use case class generator for case classes" in {
-    case class A(foo: String)
-
-    val generated     = TSType.getOrGenerate[A]
-    val fromCaseClass = TSType.fromCaseClass[A]
+    val generated     = TSType.getOrGenerate[A3]
+    val fromCaseClass = TSType.fromCaseClass[A3]
 
     generated shouldBe fromCaseClass
-    fromCaseClass shouldBe TSType.interface[A]("foo" -> TSString)
+    fromCaseClass shouldBe TSType.interface[A3]("foo" -> TSString)
   }
 
+  sealed trait A4
+  case class B(foo: String) extends A4
   it should "use sealed trait generator for sealed traits" in {
-    sealed trait A
-    case class B(foo: String) extends A
 
-    val generated  = TSType.getOrGenerate[A]
-    val fromSealed = TSType.fromSealed[A]
+    val generated  = TSType.getOrGenerate[A4]
+    val fromSealed = TSType.fromSealed[A4]
 
     generated shouldBe fromSealed
-    fromSealed shouldBe TSType.alias[A](TSTypeReference(ref("B")))
+    fromSealed shouldBe TSType.alias[A4](TSTypeReference(ref("B")))
   }
 
   it should "give a compile error for unsupported types if no implicit is available" in {
@@ -157,14 +154,13 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     TSType.getOrGenerate[A] shouldBe theSameInstanceAs(tsA)
   }
 
+  case class A5(foo: String)
   it should "use case class generator for case classes" in {
-    case class A(foo: String)
-
-    val generated     = TSIType.getOrGenerate[A]
-    val fromCaseClass = TSType.fromCaseClass[A]
+    val generated     = TSIType.getOrGenerate[A5]
+    val fromCaseClass = TSType.fromCaseClass[A5]
 
     generated shouldBe fromCaseClass
-    fromCaseClass shouldBe TSType.interface[A]("foo" -> TSString)
+    fromCaseClass shouldBe TSType.interface[A5]("foo" -> TSString)
   }
 
   it should "give a compile error for unsupported types if no implicit is available" in {
