@@ -3,6 +3,9 @@ package nl.codestar.scalatsi
 import java.util.regex.Pattern
 
 import scala.reflect.ClassTag
+import scala.util.Try
+
+import scala.collection.compat.immutable.ArraySeq
 
 /** This type is used as a marker that a type with this name exists and is either already defined or externally defined
   * @note name takes from [Typescript specification](https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#3.8.2)
@@ -27,7 +30,7 @@ object TSRef {
   def unapply(arg: TSRef): Option[(String, Seq[String])] = Some((arg.name.id, arg.namespace.parts.map(_.id)))
 }
 
-/** A typescript identifier
+/** A valid typescript identifier
   * @see https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#382-type-references */
 case class TSIdentifier private (id: String) {
   import TSIdentifier._
@@ -36,12 +39,22 @@ case class TSIdentifier private (id: String) {
 }
 
 object TSIdentifier {
-  def apply(id: String): TSIdentifier                  = new TSIdentifier(id)
-  def apply[T](implicit ct: ClassTag[T]): TSIdentifier = TSIdentifier(ct.getClass.getSimpleName)
+  /** Default identifier to use as a stand-in on the rare ocasion that a JVM name is not a valid Typescript name */
+  final val INVALID = TSIdentifier("INVALID")
+
+  /** Transform a string to a typescript identifier
+    * @throws IllegalArgumentException if the name is not a valid typescript identifier */
+  def apply(name: String): TSIdentifier = new TSIdentifier(name)
+
+  /** Transform a type into a typescript identifier */
+  def apply[T](implicit ct: ClassTag[T]): TSIdentifier = TSIdentifier.idOrInvalid(ct.getClass.getSimpleName)
 
   def unapply(arg: TSIdentifier): Option[String] = Some(arg.id)
 
-  final def isValidTSName(name: String): Boolean =
+  def idOrInvalid(name: String): TSIdentifier = Try(apply(name)).getOrElse(INVALID)
+
+
+  def isValidTSName(name: String): Boolean =
     tsIdentifierPattern.matcher(name).matches() && !reservedKeywords.contains(name)
 
   private val tsIdentifierPattern = Pattern.compile("[_$\\p{L}\\p{Nl}][_$\\p{L}\\p{Nl}\\p{Nd}\\{Mn}\\{Mc}\\{Pc}]*")
@@ -99,7 +112,7 @@ object TSIdentifier {
 
 /** A typescript namespace
   * @see https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#3.8.2 */
-case class TSNamespace private (parts: IndexedSeq[TSIdentifier]) {
+case class TSNamespace(parts: IndexedSeq[TSIdentifier]) {
 
   override def toString: String = parts.mkString(".")
 
@@ -109,10 +122,12 @@ case class TSNamespace private (parts: IndexedSeq[TSIdentifier]) {
 }
 
 object TSNamespace {
-  def apply(parts: IndexedSeq[TSIdentifier]): TSNamespace = new TSNamespace(parts)
-  def apply(namespace: String): TSNamespace               = TSNamespace(namespace.split('.').map(TSIdentifier(_)))
-  def apply(pck: Package): TSNamespace                    = apply(pck.getName)
-  def apply[T](implicit ct: ClassTag[T]): TSNamespace     = apply(ct.getClass.getPackage)
+  def apply(parts: String*): TSNamespace              = new TSNamespace(parts.map(TSIdentifier.idOrInvalid).toIndexedSeq)
+  def apply(namespace: String): TSNamespace           = TSNamespace(ArraySeq.unsafeWrapArray(namespace.split('.')).map(TSIdentifier.idOrInvalid))
+  def apply(pck: Package): TSNamespace                = apply(pck.getName)
+  def apply[T](implicit ct: ClassTag[T]): TSNamespace = apply(ct.getClass.getPackage)
+
+  def parse(namespace: String): Try[TSNamespace] = Try(apply(namespace))
 
   def unapplySeq(arg: TSNamespace): Option[Seq[String]] = Some(arg.parts.map(_.id))
 }

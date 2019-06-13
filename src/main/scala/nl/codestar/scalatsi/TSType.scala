@@ -111,7 +111,7 @@ object TSType {
     * interface[Foo]("bar" -> TSString) will output "interface Foo { bar: string }" in the package of Foo
     **/
   def interface[T: ClassTag](members: (String, TypescriptType)*): TSIType[T] =
-    TSIType(TSInterface(TSRef[T], ListMap(members: _*)))
+    TSIType(TSInterface(TSRef[T], members: _*))
 
   /** Create an indexed interface for T
     *
@@ -130,6 +130,9 @@ object TSType {
 )
 trait TSNamedType[T] extends TSType[T] {
   def get: TypescriptNamedType
+
+  def withName(name: String): TSNamedType[T]           = TSNamedType(get.withName(name))
+  def withNamespace(namespace: String): TSNamedType[T] = TSNamedType(get.withNamespace(namespace))
 
   override def toString: String = s"TSNamedType($get)"
 }

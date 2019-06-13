@@ -45,10 +45,13 @@ object TypescriptType {
     /** Return a reference to this type */
     def asReference: TSTypeReference = TSTypeReference(ref)
 
-    /** Change the name of this type */
+    /** Change the name of this type
+      * @see [[TSIdentifier.apply]]
+      **/
     def withName(name: String): Self = withRef(ref.withName(name))
 
-    /** Change the namespace of this type */
+    /** Change the namespace of this type
+      * @see [[TSNamespace.apply]]*/
     def withNamespace(namespace: String): Self = withRef(ref.withNamespace(namespace))
 
     protected def withRef(ref: TSRef): Self
@@ -118,11 +121,17 @@ object TypescriptType {
     override protected def withRef(ref: TSRef): TSNamedIndexedInterface = this.copy(ref = ref)
   }
 
-  case class TSInterface(ref: TSRef, members: ListMap[String, TypescriptType]) extends TypescriptNamedType with TypescriptAggregateType {
+  case class TSInterface private (ref: TSRef, members: ListMap[String, TypescriptType])
+      extends TypescriptNamedType
+      with TypescriptAggregateType {
     override type Self = TSInterface
 
     override def nested: Set[TypescriptType]                = members.values.toSet
     override protected def withRef(ref: TSRef): TSInterface = this.copy(ref = ref)
+  }
+  object TSInterface {
+    def apply(ref: TSRef, members: ListMap[String, TypescriptType]): TSInterface = new TSInterface(ref, members)
+    def apply(ref: TSRef, members: (String, TypescriptType)*): TSInterface       = TSInterface(ref, ListMap(members: _*))
   }
   case class TSIntersection(of: Seq[TypescriptType]) extends TypescriptAggregateType { def nested: Set[TypescriptType] = of.toSet }
   object TSIntersection {
