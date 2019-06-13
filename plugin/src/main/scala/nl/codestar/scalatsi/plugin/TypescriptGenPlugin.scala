@@ -16,7 +16,7 @@ object TypescriptGenPlugin extends AutoPlugin {
         | will emit the "company.myservice.api.MyClass" JVM class as a "backend.api.MyClass" typescript interface.
       """.stripMargin
     )
-    @deprecated("Use typescriptOutputLocation", "0.2.0")
+    @deprecated("Use typescriptOutputLocation instead", "0.2.0")
     val typescriptOutputFile = typescriptOutputLocation
 
     val generateTypescript = taskKey[Unit]("Generate typescript this project")

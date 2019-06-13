@@ -12,22 +12,19 @@ case class TSIdentifier(id: String) {
 
 /** A typescript namespace
   * @see https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#3.8.2 */
-case class TSNamespace(ids: IndexedSeq[TSIdentifier]) extends AnyVal {
+case class TSNamespace private(parts: IndexedSeq[TSIdentifier]) {
 
-  override def toString: String = ids.mkString(".")
+  override def toString: String = parts.mkString(".")
 
-  /** Strip the common prefix of two namespaces
-    * @example "foo.bar.baz.A" */
-  def commonPrefix(other: TSNamespace): TSNamespace = {
-    var i = 0
-    // set i to the last common prefix
-    while (i < other.ids.length && ids(i) == other.ids(i)) { i += 1 }
-    TSNamespace(ids.drop(i))
-  }
+  /** The namespace without a common prefix
+    * @example "foo.bar.baz.A" and "foo.bar." will give "baz" */
+  def withoutCommonPrefix(other: TSNamespace): TSNamespace = TSNamespace(parts.dropCommonPrefix(other.parts))
 }
 
 object TSNamespace {
   def apply(ids: IndexedSeq[TSIdentifier]): TSNamespace = new TSNamespace(ids)
+  def apply(pck: Package): TSNamespace = apply(pck.getName)
+  def apply(namespace: String): TSNamespace = TSNamespace(namespace.split('.').map(TSIdentifier.apply))
 }
 
 object TSIdentifier {

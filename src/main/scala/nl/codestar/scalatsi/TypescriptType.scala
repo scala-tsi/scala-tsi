@@ -4,6 +4,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 import TypescriptType._
 
+import scala.reflect.ClassTag
+
 sealed trait TypescriptType {
   def |(tt: TypescriptType): TSUnion = this match {
     case TSUnion(of) => TSUnion(of :+ tt)
@@ -86,12 +88,7 @@ object TypescriptType {
 
   }
   object TSTypeReference {
-
-    /** Transforms "name.space.id" into TSTypeReference */
-    def parse(s: String): Try[TSTypeReference] = Try {
-      val split = s.split(".")
-      TSTypeReference(TSIdentifier(split.last), TSNamespace(split.dropRight(1)))
-    }
+    def apply[T: ClassTag] = implicitly[ClassTag[T]].getClass.getPackage
   }
 
   /** Typescript indexed interfaces

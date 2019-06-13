@@ -92,16 +92,16 @@ object TSType {
     * @example alias[Foo, String]("IFoo") will generate typescript `type IFoo = string`
     * @see sameAs
     */
-  def alias[T, Alias](name: String)(implicit tsType: TSType[Alias]): TSNamedType[T] =
-    alias(name, tsType.get)
+  def alias[T, Alias](ref: TSTypeReference)(implicit tsType: TSType[Alias]): TSNamedType[T] =
+    alias(ref, tsType.get)
 
   /** Create a Typescript alias "name" for type T, with the definition of tsType
     *
     * @example alias[Foo]("IFoo", TSString) will generate typescript `type IFoo = string`
     * @see sameAs
     */
-  def alias[T](name: String, tsType: TypescriptType): TSNamedType[T] =
-    TSNamedType(TSAlias(name, tsType))
+  def alias[T](ref: TSTypeReference, tsType: TypescriptType): TSNamedType[T] =
+    TSNamedType(TSAlias(ref, tsType))
 
   /** Create "name" as the typescript type for T, with "name" being defined elsewhere
     * external[Foo]("IXyz") will use "IXyz" as the typescript type every time something contains a Foo
