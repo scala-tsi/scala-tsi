@@ -69,14 +69,12 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     TSType.fromSealed[FooOrBar].get shouldBe TSAlias(ref("FooOrBar"), tsFoo.get.asReference | TSNumber)
   }
 
+  // Package cannot be inferred when the type is defined anonymously
+  sealed trait LinkedList
+  case object Nil                                     extends LinkedList
+  case class Node(value: Int, next: LinkedList = Nil) extends LinkedList
+
   it should "handle sealed traits with recursive definitions" in {
-
-    // Package goes wrong when
-    sealed trait LinkedList
-    case object Nil                                     extends LinkedList
-    case class Node(value: Int, next: LinkedList = Nil) extends LinkedList
-
-    // TODO: Unit tests for UNKNOWN
 
     implicit val nilType: TSType[Nil.type] = TSType(TSNull)
     implicit val llType: TSNamedType[Node] = TSType.alias[Node](TSNull | TSTypeReference(ref("LinkedList")))

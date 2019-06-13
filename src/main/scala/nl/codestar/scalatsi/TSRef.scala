@@ -31,7 +31,7 @@ object TSRef {
 
 /** A valid typescript identifier
   * @see https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#382-type-references */
-case class TSIdentifier private (id: String) {
+case class TSIdentifier(id: String) {
   import TSIdentifier._
   require(isValidTSName(id))
   override def toString: String = id
@@ -39,16 +39,13 @@ case class TSIdentifier private (id: String) {
 object TSIdentifier {
 
   /** Transform a string to a typescript identifier
-    * @throws IllegalArgumentException if the name is not a valid typescript identifier */
-  def apply(name: String): TSIdentifier = new TSIdentifier(name)
+    * @return [[TSIdentifier.INVALID]] if the identifier is not valid */
+  def apply(name: String): TSIdentifier = Try(new TSIdentifier(name)).getOrElse(INVALID)
 
   /** Transform a type into a typescript identifier */
-  def apply[T](implicit tt: WeakTypeTag[T]): TSIdentifier =
-    TSIdentifier.idOrInvalid(tt.tpe.typeSymbol.name.toString)
+  def apply[T](implicit tt: WeakTypeTag[T]): TSIdentifier = TSIdentifier(tt.tpe.typeSymbol.name.toString)
 
   def unapply(arg: TSIdentifier): Option[String] = Some(arg.id)
-
-  def idOrInvalid(name: String): TSIdentifier = Try(apply(name)).getOrElse(INVALID)
 
   def isValidTSName(name: String): Boolean =
     tsIdentifierPattern.matcher(name).matches() && !reservedKeywords.contains(name)
@@ -131,13 +128,13 @@ object TSNamespace {
   /** Identifier to use as a stand-in when the package or name of a JVM type is unknown (e.g. it is anonymous) */
   final val UNKNOWN = TSNamespace(ArraySeq(TSIdentifier.UNKNOWN))
 
-  def apply(parts: String*): TSNamespace    = new TSNamespace(parts.map(TSIdentifier.idOrInvalid).toIndexedSeq)
+  def apply(parts: String*): TSNamespace    = new TSNamespace(parts.map(TSIdentifier(_)).toIndexedSeq)
   def apply(namespace: String): TSNamespace = TSNamespace(split(namespace): _*)
   def apply[T](implicit tt: WeakTypeTag[T]): TSNamespace =
-    Option(tt.tpe.typeSymbol.fullName)
-    // If the name is not known (e.g. because it is defined in an inner class) it will be "<none>"
-      .filter(_ != "<none>")
-      .map(name => apply(split(name).dropRight(1): _*))
+    Option(split(tt.tpe.typeSymbol.fullName).dropRight(1))
+    // If the namespace is not known (e.g. because it is defined in an inner class) it will be "<none>"
+      .filterNot(ns => ns.length == 1 && ns.head == "<none>")
+      .map(apply(_: _*))
       .getOrElse(UNKNOWN)
 
   private def split(s: String): IndexedSeq[String] = ArraySeq.unsafeWrapArray(s.split('.'))
