@@ -3,6 +3,7 @@ package nl.codestar.scalatsi
 import scala.collection.immutable.ListMap
 import scala.util.Try
 import TypescriptType._
+import scala.reflect.classTag
 
 import scala.reflect.ClassTag
 
@@ -27,7 +28,7 @@ object TypescriptType {
       case "undefined" => TSUndefined
       case "void"      => TSVoid
       case "object"    => TSObject
-      case _           => TSTypeReference.parse(tpe).get
+      case _           => TSTypeReference(tpe)
     }
 
   /** Get a reference to a named type, or the type itself if it is unnamed or built-in */
@@ -78,7 +79,7 @@ object TypescriptType {
   /** This type is used as a marker that a type with this name exists and is either already defined or externally defined
     * @note name takes from [Typescript specification](https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#3.8.2)
     * */
-  sealed case class TSTypeReference(identifier: TSIdentifier, namespace: TSNamespace) extends TypescriptNamedType {
+  sealed case class TSTypeReference private (identifier: TSIdentifier, namespace: TSNamespace) extends TypescriptNamedType {
     override val ref: TSTypeReference = this
 
     override def toString: String = {
@@ -88,7 +89,12 @@ object TypescriptType {
 
   }
   object TSTypeReference {
-    def apply[T: ClassTag] = implicitly[ClassTag[T]].getClass.getPackage
+    def apply(identifier: TSIdentifier, namespace: TSNamespace): TSTypeReference = new TSTypeReference(identifier, namespace)
+    def apply(identifier: String): TSTypeReference = {
+      val namespaceWithId = TSNamespace(identifier)
+      TSTypeReference(namespaceWithId.parts.head, TSNamespace(namespaceWithId.parts.tail))
+    }
+    def apply[T: ClassTag] = TSTypeReference(TSIdentifier[T], TSNamespace[T])
   }
 
   /** Typescript indexed interfaces
