@@ -72,7 +72,7 @@ object TypescriptTypeSerializer {
          |}
        """.stripMargin
 
-    case TSInterface(name, members) =>
+    case TSInterface(ref, members) =>
       def symbol(required: Boolean) = if (required) ":" else "?:"
 
       val mbs = members.map({
@@ -81,7 +81,7 @@ object TypescriptTypeSerializer {
       })
 
       s"""
-         |export interface $name {
+         |export interface ${ref.name} {
          |${mbs.mkString("\n")}
          |}
        """.stripMargin

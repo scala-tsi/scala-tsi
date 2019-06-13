@@ -25,7 +25,7 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
 
     val typescript = TypescriptTypeSerializer.emit[Person]
 
-    typescript.trim should equal("""export interface IPerson {
+    typescript.trim should equal("""export interface Person {
                                    |  name: string
                                    |  age: number
                                    |}""".stripMargin)(after being whiteSpaceNormalised)
@@ -40,12 +40,12 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
 
     val typescript = TypescriptTypeSerializer.emit[ComplexCaseClass]
 
-    typescript.trim should equal("""export interface INestedCaseClass {
+    typescript.trim should equal("""export interface NestedCaseClass {
                                    |  name: string
                                    |}
                                    |
-                                   |export interface IComplexCaseClass {
-                                   |  nested: INestedCaseClass
+                                   |export interface ComplexCaseClass {
+                                   |  nested: NestedCaseClass
                                    |}""".stripMargin)(after being whiteSpaceNormalised)
   }
 
@@ -57,7 +57,7 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
 
     val typescript = TypescriptTypeSerializer.emit[OptionCaseClass]
 
-    typescript.trim should equal("""export interface IOptionCaseClass {
+    typescript.trim should equal("""export interface OptionCaseClass {
                                    |  option?: string
                                    |}""".stripMargin)(after being whiteSpaceNormalised)
   }
@@ -66,19 +66,19 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
     case class A(b: B)
     case class B(a: A)
 
-    implicit val tsA: TSType[A]  = TSType.external("IA")
+    implicit val tsA: TSType[A]  = TSType.external("A")
     implicit val tsB: TSIType[B] = TSType.fromCaseClass
     val tsAGenerated: TSIType[A] = TSType.fromCaseClass
 
     TypescriptTypeSerializer
       .emit(tsAGenerated)
       .replaceAll("\\s", "") should equal("""
-                                            |export interface IB {
-                                            |  a: IA
+                                            |export interface B {
+                                            |  a: A
                                             |}
                                             |
-                                            |export interface IA {
-                                            |  b: IB
+                                            |export interface A {
+                                            |  b: B
                                             |}""".stripMargin.replaceAll("\\s", ""))
   }
 
@@ -101,7 +101,7 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
 
     val typescript = TypescriptTypeSerializer.emit[PrimitiveTypes]
 
-    typescript.trim should equal("""export interface IPrimitiveTypes {
+    typescript.trim should equal("""export interface PrimitiveTypes {
                                    |  char: number
                                    |  string: string
                                    |  byte: number
@@ -124,7 +124,7 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
 
     val typescript = TypescriptTypeSerializer.emit[Something]
 
-    typescript.trim should equal("""export interface ISomething {
+    typescript.trim should equal("""export interface Something {
                                    |  values: { [ key: string ]: string }
                                    |}""".stripMargin)(after being whiteSpaceNormalised)
   }
