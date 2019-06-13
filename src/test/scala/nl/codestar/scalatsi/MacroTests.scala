@@ -6,9 +6,7 @@ import nl.codestar.scalatsi.TypescriptType._
 case class Person(name: String, age: Int)
 
 class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
-  val pckgName       = "nl.codestar.scalatsi"
-  val namespace      = TSNamespace("nl", "codestar", "scalatsi")
-  def ref(s: String) = TSRef(TSIdentifier(s), namespace)
+  def ref(s: String) = TSRef(TSIdentifier(s), TSNamespace[TypescriptTypeSerializerTests])
 
   "The case class to TypeScript type macro" should "be able to translate a simple case class" in {
     case class Person(name: String, age: Int)

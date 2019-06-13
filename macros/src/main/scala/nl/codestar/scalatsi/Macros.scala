@@ -1,7 +1,5 @@
 package nl.codestar.scalatsi
 
-import java.util.regex.Pattern
-
 import scala.language.higherKinds
 import scala.reflect.macros.blackbox
 
@@ -19,10 +17,8 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
        TSNamedType(TSAlias(${ref[T]}, TSNever))
      }"""
 
-  private def ref[T](implicit tt: c.WeakTypeTag[T]): Tree = {
-    val symbol = weakTypeOf[T].typeSymbol.name
-    q""" _root_.nl.codestar.scalatsi.TSRef[T]"""
-  }
+  private def ref[T](implicit tt: c.WeakTypeTag[T]): Tree =
+    q""" _root_.nl.codestar.scalatsi.TSRef[${tt.tpe.typeSymbol}]"""
 
   private def macroUtil = new MacroUtil[c.type](c)
 

@@ -39,6 +39,7 @@ case class TSIdentifier private (id: String) {
 }
 
 object TSIdentifier {
+
   /** Default identifier to use as a stand-in on the rare ocasion that a JVM name is not a valid Typescript name */
   final val INVALID = TSIdentifier("INVALID")
 
@@ -52,7 +53,6 @@ object TSIdentifier {
   def unapply(arg: TSIdentifier): Option[String] = Some(arg.id)
 
   def idOrInvalid(name: String): TSIdentifier = Try(apply(name)).getOrElse(INVALID)
-
 
   def isValidTSName(name: String): Boolean =
     tsIdentifierPattern.matcher(name).matches() && !reservedKeywords.contains(name)
