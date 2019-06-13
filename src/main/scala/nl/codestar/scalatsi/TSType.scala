@@ -4,6 +4,7 @@ import nl.codestar.scalatsi.TypescriptType._
 
 import scala.annotation.implicitNotFound
 import scala.collection.immutable.ListMap
+import scala.reflect.ClassTag
 
 /* TODO: Move this somewhere to the docs
  * To define an implicit TSType[T]:
@@ -79,29 +80,21 @@ object TSType {
   def sameAs[Source, Target](implicit tsType: TSType[Target]): TSType[Source] =
     TSType(tsType.get)
 
-  /** Create a Typescript alias "T" for type T, with the definition of Alias
-    *
-    * @example alias[Foo, String] will generate typescript `type Foo = string`
-    * @see sameAs
-    */
-  def alias[T, Alias](implicit tsType: TSType[Alias], ct: Manifest[T]): TSNamedType[T] =
-    alias[T, Alias](ct.runtimeClass.getSimpleName)
-
   /** Create a Typescript alias "name" for type T, with the definition of Alias
     *
-    * @example alias[Foo, String]("IFoo") will generate typescript `type IFoo = string`
+    * @example alias[Foo, String]() will generate typescript `type Foo = string`
     * @see sameAs
     */
-  def alias[T, Alias](ref: TSTypeReference)(implicit tsType: TSType[Alias]): TSNamedType[T] =
-    alias(ref, tsType.get)
+  def alias[T: ClassTag, Alias]()(implicit tsType: TSType[Alias]): TSNamedType[T] =
+    alias[T](tsType.get)
 
   /** Create a Typescript alias "name" for type T, with the definition of tsType
     *
-    * @example alias[Foo]("IFoo", TSString) will generate typescript `type IFoo = string`
+    * @example alias[Foo](TSString) will generate typescript `type Foo = string`
     * @see sameAs
     */
-  def alias[T](ref: TSTypeReference, tsType: TypescriptType): TSNamedType[T] =
-    TSNamedType(TSAlias(ref, tsType))
+  def alias[T: ClassTag](tsType: TypescriptType): TSNamedType[T] =
+    TSNamedType(TSAlias(TSTypeReference[T], tsType))
 
   /** Create "name" as the typescript type for T, with "name" being defined elsewhere
     * external[Foo]("IXyz") will use "IXyz" as the typescript type every time something contains a Foo
@@ -109,33 +102,27 @@ object TSType {
   def external[T](name: String): TSNamedType[T] =
     TypescriptType.fromString(name) match {
       case t: TSTypeReference => TSNamedType(t)
-      case t =>
-        throw new IllegalArgumentException(s"String $name is a predefined type $t")
+      case t                  => throw new IllegalArgumentException(s"String $name is a predefined type $t")
     }
 
   /** Create an interface "name" for T
     *
-    * @example interface[Foo]("MyFoo", "bar" -> TSString) will output "interface MyFoo { bar: string }" */
-  def interface[T](name: String, members: (String, TypescriptType)*): TSIType[T] =
-    TSIType(TSInterface(name, ListMap(members: _*)))
-
-  /** Create an interface "IClassname" for T
-    *
-    * @example interface[Foo]("bar" -> TSString) will output "interface IFoo { bar: string }" */
-  def interface[T](members: (String, TypescriptType)*)(implicit ct: Manifest[T]): TSIType[T] =
-    interface[T]("I" + ct.runtimeClass.getSimpleName, members: _*)
+    * @example
+    * interface[Foo]("bar" -> TSString) will output "interface Foo { bar: string }" in the package of Foo
+    **/
+  def interface[T: ClassTag](members: (String, TypescriptType)*): TSIType[T] =
+    TSIType(TSInterface(TSTypeReference[T], ListMap(members: _*)))
 
   /** Create an indexed interface for T
     *
-    * @example interfaceIndexed[Foo]("IFooLookup", "key", TSString, TSInt) will output "interface IFooLookup { [key: string] : Int }"
+    * @example interfaceIndexed[Foo]("key", TSString, TSInt) will output "interface Foo { [key: string] : Int }"
     */
-  def interfaceIndexed[T](
-    name: String,
+  def interfaceIndexed[T: ClassTag](
     indexName: String = "key",
     indexType: TypescriptType = TSString,
     valueType: TypescriptType
   ): TSNamedType[T] =
-    TSNamedType(TSInterfaceIndexed(name, indexName, indexType, valueType))
+    TSNamedType(TSInterfaceIndexed(TSTypeReference[T], indexName, indexType, valueType))
 }
 
 @implicitNotFound(
