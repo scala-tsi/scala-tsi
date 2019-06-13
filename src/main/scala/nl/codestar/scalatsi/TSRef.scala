@@ -24,7 +24,7 @@ object TSRef {
   }
   def apply[T: ClassTag]: TSRef = TSRef(TSIdentifier[T], TSNamespace[T])
 
-  def unapply(arg: TSRef): Option[(String, Seq[String])] = Some(arg.name.id, arg.namespace.parts.map(_.id))
+  def unapply(arg: TSRef): Option[(String, Seq[String])] = Some((arg.name.id, arg.namespace.parts.map(_.id)))
 }
 
 /** A typescript identifier

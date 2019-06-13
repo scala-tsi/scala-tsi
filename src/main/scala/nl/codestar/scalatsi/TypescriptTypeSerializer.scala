@@ -3,9 +3,8 @@ package nl.codestar.scalatsi
 import nl.codestar.scalatsi.TypescriptType._
 
 object TypescriptTypeSerializer {
-  // TODO: Optimize? Memoize? Tailrec?
   def serialize(tp: TypescriptType): String = tp match {
-    case t: TypescriptNamedType => t.name
+    case t: TypescriptNamedType => t.ref.name.id
     case TSAny                  => "any"
     case TSArray(elements)      => serialize(elements) + "[]"
     case TSBoolean              => "boolean"
@@ -51,24 +50,25 @@ object TypescriptTypeSerializer {
   }
 
   private def emitNamed(named: TypescriptNamedType): String = named match {
-    case TSAlias(name, underlying) =>
-      s"export type $name = ${serialize(underlying)}"
+    case TSAlias(ref, underlying) =>
+      s"export type ${ref.name} = ${serialize(underlying)}"
 
-    case TSEnum(name, const, entries) =>
+    case TSEnum(ref, const, entries) =>
       val mbs = entries.map({
         case (entryName, Some(i)) => s"  $entryName = $i"
         case (entryName, None)    => s"  $entryName"
       })
-      s"""export ${if (const) "const " else ""}enum $name {
+      s"""export ${if (const) "const " else ""}enum ${ref.name} {
          |${mbs.mkString(",\n")}
          |}
        """.stripMargin
 
     case _: TSTypeReference => ""
 
-    case TSInterfaceIndexed(name, indexName, indexType, valueType) =>
-      s"""export interface $name {
-         |  [ $indexName: ${serialize(indexType)} ]: ${serialize(valueType)}
+    case TSNamedIndexedInterface(ref, underlying) =>
+      // Re-implement indexed interface serialization to provide prettier output
+      s"""export interface ${ref.name} {
+         |  [ ${underlying.indexName}: ${serialize(underlying.indexType)} ]: ${serialize(underlying.valueType)}
          |}
        """.stripMargin
 
@@ -87,7 +87,6 @@ object TypescriptTypeSerializer {
        """.stripMargin
   }
 
-  // TODO: Optimize, Memoize or something, tail rec etc
   private def discoverNestedNames(tp: TypescriptType): Set[TypescriptNamedType] = {
     val me: Set[TypescriptNamedType] = tp match {
       case named: TypescriptNamedType => Set(named)

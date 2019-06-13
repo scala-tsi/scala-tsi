@@ -1,7 +1,9 @@
 package nl.codestar.scalatsi.generator
 
+import nl.codestar.scalatsi.output.WriteTSToFiles
+
 object GeneratorApp {
   def main(args: Array[String]): Unit = {
-    _root_.nl.codestar.scalatsi.output.WriteTSToFiles.write(UserOptions.value)(UserClasses.outputClasses)
+    WriteTSToFiles.write(UserOptions.value)(UserClasses.outputClasses)
   }
 }
