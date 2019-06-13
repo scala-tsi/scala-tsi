@@ -29,6 +29,10 @@ object TypescriptTypeSerializer {
     case TSLiteralString(v)     => s""""${v.replaceAllLiterally("\"", "\"\"")}""""
   }
 
+  def generateImports(tp: TypescriptNamedType): String = ???
+
+  private def importLine(myNameSpacens: TSNamespace, types: Seq[TSIdentifier]): String
+
   // Unfortunately no vararg generics in scala
   def emit[T](implicit tsType: TSNamedType[T]): String =
     emits(tsType.get)

@@ -35,6 +35,8 @@ case class TSIdentifier(id: String) {
   import TSIdentifier._
   require(isValidTSName(id))
   override def toString: String = id
+
+  def isValid: Boolean = !(this.eq(TSIdentifier.INVALID) || this.eq(TSIdentifier.UNKNOWN))
 }
 object TSIdentifier {
 
@@ -121,6 +123,8 @@ case class TSNamespace(parts: IndexedSeq[TSIdentifier]) {
   /** The namespace without a common prefix
     * @example "foo.bar.baz.A" and "foo.bar." will give "baz" */
   def withoutCommonPrefix(other: TSNamespace): TSNamespace = TSNamespace(parts.dropCommonPrefix(other.parts))
+
+  def isValid: Boolean = parts.forall(_.isValid)
 }
 
 object TSNamespace {

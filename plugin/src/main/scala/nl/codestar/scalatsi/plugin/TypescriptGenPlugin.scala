@@ -12,14 +12,20 @@ object TypescriptGenPlugin extends AutoPlugin {
     val typescriptOutputLocation       = settingKey[File]("Directory or file where all typescript interfaces will be written to")
     val typescriptMapping              = settingKey[Map[String, String]](
       """Translation table of the JVM namespaces to the typescript modules.
-        | an entry like `company.myservice.api -> backend.api`.
-        | will emit the "company.myservice.api.MyClass" JVM class as a "backend.api.MyClass" typescript interface.
+        | an entry like `myservice.api -> backend.api`.
+        | will emit the "myservice.api.MyClass" JVM class as a "backend.api.MyClass" typescript interface.
+      """.stripMargin
+    )
+    val typescriptIgnoredPrefix        = settingKey[String](
+      """A prefix to strip from your prefix/packages.
+        | Setting this to `com.company` will emit `com.company.myservice.api` as `myservice.api`.
+        | Will be applied before typescriptMapping
       """.stripMargin
     )
     @deprecated("Use typescriptOutputLocation instead", "0.2.0")
     val typescriptOutputFile = typescriptOutputLocation
 
-    val generateTypescript = taskKey[Unit]("Generate typescript this project")
+    val generateTypescript = taskKey[Unit]("Generate typescript for this project")
 
     val generateTypescriptGeneratorApplication = taskKey[Seq[File]]("Generate an app to generate typescript interfaces")
   }
@@ -35,7 +41,8 @@ object TypescriptGenPlugin extends AutoPlugin {
     typescriptGenerationImports := Seq(),
     typescriptClassesToGenerateFor := Seq(),
     typescriptOutputLocation := target.value / "typescript-interfaces",
-    typescriptMapping := Map()
+    typescriptMapping := Map(),
+    typescriptIgnoredPrefix := "",
   )
 
   /** Settings for the plugin, should generally not be modified by the user */
