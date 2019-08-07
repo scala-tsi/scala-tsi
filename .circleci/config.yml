@@ -87,14 +87,9 @@ jobs:
 
 workflows:
   version: 2
-  # Build for normal commits
-  build:
+  build_and_publish:
     jobs:
-      - build
-  # Build for tags
-  build_tagged:
-    jobs:
-      - publish:
+      - build:
           filters:  # required since `deploy` has tag filters AND requires `build`
             tags:
               only: /.*/
