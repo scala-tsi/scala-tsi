@@ -126,7 +126,11 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
 
     symbol.knownDirectSubclasses.toSeq match {
       case Seq() =>
-        c.warning(c.enclosingPosition, s"Sealed $T has no known subclasses, could not generate union")
+        val symbolType =
+          if (symbol.isTrait) "trait"
+          else if (symbol.isClass && symbol.isAbstract) "abstract class"
+          else "type"
+        c.warning(c.enclosingPosition, s"Sealed $symbolType $T has no known subclasses, could not generate union")
         mapToNever[T]
       case Seq(singleChild) =>
         q"""{
