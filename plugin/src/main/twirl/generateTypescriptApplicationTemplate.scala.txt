@@ -5,18 +5,20 @@ package nl.codestar.scalatsi.generator
 import _root_.nl.codestar.scalatsi.TSNamedType
 import _root_.nl.codestar.scalatsi.TypescriptType.TypescriptNamedType
 import _root_.java.io.File
+import _root_.nl.codestar.scalatsi.TypescriptType._
+import _root_.nl.codestar.scalatsi.TSType
 
 /** User imports */
 @for(imp <- imports) {
 import @imp
 }
 
-object ApplicationTypescriptGeneration {
+object ApplicationTypescriptGeneration extends _root_.nl.codestar.scalatsi.DefaultTSTypes {
 
   // If you get a generator or implicit not found error here, make sure you have defined a TSType[T] implicit and imported it
   val toOutput: Seq[TypescriptNamedType] = Seq(
     @for(userClass <- classes) {
-      TSNamedType.getOrGenerate[@userClass].get
+      TSNamedType.getOrGenerate[@userClass].get,
     }
   )
 
