@@ -2,7 +2,7 @@ import sbt.Keys.scalacOptions
 
 lazy val commonSettings = Seq(
   organization := "nl.codestar",
-  version := "0.2.3-SNAPSHOT",
+  version := "0.2.0-SNAPSHOT",
   scalaVersion := "2.13.0",
   crossScalaVersions := Seq("2.12.8", "2.13.0"),
   compilerOptions,
