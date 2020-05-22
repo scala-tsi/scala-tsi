@@ -48,8 +48,8 @@ object TypescriptTypeSerializer {
       .flatMap(discoverNestedNames)
       .toSeq
       .sorted
-      .map(namedType => emitNamed(namedType)(styleOptions))
-      .mkString("\n")
+      .flatMap(namedType => emitNamed(namedType)(styleOptions))
+      .mkString("", "\n\n", "\n")
 
   private object TSInterfaceEntry {
     def unapply(typescriptType: TypescriptType): Option[(TypescriptType, Boolean)] =
@@ -60,29 +60,27 @@ object TypescriptTypeSerializer {
       }
   }
 
-  private def emitNamed(named: TypescriptNamedType)(implicit styleOptions: StyleOptions): String = {
+  private def emitNamed(named: TypescriptNamedType)(implicit styleOptions: StyleOptions): Option[String] = {
     import styleOptions._
     named match {
       case TSAlias(name, underlying) =>
-        s"export type $name = ${serialize(underlying)}"
+        Some(s"export type $name = ${serialize(underlying)}")
 
       case TSEnum(name, const, entries) =>
         val mbs = entries.map({
           case (entryName, Some(i)) => s"  $entryName = $i"
           case (entryName, None)    => s"  $entryName"
         })
-        s"""export ${if (const) "const " else ""}enum $name {
-           |${mbs.mkString(",\n")}
-           |}$sc
-       """.stripMargin
+        Some(s"""export ${if (const) "const " else ""}enum $name {
+                |${mbs.mkString(",\n")}
+                |}$sc""".stripMargin)
 
-      case _: TSTypeReference => ""
+      case _: TSTypeReference => None
 
       case TSInterfaceIndexed(name, indexName, indexType, valueType) =>
-        s"""export interface $name {
-           |  [ $indexName: ${serialize(indexType)} ]: ${serialize(valueType)}$sc
-           |}
-       """.stripMargin
+        Some(s"""export interface $name {
+                |  [ $indexName: ${serialize(indexType)} ]: ${serialize(valueType)}$sc
+                |}""".stripMargin)
 
       case TSInterface(name, members) =>
         def symbol(required: Boolean) = if (required) ":" else "?:"
@@ -92,11 +90,9 @@ object TypescriptTypeSerializer {
             s"  $memberName${symbol(required)} ${serialize(tp)}"
         })
 
-        s"""
-           |export interface $name {
-           |${mbs.mkString("", s"$sc\n", sc)}
-           |}
-       """.stripMargin
+        Some(s"""export interface $name {
+                |${mbs.mkString("", s"$sc\n", sc)}
+                |}""".stripMargin)
     }
   }
 
