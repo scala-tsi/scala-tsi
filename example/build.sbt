@@ -17,7 +17,6 @@ lazy val root = (project in file("."))
 // (compile in Compile) := ((compile in Compile) dependsOn (typescript in Compile)).value
 
 lazy val compilerOptions = Seq(
-  "-Xsource:2.13",
   "-unchecked",
   "-feature",
   "-deprecation",
