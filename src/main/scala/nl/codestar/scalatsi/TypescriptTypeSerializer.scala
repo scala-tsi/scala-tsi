@@ -27,7 +27,7 @@ object TypescriptTypeSerializer {
     case TSVoid                 => "void"
     case TSLiteralBoolean(v)    => v.toString()
     case TSLiteralNumber(v)     => v.toString()
-    case TSLiteralString(v)     => s""""${v.replaceAllLiterally("\"", "\"\"")}""""
+    case TSLiteralString(v)     => s""""${v.replace("\"", "\"\"")}""""
   }
 
   // Unfortunately no vararg generics in scala

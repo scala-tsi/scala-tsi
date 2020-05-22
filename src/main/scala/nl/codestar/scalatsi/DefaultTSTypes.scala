@@ -2,8 +2,6 @@ package nl.codestar.scalatsi
 
 import nl.codestar.scalatsi.TypescriptType._
 
-import language.higherKinds
-
 trait DefaultTSTypes extends PrimitiveTSTypes with ScalaTSTypes with CollectionTSTypes with TupleTSTypes with JavaTSTypes {}
 
 object DefaultTSTypes extends DefaultTSTypes
