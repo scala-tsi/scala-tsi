@@ -6,10 +6,12 @@ lazy val root = (project in file("."))
       scalaVersion := "2.13.2",
       organization := "nl.codestar",
       scalacOptions ++= compilerOptions,
-      typescriptClassesToGenerateFor := Seq("Foo", "Sealed", "Person"),
+      typescriptClassesToGenerateFor := Seq("Foo", "Sealed", "Person", "DeepThought"),
       typescriptGenerationImports := Seq("models._", "ReadmeTSTypes._"),
       typescriptOutputFile := baseDirectory.value / "model.ts",
       scalafmtConfig := file("../.scalafmt.conf")
+      // Enable to debug macros
+      // scalacOptions += "-Ymacro-debug-lite"
     )
   )
 

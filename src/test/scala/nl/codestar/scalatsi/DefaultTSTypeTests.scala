@@ -31,11 +31,20 @@ class DefaultTSTypeTests extends WordSpec with Matchers with DefaultTSTypes {
       generated should ===(manual)
     }
 
+    "None" in {
+      "implicitly[TSType[None.type]]" should compile
+      implicitly[TSType[None.type]].get shouldBe TSNull
+    }
+
     "Option" in {
       "implicitly[TSType[Option[Int]]]" should compile
       val generated = implicitly[TSType[Option[Int]]].get
-      val manual    = implicitly[TSType[Int]] | TSNull
+      val manual    = implicitly[TSType[Int]] | TSUndefined
       generated should ===(manual)
+    }
+
+    "Some" in {
+      implicitly[TSType[Some[Int]]] shouldBe implicitly[TSType[Int]]
     }
 
     "Either" in {
