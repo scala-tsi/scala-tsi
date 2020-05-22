@@ -55,6 +55,7 @@ jobs:
             sbt -batch publishLocal sbt-scala-tsi/publishLocal
 
       - run:
+          name: "example project: sbt test"
           command: sbt -batch test
           working_directory: example
 
