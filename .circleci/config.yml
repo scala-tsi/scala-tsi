@@ -55,10 +55,15 @@ jobs:
             sbt -batch publishLocal sbt-scala-tsi/publishLocal
 
       - run:
-          name: "example project: sbt test"
-          command: sbt -batch test
+          name: "test and generate example project"
+          command: sbt -batch test generateTypescript exit
           working_directory: example
 
+      - run:
+          name: "Check example project output"
+          command: cmp model.ts expected_model.ts
+          working_directory: example
+          
       - store_test_results:
           path: example/target/test-reports
 
