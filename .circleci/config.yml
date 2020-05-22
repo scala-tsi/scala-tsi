@@ -58,7 +58,8 @@ jobs:
           name: "Run and test example project"
           command: |
             sbt -batch test exit
-            sbt -batch generateTypescript exit
+            # TODO: for some reason sbt doesn't quit on CircleCI with this task
+            timeout 5s sbt -batch generateTypescript exit
             cmp model.ts
           working_directory: example
 
