@@ -1,4 +1,4 @@
-@(imports: Seq[String], classes: Seq[String], targetFile: String)
+@(imports: Seq[String], classes: Seq[String], targetFile: String, useSemicolons: Boolean)
 
 package nl.codestar.scalatsi.generator
 
@@ -16,14 +16,17 @@ import @imp
 object ApplicationTypescriptGeneration extends _root_.nl.codestar.scalatsi.DefaultTSTypes {
 
   // If you get a generator or implicit not found error here, make sure you have defined a TSType[T] implicit and imported it
-  val toOutput: Seq[TypescriptNamedType] = Seq(
+  val toOutput: Seq[TypescriptNamedType] = Set(
     @for(userClass <- classes) {
       TSNamedType.getOrGenerate[@userClass].get,
     }
   )
 
   val options = _root_.nl.codestar.scalatsi.output.OutputOptions(
-    targetFile = new File("@targetFile")
+    targetFile = new File("@targetFile"),
+    styleOptions = StyleOptions(
+        semicolons = @useSemicolons
+    )
   )
 
   def main(args: Array[String]): Unit = {

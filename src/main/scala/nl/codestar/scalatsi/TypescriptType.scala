@@ -83,8 +83,8 @@ object TypescriptType {
   @deprecated("0.2.0", "Renamed to TSTypeReference")
   type TSExternalName = TSTypeReference
 
-  /** Typescript indexed interfaces
-    * { [indexName:indexType]: valueType}
+  /** Typescript anonymous indexed interfaces
+    * { [indexName:indexType]: valueType }
     * @param indexType index type, TSNumber or TSString
     **/
   case class TSIndexedInterface(indexName: String = "key", indexType: TypescriptType, valueType: TypescriptType)
