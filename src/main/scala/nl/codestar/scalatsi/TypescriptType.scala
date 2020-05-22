@@ -42,7 +42,9 @@ object TypescriptType {
 
     def asReference: TSTypeReference = TSTypeReference(name)
   }
-  object TypescriptNamedType
+  object TypescriptNamedType {
+    implicit val ordering: Ordering[TypescriptNamedType] = Ordering.by[TypescriptNamedType, String](_.name)
+  }
 
   /** A marker trait for a TS type that can contain nested types */
   sealed trait TypescriptAggregateType extends TypescriptType {
@@ -83,8 +85,8 @@ object TypescriptType {
   @deprecated("0.2.0", "Renamed to TSTypeReference")
   type TSExternalName = TSTypeReference
 
-  /** Typescript indexed interfaces
-    * { [indexName:indexType]: valueType}
+  /** Typescript anonymous indexed interfaces
+    * { [indexName:indexType]: valueType }
     * @param indexType index type, TSNumber or TSString
     **/
   case class TSIndexedInterface(indexName: String = "key", indexType: TypescriptType, valueType: TypescriptType)

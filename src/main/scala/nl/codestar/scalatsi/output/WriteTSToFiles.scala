@@ -6,8 +6,8 @@ import nl.codestar.scalatsi.TypescriptType.TypescriptNamedType
 import nl.codestar.scalatsi.TypescriptTypeSerializer
 
 object WriteTSToFiles {
-  def write(options: OutputOptions)(types: Seq[TypescriptNamedType]): Unit = {
-    val output = TypescriptTypeSerializer.emits(types: _*)
+  def write(options: OutputOptions)(types: Set[TypescriptNamedType]): Unit = {
+    val output = TypescriptTypeSerializer.emits(options.styleOptions, types)
     if (!options.targetFile.exists()) {
       options.targetFile.createNewFile()
     }
