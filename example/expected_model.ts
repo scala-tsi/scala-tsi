@@ -16,4 +16,25 @@ export interface IFoo {
   num?: number
   baz?: IBaz
 }
-       
+
+export interface IJob {
+  tasks: string[]
+  boss: string
+}
+
+export interface IPerson {
+  name : string,
+  email : string,
+  age ?: number
+  job: IJob
+}
+
+export type ISealed = ISealedOption1 | ISealedOption2
+
+export interface ISealedOption1 {
+  foo: string
+}
+
+export interface ISealedOption2 {
+  bar: number
+}
