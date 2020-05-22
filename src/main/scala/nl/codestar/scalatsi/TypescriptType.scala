@@ -80,6 +80,8 @@ object TypescriptType {
   case class TSTypeReference(name: String) extends TypescriptNamedType {
     override def asReference: TSTypeReference = this
   }
+  @deprecated("0.2.0", "Renamed to TSTypeReference")
+  type TSExternalName = TSTypeReference
 
   /** Typescript indexed interfaces
     * { [indexName:indexType]: valueType}
