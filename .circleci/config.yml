@@ -56,7 +56,7 @@ jobs:
 
       - run:
           name: "test and generate example project"
-          command: sbt -batch test generateTypescript exit
+          command: sbt -batch test generateTypescript scalafmtSbtCheck scalafmtCheckAll exit
           working_directory: example
 
       - run:
