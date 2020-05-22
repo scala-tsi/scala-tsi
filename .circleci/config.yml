@@ -57,7 +57,7 @@ jobs:
       - run:
           name: "Run and test example project"
           command: |
-            sbt -batch test generateTypescript
+            sbt -batch test generateTypescript exit
             cmp model.ts
           working_directory: example
 
