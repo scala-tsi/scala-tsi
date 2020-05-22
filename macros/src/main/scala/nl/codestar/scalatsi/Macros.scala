@@ -101,6 +101,8 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
       c.abort(c.enclosingPosition, s"Expected case class, but found: $T")
 
     val members = caseClassFieldsTypes(T) map {
+      case (name, none) if none <:< typeOf[None.type] =>
+        q"($name, TSNull)"
       case (name, optional) if optional <:< typeOf[Option[_]] =>
         val typeArg = optional.typeArgs.head
         q"($name, ${getTSType(typeArg)} | TSUndefined)"

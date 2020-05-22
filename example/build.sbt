@@ -10,6 +10,8 @@ lazy val root = (project in file("."))
       typescriptGenerationImports := Seq("models._", "ReadmeTSTypes._"),
       typescriptOutputFile := baseDirectory.value / "model.ts",
       scalafmtConfig := file("../.scalafmt.conf")
+      // Enable to debug macros
+      // scalacOptions += "-Ymacro-debug-lite"
     )
   )
 

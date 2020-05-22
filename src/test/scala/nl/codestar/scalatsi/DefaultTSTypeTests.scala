@@ -39,7 +39,7 @@ class DefaultTSTypeTests extends WordSpec with Matchers with DefaultTSTypes {
     "Option" in {
       "implicitly[TSType[Option[Int]]]" should compile
       val generated = implicitly[TSType[Option[Int]]].get
-      val manual    = implicitly[TSType[Int]] | TSNull
+      val manual    = implicitly[TSType[Int]] | TSUndefined
       generated should ===(manual)
     }
 

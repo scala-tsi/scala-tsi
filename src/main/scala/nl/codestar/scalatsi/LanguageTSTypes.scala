@@ -9,7 +9,7 @@ trait ScalaTSTypes {
 trait CollectionTSTypes extends LowPriorityCollectionTSType {
   // This chooses null union to represent Option types.
   // When defining interfaces however Option will be represented with undefined union
-  implicit def tsOption[E](implicit e: TSType[E]): TSType[Option[E]] = TSType(e | TSNull)
+  implicit def tsOption[E](implicit e: TSType[E]): TSType[Option[E]] = TSType(e | TSUndefined)
   implicit val noneTSType: TSType[None.type]                         = TSType(TSNull)
   implicit def tsSome[E](implicit e: TSType[E]): TSType[Some[E]]     = TSType(e.get)
 
