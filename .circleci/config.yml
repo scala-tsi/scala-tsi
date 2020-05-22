@@ -15,12 +15,12 @@ jobs:
       - run:
           name: Compile and test for 2.13
           command:
-            sbt ++2.13.2 compile test:compile scala-tsi-macros/compile scala-tsi-macros/test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
+            sbt -batch ++2.13.2 compile test:compile scala-tsi-macros/compile scala-tsi-macros/test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
 
       - run:
           name: Compile and test for 2.12
           command:
-            sbt ++2.12.11 compile test:compile scala-tsi-macros/compile scala-tsi-macros/test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
+            sbt -batch ++2.12.11 compile test:compile scala-tsi-macros/compile scala-tsi-macros/test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
 
       - save_cache:
           key:  scala-tsi-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
@@ -52,10 +52,10 @@ jobs:
 
       - run:
           command:
-            sbt publishLocal sbt-scala-tsi/publishLocal
+            sbt -batch publishLocal sbt-scala-tsi/publishLocal
 
       - run:
-          command: sbt test exit
+          command: sbt -batch test
           working_directory: example
 
       - store_test_results:
@@ -75,12 +75,12 @@ jobs:
 
       - run:
           command:
-            sbt +publishSigned +sbt-scala-tsi/publishSigned
+            sbt -batch +publishSigned +sbt-scala-tsi/publishSigned
 
       # releases everything from nl.codestar, look into releasing only this project
       - run:
           command:
-            sbt "sonatypeReleaseAll nl.codestar"
+            sbt -batch "sonatypeReleaseAll nl.codestar"
 
 workflows:
   version: 2
