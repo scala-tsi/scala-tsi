@@ -30,7 +30,7 @@ object TypescriptGenPlugin extends AutoPlugin {
     typescriptGenerationImports := Seq(),
     typescriptClassesToGenerateFor := Seq(),
     typescriptOutputFile := target.value / "scala-interfaces.ts",
-    typescriptStyleSemicolons := true,
+    typescriptStyleSemicolons := false,
     // Task settings
     generateTypescript := runTypescriptGeneration.value,
     generateTypescriptGeneratorApplication in Compile := createTypescriptGenerationTemplate(
