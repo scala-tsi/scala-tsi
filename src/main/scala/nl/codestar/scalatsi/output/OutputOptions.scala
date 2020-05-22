@@ -11,6 +11,4 @@ case class StyleOptions(
   semicolons: Boolean = false
 ) {
   private[scalatsi] val sc: String = if (semicolons) ";" else ""
-
-  println(s"sc: $sc")
 }

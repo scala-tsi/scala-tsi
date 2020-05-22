@@ -1,4 +1,3 @@
-import org.scalafmt.sbt.ScalafmtPlugin.autoImport.scalafmtOnCompile
 import sbt.Keys._
 
 lazy val root = (project in file("."))
@@ -7,15 +6,12 @@ lazy val root = (project in file("."))
       scalaVersion := "2.13.2",
       organization := "nl.codestar",
       scalacOptions ++= compilerOptions,
-      typescriptClassesToGenerateFor := Seq("Foo"),
-      typescriptGenerationImports := Seq("models._", "Foo._"),
+      typescriptClassesToGenerateFor := Seq("Foo", "Sealed", "Person"),
+      typescriptGenerationImports := Seq("models._", "ReadmeTSTypes._"),
       typescriptOutputFile := baseDirectory.value / "model.ts",
-      scalafmtConfig := file("../.scalafmt.conf"),
-      scalafmtOnCompile := true // format code on compile
+      scalafmtConfig := file("../.scalafmt.conf")
     )
   )
-
-// (compile in Compile) := ((compile in Compile) dependsOn (typescript in Compile)).value
 
 lazy val compilerOptions = Seq(
   "-unchecked",
@@ -27,5 +23,6 @@ lazy val compilerOptions = Seq(
   "-target:jvm-1.8"
 )
 
-resolvers += Opts.resolver.sonatypeReleases
-resolvers += Opts.resolver.sonatypeSnapshots
+// Enable these in your real project
+//resolvers += Opts.resolver.sonatypeReleases
+//resolvers += Opts.resolver.sonatypeSnapshots

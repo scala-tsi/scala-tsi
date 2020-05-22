@@ -9,17 +9,6 @@ import scala.annotation.nowarn
 
 class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultTSTypes {
 
-  import org.scalactic._
-
-  def whiteSpaceNormalised: Uniformity[String] =
-    new AbstractStringUniformity {
-
-      /** Returns the string with all consecutive white spaces reduced to a single space, then removes empty lines. */
-      def normalized(s: String): String = s.replaceAll("\\s+", " ")
-
-      override def toString: String = "whiteSpaceNormalised"
-    }
-
   "The Typescript serializer" should "serialize to a simple interface" in {
     case class Person(name: String, age: Int)
 
@@ -27,10 +16,11 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
 
     val typescript = TypescriptTypeSerializer.emit[Person]()
 
-    typescript.trim should equal("""export interface IPerson {
-                                   |  name: string
-                                   |  age: number
-                                   |}""".stripMargin)(after being whiteSpaceNormalised)
+    typescript should equal("""export interface IPerson {
+                              |  name: string
+                              |  age: number
+                              |}
+                              |""".stripMargin)
   }
 
   it should "serialize an interface with semicolons if configured" in {
@@ -40,10 +30,11 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
 
     val typescript = TypescriptTypeSerializer.emit[Person](StyleOptions(semicolons = true))
 
-    typescript.trim should equal("""export interface IPerson {
-                                   |  name: string;
-                                   |  age: number;
-                                   |}""".stripMargin)(after being whiteSpaceNormalised)
+    typescript should equal("""export interface IPerson {
+                              |  name: string;
+                              |  age: number;
+                              |}
+                              |""".stripMargin)
   }
 
   it should "be able to generate multiple typescript interfaces for a nested case classes" in {
@@ -55,13 +46,14 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
 
     val typescript = TypescriptTypeSerializer.emit[ComplexCaseClass]()
 
-    typescript.trim should equal("""export interface INestedCaseClass {
-                                   |  name: string
-                                   |}
-                                   |
-                                   |export interface IComplexCaseClass {
-                                   |  nested: INestedCaseClass
-                                   |}""".stripMargin)(after being whiteSpaceNormalised)
+    typescript should equal("""export interface IComplexCaseClass {
+                              |  nested: INestedCaseClass
+                              |}
+                              |
+                              |export interface INestedCaseClass {
+                              |  name: string
+                              |}
+                              |""".stripMargin)
   }
 
   it should "be able to handle options in a case class" in {
@@ -72,9 +64,10 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
 
     val typescript = TypescriptTypeSerializer.emit[OptionCaseClass]()
 
-    typescript.trim should equal("""export interface IOptionCaseClass {
-                                   |  option?: string
-                                   |}""".stripMargin)(after being whiteSpaceNormalised)
+    typescript should equal("""export interface IOptionCaseClass {
+                              |  option?: string
+                              |}
+                              |""".stripMargin)
   }
 
   it should "handle recursive types" in {
@@ -85,16 +78,14 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
     @nowarn("cat=unused") implicit val tsB: TSIType[B] = TSType.fromCaseClass
     val tsAGenerated: TSIType[A]                       = TSType.fromCaseClass
 
-    TypescriptTypeSerializer
-      .emit()(tsAGenerated)
-      .replaceAll("\\s", "") should equal("""
-                                            |export interface IB {
-                                            |  a: IA
-                                            |}
-                                            |
-                                            |export interface IA {
-                                            |  b: IB
-                                            |}""".stripMargin.replaceAll("\\s", ""))
+    TypescriptTypeSerializer.emit()(tsAGenerated) should equal("""|export interface IA {
+                                                                  |  b: IB
+                                                                  |}
+                                                                  |
+                                                                  |export interface IB {
+                                                                  |  a: IA
+                                                                  |}
+                                                                  |""".stripMargin)
   }
 
   it should "be able to handle all primitive types" in {
@@ -116,18 +107,19 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
 
     val typescript = TypescriptTypeSerializer.emit[PrimitiveTypes]()
 
-    typescript.trim should equal("""export interface IPrimitiveTypes {
-                                   |  char: number
-                                   |  string: string
-                                   |  byte: number
-                                   |  short: number
-                                   |  int: number
-                                   |  long: number
-                                   |  float: number
-                                   |  double: number
-                                   |  boolean: boolean
-                                   |  stringSeq: string[]
-                                   |}""".stripMargin)(after being whiteSpaceNormalised)
+    typescript should equal("""export interface IPrimitiveTypes {
+                              |  char: number
+                              |  string: string
+                              |  byte: number
+                              |  short: number
+                              |  int: number
+                              |  long: number
+                              |  float: number
+                              |  double: number
+                              |  boolean: boolean
+                              |  stringSeq: string[]
+                              |}
+                              |""".stripMargin)
   }
 
   it should "serialize an indexed interface" in {
@@ -139,9 +131,10 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
 
     val typescript = TypescriptTypeSerializer.emit[Something]()
 
-    typescript.trim should equal("""export interface ISomething {
-                                   |  values: { [ key: string ]: string }
-                                   |}""".stripMargin)(after being whiteSpaceNormalised)
+    typescript should equal("""export interface ISomething {
+                              |  values: { [ key: string ]: string }
+                              |}
+                              |""".stripMargin)
   }
 
   it should "handle a type alias with nested types" in {
@@ -166,9 +159,10 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
 
     val typescript = TypescriptTypeSerializer.emit[Something]()
 
-    typescript.trim should equal("""export interface ISomething {
-                                   |  [ as: string ]: string
-                                   |}""".stripMargin)(after being whiteSpaceNormalised)
+    typescript should equal("""export interface ISomething {
+                              |  [ as: string ]: string
+                              |}
+                              |""".stripMargin)
   }
 
   it should "handle string literal types" in {

@@ -104,6 +104,7 @@ First we define the mapping as follows
 package myproject
 
 import nl.codestar.scalatsi._
+import nl.codestar.scalatsi.dsl._
 
 // A TSType[T] is what tells scala-tsi how to convert your type T into typescript
 // MyModelTSTypes contains all TSType[_]'s for your model
