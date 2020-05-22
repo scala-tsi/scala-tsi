@@ -1,6 +1,5 @@
 package nl.codestar.scalatsi
 
-import scala.language.higherKinds
 import scala.reflect.macros.blackbox
 
 private[scalatsi] class Macros(val c: blackbox.Context) {
