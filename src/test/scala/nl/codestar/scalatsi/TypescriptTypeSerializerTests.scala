@@ -55,12 +55,12 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
 
     val typescript = TypescriptTypeSerializer.emit[ComplexCaseClass]()
 
-    typescript.trim should equal("""export interface INestedCaseClass {
-                                   |  name: string
+    typescript.trim should equal("""export interface IComplexCaseClass {
+                                   |  nested: INestedCaseClass
                                    |}
                                    |
-                                   |export interface IComplexCaseClass {
-                                   |  nested: INestedCaseClass
+                                   |export interface INestedCaseClass {
+                                   |  name: string
                                    |}""".stripMargin)(after being whiteSpaceNormalised)
   }
 
@@ -88,12 +88,11 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
     TypescriptTypeSerializer
       .emit()(tsAGenerated)
       .replaceAll("\\s", "") should equal("""
-                                            |export interface IB {
-                                            |  a: IA
-                                            |}
-                                            |
                                             |export interface IA {
                                             |  b: IB
+                                            |}
+                                            |export interface IB {
+                                            |  a: IA
                                             |}""".stripMargin.replaceAll("\\s", ""))
   }
 
