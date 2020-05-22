@@ -59,11 +59,11 @@ jobs:
           command: sbt -batch test generateTypescript exit
           working_directory: example
 
-       - run:
-         name: "Check example project output"
-         command: cmp model.ts expected_model.ts
-         working_directory: example
-
+      - run:
+          name: "Check example project output"
+          command: cmp model.ts expected_model.ts
+          working_directory: example
+          
       - store_test_results:
           path: example/target/test-reports
 
