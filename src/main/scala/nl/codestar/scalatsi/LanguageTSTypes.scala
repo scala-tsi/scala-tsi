@@ -3,7 +3,8 @@ package nl.codestar.scalatsi
 import nl.codestar.scalatsi.TypescriptType._
 
 trait ScalaTSTypes {
-  implicit val anyTSType: TSType[Any] = TSType(TSAny)
+  implicit val anyTSType: TSType[Any]        = TSType(TSAny)
+  implicit val noneTSType: TSType[None.type] = TSType(TSNull)
 }
 
 trait CollectionTSTypes extends LowPriorityCollectionTSType {

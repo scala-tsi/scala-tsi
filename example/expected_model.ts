@@ -7,6 +7,12 @@ export interface IBaz {
   bar: number
 }
 
+export interface IDeepThought {
+  query: "The Answer to Life, the Universe and Everything"
+  answer: 42
+  question: null
+}
+
 export interface IFoo {
   bar: IBar
   bool: boolean

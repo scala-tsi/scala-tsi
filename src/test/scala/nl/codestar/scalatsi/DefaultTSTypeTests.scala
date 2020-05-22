@@ -16,6 +16,7 @@ class DefaultTSTypeTests extends WordSpec with Matchers with DefaultTSTypes {
     "scala.math.BigDecimal" in { "implicitly[TSType[scala.math.BigDecimal]]" should compile }
     "java.math.BigDecimal" in { "implicitly[TSType[java.math.BigDecimal]]" should compile }
     "scala.math.BigInt" in { "implicitly[TSType[scala.math.BigInt]]" should compile }
+    "None" in { "implicitly[TSType[None.type]]" should compile }
 
     "Tuple2" in {
       "implicitly[TSType[(Int, String)]]" should compile
