@@ -53,8 +53,7 @@ See [Example](#Example) for more a more in-depth example
 ## Configuration
 
 | Key | Type | Default | Description |
-| --- | ---- | ------- ----------- |
- 
+| --- | ---- | ------- | ----------- |
 | typescriptClassesToGenerateFor | Seq[String] | `Seq()` | A list of all your (top-level) classes that you want to generate interfaces for |
 | typescriptGenerationImports | Seq[String] | `Seq()` | A list of all imports. This should import all classes you defined above, as well as custom `TSType` implicits |
 | typescriptOutputFile | File | `target/scala-interfaces.ts`| The output file with generated typescript interfaces |
