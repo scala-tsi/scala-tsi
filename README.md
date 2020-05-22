@@ -34,21 +34,18 @@ lazy val root = (project in file("."))
 
 Now `sbt generateTypescript` will transform a file like
 ```scala
-package mymodel
-import nl.codestar.scalatsi._
-
 case class MyClass(foo: String, bar: Int)
 ```
 
 Into a typescript interface like
 ```typescript
-export interface MyClass {
-  a: string
-  b: number
+export interface IMyClass {
+  foo: string
+  bar: number
 }
 ```
 
-See [Example](#Example) for more a more in-depth example
+See [#Example](#Example) or [the example project](example/) for more a more examples
 
 ## Configuration
 
@@ -98,7 +95,6 @@ case class Job(tasks: Seq[String], boss: String)
 With [Typescript](https://www.typescriptlang.org/), your frontend can know what data is available in what format.
 However, keeping the Typescript definitions in sync with your scala classes is a pain and error-prone. scala-tsi solves that.
 
-
 First we define the mapping as follows
 ```scala
 package myproject
@@ -134,8 +130,8 @@ lazy val root = (project in file("."))
 this will generate in your project root a `model.ts`:
 ```
 export interface IPerson {
-  name : string,
-  email : string,
+  name : string
+  email : string
   age ?: number
   job: IJob
 }
