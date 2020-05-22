@@ -22,7 +22,3 @@ lazy val compilerOptions = Seq(
   "UTF8",
   "-target:jvm-1.8"
 )
-
-// Enable these in your real project
-//resolvers += Opts.resolver.sonatypeReleases
-//resolvers += Opts.resolver.sonatypeSnapshots
