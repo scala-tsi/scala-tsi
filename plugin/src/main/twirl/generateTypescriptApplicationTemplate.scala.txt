@@ -23,7 +23,7 @@ object ApplicationTypescriptGeneration extends _root_.nl.codestar.scalatsi.Defau
   )
 
   val options = _root_.nl.codestar.scalatsi.output.OutputOptions(
-    targetFile = new File("@targetFile"),
+    targetFile = new File("""@targetFile"""), // Warning: always use literal string here for windows paths with \
     styleOptions = StyleOptions(
         semicolons = @useSemicolons
     )
