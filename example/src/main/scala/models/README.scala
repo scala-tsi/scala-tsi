@@ -6,7 +6,7 @@ import nl.codestar.scalatsi.dsl._
 
 /*************************************
   * Examples from the project README
-  */
+  ***********************************/
 
 case class Person(
   name: String,
