@@ -30,14 +30,12 @@ jobs:
             - project/target/resolution-cache
             - project/target/streams
             - ~/.sbt
-            - ~/.ivy2/cache
             - ~/.cache
       - save_cache:
         # Changing this key/incrementing the number at the end is the only way to remove old dependencies and/or generate a more up-to-date cache
           key: scala-tsi-5
           paths:
             - ~/.sbt
-            - ~/.ivy2/cache
             - ~/.cache
 
       - run:
