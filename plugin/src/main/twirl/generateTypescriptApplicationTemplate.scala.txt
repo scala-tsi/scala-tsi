@@ -20,7 +20,7 @@ object ApplicationTypescriptGeneration extends _root_.nl.codestar.scalatsi.Defau
     @for(userClass <- classes) {
       TSNamedType.getOrGenerate[@userClass].get,
     }
-  )(TSNamedType.ordering)
+  )
 
   val options = _root_.nl.codestar.scalatsi.output.OutputOptions(
     targetFile = new File("""@targetFile"""), // Warning: always use literal string here for windows paths with \

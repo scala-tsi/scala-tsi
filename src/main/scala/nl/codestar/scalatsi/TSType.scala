@@ -159,6 +159,8 @@ object TSNamedType {
     * @see [[TSType.getOrGenerate]]
     **/
   def getOrGenerate[T]: TSNamedType[T] = macro Macros.getImplicitMappingOrGenerateDefault[T, TSNamedType]
+
+  implicit val ordering: Ordering[TSNamedType[_]] = Ordering.by[TSNamedType[_], TypescriptNamedType](_.get)
 }
 
 @implicitNotFound(
