@@ -85,7 +85,7 @@ class DefaultTSTypeTests extends WordSpec with Matchers with DefaultTSTypes {
     val pos: source.Position
 
     def forWord(right: => Unit)(implicit fun: StringVerbBlockRegistration): Unit = {
-      fun(leftSideString, "for", pos, right _)
+      fun(leftSideString, "for", pos, () => right)
     }
   }
 }

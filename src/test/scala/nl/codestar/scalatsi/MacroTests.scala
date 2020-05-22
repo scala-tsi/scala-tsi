@@ -3,6 +3,8 @@ package nl.codestar.scalatsi
 import org.scalatest.{FlatSpec, Matchers}
 import nl.codestar.scalatsi.TypescriptType._
 
+import scala.annotation.nowarn
+
 case class Person(name: String, age: Int)
 
 class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
@@ -30,16 +32,11 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     case class Foo(foo: String) extends FooOrBar
     case class Bar(bar: Int)    extends FooOrBar
 
-    implicit val tsFoo = TSType.fromCaseClass[Foo]
-    implicit val tsBar = TSType.fromCaseClass[Bar]
-
-    // TODO: This will probably not emit Foo or Bar, when used, test this
-
     TSType.fromSealed[FooOrBar] shouldBe TSType.alias("FooOrBar", TSTypeReference("IFoo") | TSTypeReference("IBar"))
   }
 
   it should "handle sealed abstract classes" in {
-    sealed abstract class FooOrBar(tpe: String)
+    @nowarn("cat=unused-params") sealed abstract class FooOrBar(tpe: String)
     case class Foo(foo: String) extends FooOrBar("Foo")
     case class Bar(bar: Int)    extends FooOrBar("Bar")
 
@@ -72,8 +69,8 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     case object Nil                                     extends LinkedList
     case class Node(value: Int, next: LinkedList = Nil) extends LinkedList
 
-    implicit val nilType: TSType[Nil.type] = TSType(TSNull)
-    implicit val llType: TSType[Node]      = TSType.alias("INode", TSNull | TSTypeReference("ILinkedList"))
+    @nowarn("cat=unused") implicit val nilType: TSType[Nil.type] = TSType(TSNull)
+    @nowarn("cat=unused") implicit val llType: TSType[Node]      = TSType.alias("INode", TSNull | TSTypeReference("ILinkedList"))
 
     TSType.fromSealed[LinkedList] shouldBe TSType.alias("LinkedList", TSNull | TSTypeReference("INode"))
   }
@@ -81,8 +78,7 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
   it should "handle sealed traits without subclasses" in {
     sealed trait Empty
 
-    // Expect a warning here
-    TSType.fromSealed[Empty] shouldBe TSNamedType[Empty](TSAlias("IEmpty", TSNever))
+    (TSType.fromSealed[Empty]: @nowarn()) shouldBe TSNamedType[Empty](TSAlias("IEmpty", TSNever))
   }
 
   it should "handle sealed traits with a single subclass" in {
@@ -104,7 +100,7 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     case class A(foo: String)
 
     import dsl._
-    implicit val tsA: TSNamedType[A] = TSType.fromCaseClass[A] + ("type" -> "A")
+    @nowarn("cat=unused") implicit val tsA: TSNamedType[A] = TSType.fromCaseClass[A] + ("type" -> "A")
 
     TSNamedType.getOrGenerate[A] shouldBe TSType.interface(
       "IA",
@@ -135,7 +131,7 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
   }
 
   it should "give a compile error for unsupported types if no implicit is available" in {
-    class A
+    @nowarn("cat=unused") class A
 
     "TSType.getOrGenerate[A]" shouldNot compile
   }
@@ -159,7 +155,7 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
   }
 
   it should "give a compile error for unsupported types if no implicit is available" in {
-    sealed trait A
+    @nowarn("cat=unused") sealed trait A
 
     "TSIType.getOrGenerate[A]" shouldNot compile
   }
