@@ -67,6 +67,9 @@ jobs:
       - store_test_results:
           path: example/target/test-reports
 
+      - store_artifacts:
+          path: example/model.ts
+
   publish:
     working_directory: ~/scala-tsi
     docker:
