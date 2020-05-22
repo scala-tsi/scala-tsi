@@ -4,6 +4,8 @@ import nl.codestar.scalatsi.TypescriptType._
 import nl.codestar.scalatsi.dsl._
 import org.scalatest.{FlatSpec, Matchers}
 
+import scala.annotation.nowarn
+
 class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultTSTypes {
 
   import org.scalactic._
@@ -34,8 +36,8 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
     case class ComplexCaseClass(nested: NestedCaseClass)
     case class NestedCaseClass(name: String)
 
-    implicit val nestedCaseClassTSType: TSIType[NestedCaseClass]   = TSType.fromCaseClass[NestedCaseClass]
-    implicit val complexCaseClassTSType: TSIType[ComplexCaseClass] = TSType.fromCaseClass[ComplexCaseClass]
+    @nowarn("cat=unused") implicit val nestedCaseClassTSType: TSIType[NestedCaseClass] = TSType.fromCaseClass[NestedCaseClass]
+    implicit val complexCaseClassTSType: TSIType[ComplexCaseClass]                     = TSType.fromCaseClass[ComplexCaseClass]
 
     val typescript = TypescriptTypeSerializer.emit[ComplexCaseClass]
 
@@ -65,9 +67,9 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
     case class A(b: B)
     case class B(a: A)
 
-    implicit val tsA: TSType[A]  = TSType.external("IA")
-    implicit val tsB: TSIType[B] = TSType.fromCaseClass
-    val tsAGenerated: TSIType[A] = TSType.fromCaseClass
+    @nowarn("cat=unused") implicit val tsA: TSType[A]  = TSType.external("IA")
+    @nowarn("cat=unused") implicit val tsB: TSIType[B] = TSType.fromCaseClass
+    val tsAGenerated: TSIType[A]                       = TSType.fromCaseClass
 
     TypescriptTypeSerializer
       .emit(tsAGenerated)

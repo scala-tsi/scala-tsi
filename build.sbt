@@ -59,10 +59,18 @@ lazy val compilerOptions = scalacOptions := Seq(
   "-Ywarn-numeric-widen",
   "-Ywarn-value-discard",
   "-Ywarn-dead-code",
-  "-Ywarn-unused:params,-implicits",
+  "-Ywarn-unused:implicits",
+  "-Ywarn-unused:imports",
+  "-Ywarn-unused:locals",
+  "-Ywarn-unused:params",
+  "-Ywarn-unused:patvars",
+  "-Ywarn-unused:privates",
   "-language:experimental.macros"
 ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
-  case Some((2, 13)) => Seq()
+  case Some((2, 13)) =>
+    Seq(
+      "-Xfatal-warnings" // fatal warnings is possible now warnings can be supressed with 2.13.2's @nowarn
+    )
   case Some((2, 12)) =>
     Seq(
       "-Yno-adapted-args",
@@ -94,6 +102,8 @@ lazy val `scala-tsi` = (project in file("."))
     name := "scala-tsi",
     description := "Generate Typescript interfaces from your scala classes",
     libraryDependencies ++= Seq(
+      // To support @nowarn in 2.12
+      "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.6",
       // testing framework
       "org.scalatest" %% "scalatest" % "3.0.8" % "test"
     )
