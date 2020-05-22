@@ -68,7 +68,7 @@ lazy val compilerOptions = scalacOptions := Seq(
     Seq(
       "-Yno-adapted-args",
       "-Xfuture",
-      "-language:higherKind"
+      "-language:higherKinds"
     )
   case _ => throw new IllegalArgumentException(s"Unconfigured scala version ${scalaVersion.value}")
 })
