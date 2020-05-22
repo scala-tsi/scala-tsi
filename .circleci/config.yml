@@ -55,13 +55,14 @@ jobs:
             sbt -batch publishLocal sbt-scala-tsi/publishLocal
 
       - run:
-          name: "Run and test example project"
-          command: |
-            sbt -batch test exit
-            # TODO: for some reason sbt doesn't quit on CircleCI with this task
-            timeout 5s sbt -batch generateTypescript exit
-            cmp model.ts
+          name: "test and generate example project"
+          command: sbt -batch test generateTypescript exit
           working_directory: example
+
+       - run:
+         name: "Check example project output"
+         command: cmp model.ts expected_model.ts
+         working_directory: example
 
       - store_test_results:
           path: example/target/test-reports
