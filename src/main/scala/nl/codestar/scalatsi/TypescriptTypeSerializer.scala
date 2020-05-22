@@ -5,7 +5,6 @@ import nl.codestar.scalatsi.output.StyleOptions
 
 object TypescriptTypeSerializer {
 
-  // TODO: Optimize? Memoize? Tailrec?
   def serialize(tp: TypescriptType)(implicit styleOptions: StyleOptions = StyleOptions()): String = {
     import styleOptions._
     tp match {
@@ -48,6 +47,7 @@ object TypescriptTypeSerializer {
     types
       .flatMap(discoverNestedNames)
       .toSeq
+      .sorted
       .map(namedType => emitNamed(namedType)(styleOptions))
       .mkString("\n")
 
@@ -100,7 +100,6 @@ object TypescriptTypeSerializer {
     }
   }
 
-  // TODO: Optimize, Memoize or something, tail rec etc
   private def discoverNestedNames(tp: TypescriptType): Set[TypescriptNamedType] = {
     val me: Set[TypescriptNamedType] = tp match {
       case named: TypescriptNamedType => Set(named)

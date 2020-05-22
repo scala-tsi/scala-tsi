@@ -32,7 +32,13 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     case class Foo(foo: String) extends FooOrBar
     case class Bar(bar: Int)    extends FooOrBar
 
-    TSType.fromSealed[FooOrBar] shouldBe TSType.alias("FooOrBar", TSTypeReference("IFoo") | TSTypeReference("IBar"))
+    val foo = TSType.fromCaseClass[Foo].get
+    val bar = TSType.fromCaseClass[Bar].get
+
+    TSType.fromSealed[FooOrBar] shouldBe TSType.alias(
+      "FooOrBar",
+      TSTypeReference("IFoo", Some(foo)) | TSTypeReference("IBar", Some(bar))
+    )
   }
 
   it should "handle sealed abstract classes" in {
@@ -47,7 +53,10 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     tsFoo shouldBe TSType.interface("IFoo", "foo" -> TSString, "type" -> TSLiteralString("Foo"))
     tsBar shouldBe TSType.interface("IBar", "bar" -> TSNumber, "type" -> TSLiteralString("Bar"))
 
-    TSType.fromSealed[FooOrBar] shouldBe TSType.alias("FooOrBar", TSTypeReference("IFoo") | TSTypeReference("IBar"))
+    TSType.fromSealed[FooOrBar] shouldBe TSType.alias(
+      "FooOrBar",
+      TSTypeReference("IFoo", Some(tsFoo.get)) | TSTypeReference("IBar", Some(tsBar.get))
+    )
   }
 
   it should "handle sealed traits with a non-named mapping" in {
@@ -61,7 +70,7 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     tsFoo shouldBe TSType.interface("IFoo", "foo" -> TSString)
     tsBar.get shouldBe TSNumber
 
-    TSType.fromSealed[FooOrBar] shouldBe TSType.alias("FooOrBar", TSTypeReference("IFoo") | TSNumber)
+    TSType.fromSealed[FooOrBar] shouldBe TSType.alias("FooOrBar", TSTypeReference("IFoo", Some(tsFoo.get)) | TSNumber)
   }
 
   it should "handle sealed traits with recursive definitions" in {
@@ -70,9 +79,9 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     case class Node(value: Int, next: LinkedList = Nil) extends LinkedList
 
     @nowarn("cat=unused") implicit val nilType: TSType[Nil.type] = TSType(TSNull)
-    @nowarn("cat=unused") implicit val llType: TSType[Node]      = TSType.alias("INode", TSNull | TSTypeReference("ILinkedList"))
+    implicit val llType: TSType[Node]                            = TSType.alias("INode", TSNull | TSTypeReference("ILinkedList"))
 
-    TSType.fromSealed[LinkedList] shouldBe TSType.alias("LinkedList", TSNull | TSTypeReference("INode"))
+    TSType.fromSealed[LinkedList] shouldBe TSType.alias("LinkedList", TSNull | TSTypeReference("INode", Some(llType.get)))
   }
 
   it should "handle sealed traits without subclasses" in {
@@ -85,7 +94,9 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     sealed trait Single
     case class A(foo: Int) extends Single
 
-    TSType.fromSealed[Single] shouldBe TSType.alias("Single", TSTypeReference("IA"))
+    val a = TSType.fromCaseClass[A].get
+
+    TSType.fromSealed[Single] shouldBe TSType.alias("Single", TSTypeReference("IA", Some(a)))
   }
 
   "TSType.getOrGenerate" should "use available implicit if in scope" in {
@@ -125,9 +136,10 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
 
     val generated  = TSType.getOrGenerate[A]
     val fromSealed = TSType.fromSealed[A]
+    val b          = TSType.fromCaseClass[B].get
 
     generated shouldBe fromSealed
-    fromSealed shouldBe TSType.alias("A", TSTypeReference("IB"))
+    fromSealed shouldBe TSType.alias("A", TSTypeReference("IB", Some(b)))
   }
 
   it should "give a compile error for unsupported types if no implicit is available" in {

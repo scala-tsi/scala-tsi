@@ -2,13 +2,13 @@
 export interface IBar {
   value: string
 }
-       
+
 
 export interface IBaz {
   boo: boolean
   bar: number
 }
-       
+
 
 export interface IFoo {
   bar: IBar
@@ -17,24 +17,30 @@ export interface IFoo {
   baz?: IBaz
 }
 
+
 export interface IJob {
   tasks: string[]
   boss: string
 }
 
+
 export interface IPerson {
-  name : string,
-  email : string,
-  age ?: number
+  name: string
+  email: string
+  age?: number
   job: IJob
 }
 
-export type ISealed = ISealedOption1 | ISealedOption2
 
 export interface ISealedOption1 {
   foo: string
 }
 
+
+
 export interface ISealedOption2 {
   bar: number
 }
+
+
+export type Sealed = (ISealedOption1 | ISealedOption2)

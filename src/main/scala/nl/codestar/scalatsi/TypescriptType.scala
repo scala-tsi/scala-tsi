@@ -40,7 +40,7 @@ object TypescriptType {
     def name: String
     require(isValidTSName(name), s"Not a valid TypeScript identifier: $name")
 
-    def asReference: TSTypeReference = TSTypeReference(name)
+    def asReference: TSTypeReference = TSTypeReference(name, Some(this))
   }
   object TypescriptNamedType {
     implicit val ordering: Ordering[TypescriptNamedType] = Ordering.by[TypescriptNamedType, String](_.name)
@@ -78,9 +78,11 @@ object TypescriptType {
   /** This type is used as a marker that a type with this name exists and is either already defined or externally defined
     * Not a real Typescript type
     * @note name takes from [Typescript specification](https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#3.8.2)
+    * @param impl The implementation of the type if it is known, so that the nested types can be outputted even if not directly referenced
     * */
-  case class TSTypeReference(name: String) extends TypescriptNamedType {
+  case class TSTypeReference(name: String, impl: Option[TypescriptType] = None) extends TypescriptNamedType with TypescriptAggregateType {
     override def asReference: TSTypeReference = this
+    override def nested: Set[TypescriptType]  = impl.toSet
   }
   @deprecated("0.2.0", "Renamed to TSTypeReference")
   type TSExternalName = TSTypeReference

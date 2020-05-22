@@ -13,8 +13,6 @@ lazy val root = (project in file("."))
     )
   )
 
-// (compile in Compile) := ((compile in Compile) dependsOn (typescript in Compile)).value
-
 lazy val compilerOptions = Seq(
   "-unchecked",
   "-feature",
@@ -25,5 +23,6 @@ lazy val compilerOptions = Seq(
   "-target:jvm-1.8"
 )
 
+// Enable these in your real project
 //resolvers += Opts.resolver.sonatypeReleases
 //resolvers += Opts.resolver.sonatypeSnapshots
