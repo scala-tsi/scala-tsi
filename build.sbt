@@ -68,7 +68,7 @@ lazy val compilerOptions = scalacOptions := Seq(
     Seq(
       "-Yno-adapted-args",
       "-Xfuture",
-      "-language:higherKind"
+      "-language:higherKinds"
     )
   case _ => throw new IllegalArgumentException(s"Unconfigured scala version ${scalaVersion.value}")
 })
@@ -126,5 +126,7 @@ lazy val `sbt-scala-tsi` = (project in file("plugin"))
     buildInfoPackage := "sbt.info",
     // sbt 1 uses scala 2.12
     scalaVersion := "2.12.11",
-    crossScalaVersions := Seq("2.12.11")
+    crossScalaVersions := Seq("2.12.11"),
+    // Build for 1.2 to be compatible with SBT 1.0.0+, building for 1.3 will not work on SBT 1.0-1.2
+    crossSbtVersions := Seq("1.2.8")
   )
