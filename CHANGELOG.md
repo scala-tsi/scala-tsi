@@ -1,14 +1,14 @@
-## 0.2.2 - ???
+## 0.2.2 - 2020-05-29
 
-* Output will now be generated even if parent directories do not exists yet
-* Improves error reporting of output write
+* Add ability to rename generated types
+* Output will now be generated even if parent directories do not exists yet and improve error messages
 * Fixed unused import warning when generating model
 
-## 0.2.1 - 2020-05-28
+## 0.2.1 - 2020-05-22
 
 * Add support for [Literal types](https://docs.scala-lang.org/sips/42.type.html) under Scala 2.13
 
-## 0.2.0 - 2020-05-28
+## 0.2.0 - 2020-05-22
 
 Implicits aren't needed anymore in most cases, the plugin will use the standard generation by default!
 
