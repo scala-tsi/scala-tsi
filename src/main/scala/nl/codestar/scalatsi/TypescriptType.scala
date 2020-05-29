@@ -41,6 +41,8 @@ object TypescriptType {
     require(isValidTSName(name), s"Not a valid TypeScript identifier: $name")
 
     def asReference: TSTypeReference = TSTypeReference(name, Some(this))
+
+    def withName(newName: String): TypescriptNamedType
   }
   object TypescriptNamedType {
     implicit val ordering: Ordering[TypescriptNamedType] = Ordering.by[TypescriptNamedType, String](_.name)
@@ -57,7 +59,8 @@ object TypescriptType {
 
   /** `type name = underlying` */
   case class TSAlias(name: String, underlying: TypescriptType) extends TypescriptNamedType with TypescriptAggregateType {
-    override def nested: Set[TypescriptType] = Set(underlying)
+    override def nested: Set[TypescriptType]        = Set(underlying)
+    override def withName(newName: String): TSAlias = copy(name = newName)
   }
 
   case object TSAny                               extends TypescriptType
@@ -72,7 +75,8 @@ object TypescriptType {
   case class TSEnum(name: String, const: Boolean, entries: ListMap[String, Option[Int]])
       extends TypescriptNamedType
       with TypescriptAggregateType {
-    def nested: Set[TypescriptType] = Set(TSNumber)
+    def nested: Set[TypescriptType]                = Set(TSNumber)
+    override def withName(newName: String): TSEnum = copy(name = newName)
   }
 
   /** This type is used as a marker that a type with this name exists and is either already defined or externally defined
@@ -81,8 +85,9 @@ object TypescriptType {
     * @param impl The implementation of the type if it is known, so that the nested types can be outputted even if not directly referenced
     * */
   case class TSTypeReference(name: String, impl: Option[TypescriptType] = None) extends TypescriptNamedType with TypescriptAggregateType {
-    override def asReference: TSTypeReference = this
-    override def nested: Set[TypescriptType]  = impl.toSet
+    override def asReference: TSTypeReference               = this
+    override def nested: Set[TypescriptType]                = impl.toSet
+    override def withName(newName: String): TSTypeReference = copy(name = newName)
   }
   @deprecated("0.2.0", "Renamed to TSTypeReference")
   type TSExternalName = TSTypeReference
@@ -106,15 +111,19 @@ object TypescriptType {
       indexType == TSString || indexType == TSNumber,
       s"TypeScript indexed interface $name can only have index type string or number, not $indexType"
     )
-    def nested: Set[TypescriptType] = Set(indexType, valueType)
+    def nested: Set[TypescriptType]                            = Set(indexType, valueType)
+    override def withName(newName: String): TSInterfaceIndexed = copy(name = newName)
   }
 
   case class TSInterface(name: String, members: ListMap[String, TypescriptType]) extends TypescriptNamedType with TypescriptAggregateType {
     def nested: Set[TypescriptType] = members.values.toSet
+
+    override def withName(newName: String): TSInterface = copy(name = newName)
   }
+
   case class TSIntersection(of: Seq[TypescriptType]) extends TypescriptAggregateType { def nested: Set[TypescriptType] = of.toSet }
   object TSIntersection {
-    def of(of: TypescriptType*) = TSIntersection(of)
+    def of(of: TypescriptType*): TSIntersection = TSIntersection(of)
   }
   case object TSNever  extends TypescriptType
   case object TSNull   extends TypescriptType
@@ -123,9 +132,10 @@ object TypescriptType {
   case object TSString extends TypescriptType
 
   /** Typescript tuple: `[0.type, 1.type, ... n.type]` */
+  // TODO: Why does this have a generic parameters? Remove?
   case class TSTuple[E](of: Seq[TypescriptType]) extends TypescriptAggregateType { def nested: Set[TypescriptType] = of.toSet }
   object TSTuple {
-    def of(of: TypescriptType*) = TSTuple(of)
+    def of(of: TypescriptType*): TSTuple[Any] = TSTuple(of)
   }
 
   case object TSUndefined extends TypescriptType
@@ -133,7 +143,7 @@ object TypescriptType {
     def nested: Set[TypescriptType] = of.toSet
   }
   object TSUnion {
-    def of(of: TypescriptType*) = TSUnion(of)
+    def of(of: TypescriptType*): TSUnion = TSUnion(of)
   }
   case object TSVoid extends TypescriptType
 

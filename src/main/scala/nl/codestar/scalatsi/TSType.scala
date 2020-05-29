@@ -39,6 +39,8 @@ object TSType {
   private class TSTypeImpl[T](override val get: TypescriptType) extends TSType[T]
   def apply[T](tt: TypescriptType): TSType[T] = new TSTypeImpl(tt)
 
+  def named[T](tt: TypescriptNamedType): TSNamedType[T] = TSNamedType[T](tt)
+
   /** Get an implicit `TSType[T]` */
   def get[T](implicit tsType: TSType[T]): TSType[T] = tsType
 
@@ -76,8 +78,7 @@ object TSType {
     *
     * @see alias
     **/
-  def sameAs[Source, Target](implicit tsType: TSType[Target]): TSType[Source] =
-    TSType(tsType.get)
+  def sameAs[Source, Target](implicit tsType: TSType[Target]): TSType[Source] = TSType(tsType.get)
 
   /** Create a Typescript alias "T" for type T, with the definition of Alias
     *
@@ -122,6 +123,7 @@ object TSType {
   /** Create an interface "IClassname" for T
     *
     * @example interface[Foo]("bar" -> TSString) will output "interface IFoo { bar: string }" */
+  @deprecated("0.2.3", "Use interface(name, ...), this method confused the Scala overload resolver")
   def interface[T](members: (String, TypescriptType)*)(implicit ct: Manifest[T]): TSIType[T] =
     interface[T]("I" + ct.runtimeClass.getSimpleName, members: _*)
 
@@ -144,6 +146,8 @@ object TSType {
 trait TSNamedType[T] extends TSType[T] { self =>
   def get: TypescriptNamedType
   override def toString: String = s"TSNamedType($get)"
+
+  def withName(newName: String): TSNamedType[T] = TSNamedType(get.withName(newName))
 }
 
 object TSNamedType {
@@ -168,7 +172,8 @@ object TSNamedType {
 )
 trait TSIType[T] extends TSNamedType[T] { self =>
   override def get: TSInterface
-  override def toString: String = s"TSIType($get)"
+  override def toString: String                      = s"TSIType($get)"
+  override def withName(newName: String): TSIType[T] = TSIType(get.withName(newName))
 }
 
 object TSIType {
