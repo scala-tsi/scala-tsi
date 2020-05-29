@@ -117,7 +117,7 @@ object TSType {
     *
     * @example interface[Foo]("MyFoo", "bar" -> TSString) will output "interface MyFoo { bar: string }" */
   def interface[T](name: String, members: (String, TypescriptType)*): TSIType[T] =
-    TSIType(TSInterface(name, ListMap(members: _*)))
+    TSIType(TSInterface(name, members: _*))
 
   /** Create an interface "IClassname" for T
     *

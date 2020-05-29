@@ -112,9 +112,14 @@ object TypescriptType {
   case class TSInterface(name: String, members: ListMap[String, TypescriptType]) extends TypescriptNamedType with TypescriptAggregateType {
     def nested: Set[TypescriptType] = members.values.toSet
   }
+  object TSInterface {
+    def apply(name: String, members: ListMap[String, TypescriptType]): TSInterface = new TSInterface(name, members)
+    def apply(name: String, members: (String, TypescriptType)*): TSInterface       = TSInterface(name, ListMap(members: _*))
+  }
+
   case class TSIntersection(of: Seq[TypescriptType]) extends TypescriptAggregateType { def nested: Set[TypescriptType] = of.toSet }
   object TSIntersection {
-    def of(of: TypescriptType*) = TSIntersection(of)
+    def of(of: TypescriptType*): TSIntersection = TSIntersection(of)
   }
   case object TSNever  extends TypescriptType
   case object TSNull   extends TypescriptType
@@ -123,9 +128,10 @@ object TypescriptType {
   case object TSString extends TypescriptType
 
   /** Typescript tuple: `[0.type, 1.type, ... n.type]` */
+  // TODO: Why does this have a generic parameters? Remove?
   case class TSTuple[E](of: Seq[TypescriptType]) extends TypescriptAggregateType { def nested: Set[TypescriptType] = of.toSet }
   object TSTuple {
-    def of(of: TypescriptType*) = TSTuple(of)
+    def of(of: TypescriptType*): TSTuple[Any] = TSTuple(of)
   }
 
   case object TSUndefined extends TypescriptType
@@ -133,7 +139,7 @@ object TypescriptType {
     def nested: Set[TypescriptType] = of.toSet
   }
   object TSUnion {
-    def of(of: TypescriptType*) = TSUnion(of)
+    def of(of: TypescriptType*): TSUnion = TSUnion(of)
   }
   case object TSVoid extends TypescriptType
 
