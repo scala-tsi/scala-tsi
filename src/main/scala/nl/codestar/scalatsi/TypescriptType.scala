@@ -112,10 +112,6 @@ object TypescriptType {
   case class TSInterface(name: String, members: ListMap[String, TypescriptType]) extends TypescriptNamedType with TypescriptAggregateType {
     def nested: Set[TypescriptType] = members.values.toSet
   }
-  object TSInterface {
-    def apply(name: String, members: ListMap[String, TypescriptType]): TSInterface = new TSInterface(name, members)
-    def apply(name: String, members: (String, TypescriptType)*): TSInterface       = TSInterface(name, ListMap(members: _*))
-  }
 
   case class TSIntersection(of: Seq[TypescriptType]) extends TypescriptAggregateType { def nested: Set[TypescriptType] = of.toSet }
   object TSIntersection {

@@ -1,6 +1,7 @@
 package nl.codestar.scalatsi
 
 import nl.codestar.scalatsi.TypescriptType._
+import scala.collection.immutable.ListMap
 
 import scala.annotation.implicitNotFound
 
@@ -116,11 +117,12 @@ object TSType {
     *
     * @example interface[Foo]("MyFoo", "bar" -> TSString) will output "interface MyFoo { bar: string }" */
   def interface[T](name: String, members: (String, TypescriptType)*): TSIType[T] =
-    TSIType(TSInterface(name, members: _*))
+    TSIType(TSInterface(name, ListMap(members: _*)))
 
   /** Create an interface "IClassname" for T
     *
     * @example interface[Foo]("bar" -> TSString) will output "interface IFoo { bar: string }" */
+  @deprecated("0.2.3", "Use interface(name, ...), this method confused the Scala overload resolver")
   def interface[T](members: (String, TypescriptType)*)(implicit ct: Manifest[T]): TSIType[T] =
     interface[T]("I" + ct.runtimeClass.getSimpleName, members: _*)
 
