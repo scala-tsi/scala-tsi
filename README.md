@@ -47,6 +47,17 @@ export interface IMyClass {
 
 See [#Example](#Example) or [the example project](example/) for more a more examples
 
+#### Circular refernces
+
+Currently, scala-tsi enter an infinte loop if you have not specified implicits and have circular references in your models.
+You will get an error like:
+```
+[error] java.lang.StackOverflowError
+[error] scala.tools.nsc.typechecker.Contexts$Context.nextOuter(Contexts.scala:809)
+// The above will repeat a lot
+```
+You will have to manually define on of the models to break the ciruclar reference.
+
 ## Configuration
 
 | Key | Type | Default | Description |
