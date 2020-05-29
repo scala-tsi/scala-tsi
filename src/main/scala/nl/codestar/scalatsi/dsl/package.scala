@@ -9,7 +9,6 @@ package object dsl {
 
   // Implicit conversions to allow a more natural DSL
   // disable unused because the cls parameter if for the conversion, but isn't actually used
-  @nowarn("cat=unused-params") implicit def classToType[T](cls: Class[T])(implicit tsType: TSType[T]): TypescriptType = tsType.get
   @nowarn("cat=unused-params") implicit def classToNamedType[T](cls: Class[T])(implicit tsType: TSNamedType[T]): TypescriptNamedType =
     tsType.get
   implicit def tupleToTSInterfaceEntry[T](entry: (String, Class[T]))(implicit tsType: TSType[T]): (String, TypescriptType) =
