@@ -1,9 +1,9 @@
 package nl.codestar.scalatsi
 
 import nl.codestar.scalatsi.TypescriptType._
-import scala.collection.immutable.ListMap
 
 import scala.annotation.implicitNotFound
+import scala.collection.immutable.ListMap
 
 /* TODO: Move this somewhere to the docs
  * To define an implicit TSType[T]:

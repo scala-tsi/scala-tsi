@@ -184,9 +184,9 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
     case class Polygon(coords: Seq[Point])     extends Geometry
 
     implicit val pointTSType: TSNamedType[Point] =
-      TSType.interface("Point", "type" -> ("Point": TypescriptType), "coords" -> classOf[(Double, Double)])
+      TSType.interface("Point", "type" -> "Point", "coords" -> classOf[(Double, Double)])
     implicit val polygonTSType: TSNamedType[Polygon] =
-      TSType.interface("Polygon", "type" -> ("Polygon": TypescriptType), "coords" -> classOf[Seq[(Double, Double)]])
+      TSType.interface("Polygon", "type" -> "Polygon", "coords" -> classOf[Seq[(Double, Double)]])
     implicit val geometryTSType: TSNamedType[Geometry] =
       TSType.alias("Geometry", implicitly[TSType[Point]] | implicitly[TSType[Polygon]])
 
