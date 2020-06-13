@@ -1,8 +1,6 @@
 package models
 
-import nl.codestar.scalatsi.DefaultTSTypes
-import nl.codestar.scalatsi.TypescriptType._
-import nl.codestar.scalatsi.TSType
+import com.scalatsi.{DefaultTSTypes, TSType}
 
 case class Foo(bar: Bar, bool: Boolean, num: Option[Int], baz: Option[Baz])
 

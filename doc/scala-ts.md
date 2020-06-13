@@ -25,7 +25,7 @@ implicit val userSerializer = Json.writes[User].transform(jsobj => jsobj - "pass
 This is not possible with scala-ts, but can be done in scala-tsi as follows:
 
 ```
-import nl.codestar.scala.ts.interface.dsl._
+import com.scalatsi.dsl._
 
 implicit val userTsType = TSType.fromCaseClass[User] - "password"
 ```

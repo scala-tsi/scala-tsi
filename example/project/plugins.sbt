@@ -1,3 +1,3 @@
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.0")
 
-addSbtPlugin("nl.codestar" % "sbt-scala-tsi" % "0.2.3-SNAPSHOT")
+addSbtPlugin("com.scala-tsi" % "sbt-scala-tsi" % "0.2.3-SNAPSHOT")

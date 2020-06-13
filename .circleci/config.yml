@@ -10,7 +10,7 @@ jobs:
       - restore_cache:
           keys:
             - scala-tsi-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
-            - scala-tsi-5
+            - scala-tsi-6
 
       - run:
           name: Compile and test for 2.13
@@ -31,9 +31,10 @@ jobs:
             - project/target/streams
             - ~/.sbt
             - ~/.cache
+
       - save_cache:
         # Changing this key/incrementing the number at the end is the only way to remove old dependencies and/or generate a more up-to-date cache
-          key: scala-tsi-5
+          key: scala-tsi-6
           paths:
             - ~/.sbt
             - ~/.cache
@@ -80,11 +81,32 @@ jobs:
       - restore_cache:
           keys:
             - scala-tsi-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
-            - scala-tsi-4
+            - scala-tsi-6
 
       - run:
           command:
             sbt -batch +publishSigned +sbt-scala-tsi/publishSigned
+
+      # releases everything from com.scala-tsi, look into releasing only this project
+      - run:
+          command:
+            sbt -batch "sonatypeReleaseAll com.scala-tsi"
+
+  publish_codestar:
+    working_directory: ~/scala-tsi
+    docker:
+      - image: circleci/openjdk:8
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - scala-tsi-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
+            - scala-tsi-6
+
+      - run:
+          command:
+            sbt -batch +codestar/publishSigned +sbt-scala-tsi-codestar/publishSigned
 
       # releases everything from nl.codestar, look into releasing only this project
       - run:
@@ -100,6 +122,14 @@ workflows:
             tags:
               only: /.*/
       - publish:
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: /.*/ # Only run for tagged builds
+            tags:
+              only: /[0-9].*/ # x.y.z version has that tag name
+      - publish_codestar:
           requires:
             - build
           filters:
