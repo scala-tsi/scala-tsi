@@ -1,3 +1,9 @@
+## 0.3.0 - 2020-06-12
+
+* Change package from `nl.codestar` to `com.scalatsi`
+
+Libraries will be published under both organizations on maven central for backwards-compatibility initially.
+
 ## 0.2.2 - 2020-05-29
 
 * Add ability to rename generated types
