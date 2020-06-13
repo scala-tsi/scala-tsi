@@ -106,7 +106,7 @@ jobs:
       # releases everything from com.scala-tsi, look into releasing only this project
       - run:
           command:
-            sbt -batch "sonatypeReleaseAll com.scala-tsi"
+            sbt -batch "sonatypeReleaseAll com.scalatsi"
 
   publish_codestar:
     working_directory: ~/scala-tsi
