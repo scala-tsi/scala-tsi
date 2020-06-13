@@ -86,7 +86,7 @@ jobs:
 
       - run:
           command:
-            sbt -batch +publishSigned +sbt-scala-tsi/publishSigned
+            sbt -batch +publishLocalSigned +sbt-scala-tsi/publishLocalSigned
 
       - run:
           name: "Publish under correct new name"

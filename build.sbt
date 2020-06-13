@@ -21,9 +21,6 @@ lazy val codestarSettings = commonSettings ++ (organization := "nl.codestar")
 lazy val publishSettings = Seq(
   publishMavenStyle := true,
   publishTo := sonatypePublishToBundle.value,
-  credentials ++= sys.env
-    .get("MAVEN_CENTRAL_USER")
-    .map(user => Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, sys.env("MAVEN_CENTRAL_PASSWORD"))),
   licenses := Seq("MIT" -> url("https://github.com/scala-tsi/scala-tsi/blob/master/LICENSE")),
   homepage := Some(url("https://scalatsi.com")),
   scmInfo := Some(ScmInfo(url("https://github.com/scala-tsi/scala-tsi"), "scm:git@github.com:scala-tsi/scala-tsi.git")),
@@ -43,10 +40,15 @@ lazy val publishSettings = Seq(
     .collect({
       case "true" =>
         Seq(
+          credentials += Credentials(
+            "Sonatype Nexus Repository Manager",
+            "oss.sonatype.org",
+            sys.env("MAVEN_CENTRAL_USER"),
+            sys.env("MAVEN_CENTRAL_PASSWORD")
+          ),
           usePgpKeyHex("6044257F427C2854A6F9A0C211A02377A6DD0E59"),
           pgpSecretRing := file(".circleci/circleci.key.asc"),
-          pgpPublicRing := file(".circleci/circleci.pub.asc"),
-          pgpPassphrase := sys.env.get("GPG_passphrase").map(_.toCharArray)
+          pgpPublicRing := file(".circleci/circleci.pub.asc")
         )
     })
     .getOrElse(Seq())
