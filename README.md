@@ -1,10 +1,10 @@
 # Scala-TSI
 
-[![CircleCI](https://img.shields.io/circleci/project/github/code-star/scala-tsi/master.svg)](https://circleci.com/gh/code-star/scala-tsi/)
+[![CircleCI](https://img.shields.io/circleci/project/github/scala-tsi/scala-tsi/master.svg)](https://circleci.com/gh/scala-tsi/scala-tsi/)
 
 
-[![2.12](https://img.shields.io/maven-central/v/nl.codestar/scala-tsi_2.12.svg?label=2.12)](https://mvnrepository.com/artifact/nl.codestar/scala-tsi)
-[![2.13](https://img.shields.io/maven-central/v/nl.codestar/scala-tsi_2.13.svg?label=2.13)](https://mvnrepository.com/artifact/nl.codestar/scala-tsi)
+[![2.12](https://img.shields.io/maven-central/v/com.scalatsi/scala-tsi_2.12.svg?label=2.12)](https://mvnrepository.com/artifact/com.scalatsi/scalatsi)
+[![2.13](https://img.shields.io/maven-central/v/com.scalatsi/scala-tsi_2.13.svg?label=2.13)](https://mvnrepository.com/artifact/com.scalatsi/scalatsi)
 
 Scala TSI can automatically generate Typescript Interfaces from your Scala classes.
 
@@ -14,7 +14,7 @@ To use the project add the SBT plugin dependency in `project/plugins.sbt`:
 
 ```scala
 // See badge above for latest version number
-addSbtPlugin("nl.codestar" % "sbt-scala-tsi" % "0.2.2")
+addSbtPlugin("com.scalatsi" % "sbt-scala-tsi" % "0.2.2")
 ```
 
 And configure the plugin in your project:
@@ -110,8 +110,8 @@ First we define the mapping as follows
 ```scala
 package myproject
 
-import nl.codestar.scalatsi._
-import nl.codestar.scalatsi.dsl._
+import com.scalatsi._
+import com.scalatsi.dsl._
 
 // A TSType[T] is what tells scala-tsi how to convert your type T into typescript
 // MyModelTSTypes contains all TSType[_]'s for your model
@@ -159,4 +159,4 @@ export interface IJob {
 
 ## Features
 
-See [this list](https://github.com/code-star/scala-ts-interfaces/issues/1) for an overview of completed features, and issues for open feature ideas.
+See [this list](https://github.com/scala-tsi/scala-tsi/issues/1) for an overview of completed features, and issues for open feature ideas.

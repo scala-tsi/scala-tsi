@@ -1,8 +1,8 @@
 package models
 
-import nl.codestar.scalatsi.TSType
-import nl.codestar.scalatsi.DefaultTSTypes._
-import nl.codestar.scalatsi.dsl._
+import com.scalatsi._
+import com.scalatsi.DefaultTSTypes._
+import com.scalatsi.dsl._
 
 /*************************************
   * Examples from the project README

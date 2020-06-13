@@ -19,7 +19,7 @@ This table contains some examples of the different representations:
 | `Double`   | `TSNumber`      | `number`   |
 | `Either[String,Int]` | `TSUnion(TSString, TSNumber)` | <code>string &#124; number</code> |
 | `case class A(foo: Int)`  | `TypescriptInterface("A", Map("foo" -> TSNumber))` | `interface A {foo: number}` |
-| [`42.type`](http://docs.scala-lang.org/sips/pending/42.type.html) | `TSLiteralNumber(42)` | `42` |
+| [`42`](http://docs.scala-lang.org/sips/pending/42.type.html) | `TSLiteralNumber(42)` | `42` |
 
 ### Creating a `TSType`
 
@@ -38,8 +38,8 @@ Most interesting are `TSType.fromCaseClass`, `TSType.alias` and `TSType.interfac
 scala-tsi also defines a small DSL which you can use to construct custom definitions
 
 ```scala
-import nl.codestar.scalatsi._
-import nl.codestar.scalatsi.dsl._
+import com.scalatsi._
+import com.scalatsi.dsl._
 import DefaultTSTypes._
 
 // Includes implicit conversion from literal values to literal typescript types

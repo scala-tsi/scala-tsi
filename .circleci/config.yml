@@ -10,17 +10,17 @@ jobs:
       - restore_cache:
           keys:
             - scala-tsi-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
-            - scala-tsi-5
+            - scala-tsi-6
 
       - run:
           name: Compile and test for 2.13
           command:
-            sbt -batch ++2.13.2 compile test:compile scala-tsi-macros/compile scala-tsi-macros/test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
+            sbt -batch ++2.13.2 compile test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
 
       - run:
           name: Compile and test for 2.12
           command:
-            sbt -batch ++2.12.11 compile test:compile scala-tsi-macros/compile scala-tsi-macros/test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
+            sbt -batch ++2.12.11 compile test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
 
       - save_cache:
           key:  scala-tsi-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
@@ -29,11 +29,13 @@ jobs:
             - target/streams
             - project/target/resolution-cache
             - project/target/streams
+            - codestar
             - ~/.sbt
             - ~/.cache
+
       - save_cache:
         # Changing this key/incrementing the number at the end is the only way to remove old dependencies and/or generate a more up-to-date cache
-          key: scala-tsi-5
+          key: scala-tsi-6
           paths:
             - ~/.sbt
             - ~/.cache
@@ -70,6 +72,19 @@ jobs:
       - store_artifacts:
           path: example/model.ts
 
+      - run:
+          name: "Publish under correct new name"
+          command: |
+            test -d ~/.ivy2/local/com.scalatsi/sbt-scala-tsi
+            test -d ~/.ivy2/local/com.scalatsi/scala-tsi_2.13
+
+      - run:
+          name: "Publish under old name"
+          command: |
+            sbt -batch scala-tsi-codestar/publishLocal sbt-scala-tsi-codestar/publishLocal
+            test -d ~/.ivy2/local/nl.codestar/sbt-scala-tsi
+            test -d ~/.ivy2/local/nl.codestar/scala-tsi_2.13
+
   publish:
     working_directory: ~/scala-tsi
     docker:
@@ -80,11 +95,32 @@ jobs:
       - restore_cache:
           keys:
             - scala-tsi-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
-            - scala-tsi-4
+            - scala-tsi-6
 
       - run:
           command:
             sbt -batch +publishSigned +sbt-scala-tsi/publishSigned
+
+      # releases everything from com.scala-tsi, look into releasing only this project
+      - run:
+          command:
+            sbt -batch "sonatypeReleaseAll com.scalatsi"
+
+  publish_codestar:
+    working_directory: ~/scala-tsi
+    docker:
+      - image: circleci/openjdk:8
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - scala-tsi-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
+            - scala-tsi-6
+
+      - run:
+          command:
+            sbt -batch +scala-tsi-codestar/publishSigned +sbt-scala-tsi-codestar/publishSigned
 
       # releases everything from nl.codestar, look into releasing only this project
       - run:
@@ -100,6 +136,14 @@ workflows:
             tags:
               only: /.*/
       - publish:
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: /.*/ # Only run for tagged builds
+            tags:
+              only: /[0-9].*/ # x.y.z version has that tag name
+      - publish_codestar:
           requires:
             - build
           filters:
