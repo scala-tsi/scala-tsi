@@ -1,7 +1,6 @@
 package com.scalatsi
 
 import TypescriptType._
-import com.scalatsi
 
 trait ScalaTSTypes {
   implicit val anyTSType: TSType[Any] = TSType(TSAny)
@@ -10,11 +9,11 @@ trait ScalaTSTypes {
 trait CollectionTSTypes extends LowPriorityCollectionTSType {
   // This chooses null union to represent Option types.
   // When defining interfaces however Option will be represented with undefined union
-  implicit def tsOption[E](implicit e: TSType[E]): TSType[Option[E]] = scalatsi.TSType(e | TSUndefined)
+  implicit def tsOption[E](implicit e: TSType[E]): TSType[Option[E]] = TSType(e | TSUndefined)
   implicit val noneTSType: TSType[None.type]                         = TSType(TSNull)
   implicit def tsSome[E](implicit e: TSType[E]): TSType[Some[E]]     = TSType(e.get)
 
-  implicit def tsEither[L, R](implicit tsLeft: TSType[L], tsRight: TSType[R]): TSType[Either[L, R]] = scalatsi.TSType(tsLeft | tsRight)
+  implicit def tsEither[L, R](implicit tsLeft: TSType[L], tsRight: TSType[R]): TSType[Either[L, R]] = TSType(tsLeft | tsRight)
 
   implicit def tsStringMap[E](implicit e: TSType[E]): TSType[Map[String, E]] =
     TSType(TSIndexedInterface(indexType = TSString, valueType = e.get))

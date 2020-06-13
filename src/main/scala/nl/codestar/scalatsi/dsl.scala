@@ -27,17 +27,17 @@ object dsl {
 
   @deprecated("0.3.0", "Use com.scalatsi.dsl.TSInterfaceDSL")
   implicit class TSInterfaceDSL(val interface: TSInterface) extends AnyVal {
-    def +(member: (String, TypescriptType)): TSInterface = interface.copy(members = interface.members + member)
+    def +(member: (String, TypescriptType)): TSInterface                = interface.copy(members = interface.members + member)
     def ++(newMembers: Iterable[(String, TypescriptType)]): TSInterface = interface.copy(members = interface.members ++ newMembers)
-    def -(member: String): TSInterface = interface.copy(members = interface.members - member)
-    def --(members: Iterable[String]): TSInterface = interface.copy(members = interface.members -- members)
+    def -(member: String): TSInterface                                  = interface.copy(members = interface.members - member)
+    def --(members: Iterable[String]): TSInterface                      = interface.copy(members = interface.members -- members)
   }
 
   @deprecated("0.3.0", "Use com.scalatsi.dsl.TSITypeDSL")
   implicit class TSITypeDSL[T](val tsiType: TSIType[T]) extends AnyVal {
-    def +(member: (String, TypescriptType)): TSIType[T] = TSIType(tsiType.get + member)
+    def +(member: (String, TypescriptType)): TSIType[T]           = TSIType(tsiType.get + member)
     def ++(newMembers: Seq[(String, TypescriptType)]): TSIType[T] = TSIType(tsiType.get ++ newMembers)
-    def -(member: String): TSIType[T] = TSIType(tsiType.get - member)
-    def --(members: Iterable[String]): TSIType[T] = TSIType(tsiType.get -- members)
+    def -(member: String): TSIType[T]                             = TSIType(tsiType.get - member)
+    def --(members: Iterable[String]): TSIType[T]                 = TSIType(tsiType.get -- members)
   }
 }
