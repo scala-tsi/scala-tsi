@@ -6,7 +6,7 @@ val scala213 = "2.13.2"
 val scala212 = "2.12.11"
 
 lazy val commonSettings = Seq(
-  organization := "com.scala-tsi",
+  organization := "com.scalatsi",
   version := "0.3.0-SNAPSHOT",
   scalaVersion := scala213,
   crossScalaVersions := Seq(scala212, scala213),
@@ -23,7 +23,7 @@ lazy val publishSettings = Seq(
     case None       => Credentials(Path.userHome / ".sbt" / ".credentials")
   }),
   licenses := Seq("MIT" -> url("https://github.com/scala-tsi/scala-tsi/blob/master/LICENSE")),
-  homepage := Some(url("https://scala-tsi.com")),
+  homepage := Some(url("https://scalatsi.com")),
   scmInfo := Some(ScmInfo(url("https://github.com/scala-tsi/scala-tsi"), "scm:git@github.com:scala-tsi/scala-tsi.git")),
   developers := List(
     Developer(

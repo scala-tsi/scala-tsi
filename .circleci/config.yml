@@ -15,12 +15,12 @@ jobs:
       - run:
           name: Compile and test for 2.13
           command:
-            sbt -batch ++2.13.2 compile test:compile scala-tsi-macros/compile scala-tsi-macros/test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
+            sbt -batch ++2.13.2 compile test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
 
       - run:
           name: Compile and test for 2.12
           command:
-            sbt -batch ++2.12.11 compile test:compile scala-tsi-macros/compile scala-tsi-macros/test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
+            sbt -batch ++2.12.11 compile test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
 
       - save_cache:
           key:  scala-tsi-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
@@ -70,6 +70,13 @@ jobs:
 
       - store_artifacts:
           path: example/model.ts
+
+      - run:
+          name: "Publish under correct new name"
+          command: |
+            test -d ~/.ivy2/local/com.scalatsi/sbt-scala-tsi
+            test -d ~/.ivy2/local/com.scalatsi/scala-tsi_2.12
+            test -d ~/.ivy2/local/com.scalatsi/scala-tsi_2.13
 
       - run:
           name: "Publish under old name"

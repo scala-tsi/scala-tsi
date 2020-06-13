@@ -4,7 +4,7 @@ lazy val root = (project in file("."))
   .settings(
     Seq(
       scalaVersion := "2.13.2",
-      organization := "com.scala-tsi",
+      organization := "com.scalatsi",
       scalacOptions ++= compilerOptions,
       typescriptClassesToGenerateFor := Seq("Foo", "Sealed", "Person", "DeepThought"),
       typescriptGenerationImports := Seq("models._", "ReadmeTSTypes._"),
