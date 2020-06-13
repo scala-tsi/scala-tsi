@@ -79,9 +79,6 @@ jobs:
     steps:
       - checkout
 
-      - run:
-          command: sudo apt-get install -y gpg
-
       - restore_cache:
           keys:
             - scala-tsi-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
@@ -113,9 +110,6 @@ jobs:
     steps:
       - checkout
 
-      - run:
-          command: sudo apt-get install -y gpg
-
       - restore_cache:
           keys:
             - scala-tsi-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
@@ -131,9 +125,6 @@ jobs:
       - image: circleci/openjdk:8
     steps:
       - checkout
-
-      - run:
-          command: sudo apt-get install -y gpg
 
       - restore_cache:
           keys:
