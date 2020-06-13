@@ -125,6 +125,8 @@ lazy val `scala-tsi` = (project in file("."))
       .value
   )
 
+lazy val `scala-tsi-codestar` = `scala-tsi`.settings(organization := "nl.codestar")
+
 lazy val `sbt-scala-tsi` = (project in file("plugin"))
   .enablePlugins(SbtTwirl, BuildInfoPlugin)
   .settings(commonSettings)
@@ -140,4 +142,6 @@ lazy val `sbt-scala-tsi` = (project in file("plugin"))
     crossScalaVersions := Seq("2.12.11")
   )
 
-//lazy val `sbt-scala-tsi-codestart` = `sbt-scala-tsi`.settings(organisation := "nl.codestar")
+lazy val `sbt-scala-tsi-codestar` =
+  `sbt-scala-tsi`
+    .settings(organization := "nl.codestar")

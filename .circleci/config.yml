@@ -71,6 +71,14 @@ jobs:
       - store_artifacts:
           path: example/model.ts
 
+      - run:
+          name: "Publish under old name"
+          command: |
+            sbt -batch scala-tsi-codestar/publishLocal sbt-scala-tsi-codestar/publishLocal
+            test -d ~/.ivy2/local/nl.codestar/sbt-scala-tsi
+            test -d ~/.ivy2/local/nl.codestar/scala-tsi_2.12
+            test -d ~/.ivy2/local/nl.codestar/scala-tsi_2.13
+
   publish:
     working_directory: ~/scala-tsi
     docker:
