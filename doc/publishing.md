@@ -10,6 +10,6 @@ you can now use the published version locally in other projects
 
 ```
 sbt +publishSigned +sbt-scala-tsi/publishSigned
-// releases everything from nl.codestar, look into releasing only this project
-sbt "sonatypeReleaseAll nl.codestar"
+// releases everything from com.scalatsi, look into releasing only this project
+sbt "sonatypeReleaseAll com.scalatsi"
 ```

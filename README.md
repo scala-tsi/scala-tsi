@@ -1,6 +1,6 @@
 # Scala-TSI
 
-[![CircleCI](https://img.shields.io/circleci/project/github/code-star/scala-tsi/master.svg)](https://circleci.com/gh/code-star/scala-tsi/)
+[![CircleCI](https://img.shields.io/circleci/project/github/scala-tsi/scala-tsi/master.svg)](https://circleci.com/gh/scala-tsi/scala-tsi/)
 
 
 [![2.12](https://img.shields.io/maven-central/v/com.scala-tsi/scala-tsi_2.12.svg?label=2.12)](https://mvnrepository.com/artifact/com.scala-tsi/scala-tsi)
@@ -159,4 +159,4 @@ export interface IJob {
 
 ## Features
 
-See [this list](https://github.com/code-star/scala-ts-interfaces/issues/1) for an overview of completed features, and issues for open feature ideas.
+See [this list](https://github.com/scala-tsi/scala-tsi/issues/1) for an overview of completed features, and issues for open feature ideas.

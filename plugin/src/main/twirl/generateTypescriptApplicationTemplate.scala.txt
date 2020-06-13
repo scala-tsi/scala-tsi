@@ -1,9 +1,9 @@
 @(imports: Seq[String], classes: Seq[String], targetFile: String, useSemicolons: Boolean)
 
-package nl.codestar.scalatsi.generator
+package com.scalatsi.generator
 
-import _root_.nl.codestar.scalatsi._
-import _root_.nl.codestar.scalatsi.TypescriptType._
+import _root_.com.scalatsi._
+import _root_.com.scalatsi.TypescriptType._
 import _root_.java.io.File
 
 /** User imports */
@@ -11,7 +11,7 @@ import _root_.java.io.File
 import @imp
 }
 
-object ApplicationTypescriptGeneration extends _root_.nl.codestar.scalatsi.DefaultTSTypes {
+object ApplicationTypescriptGeneration extends _root_.com.scalatsi.DefaultTSTypes {
 
   // If you get a generator or implicit not found error here, make sure you have defined a TSType[T] implicit and imported it
   val toOutput: Set[TypescriptNamedType] = _root_.scala.collection.immutable.SortedSet(
@@ -19,14 +19,14 @@ object ApplicationTypescriptGeneration extends _root_.nl.codestar.scalatsi.Defau
       TSNamedType.getOrGenerate[@userClass].get, }
   )
 
-  val options = _root_.nl.codestar.scalatsi.output.OutputOptions(
+  val options = _root_.com.scalatsi.output.OutputOptions(
     targetFile = new File("""@targetFile"""), // Warning: always use literal string here for windows paths with \
-    styleOptions = _root_.nl.codestar.scalatsi.output.StyleOptions(
+    styleOptions = _root_.com.scalatsi.output.StyleOptions(
         semicolons = @useSemicolons
     )
   )
 
   def main(args: Array[String]): Unit = {
-    _root_.nl.codestar.scalatsi.output.WriteTSToFiles.write(options)(toOutput)
+    _root_.com.scalatsi.output.WriteTSToFiles.write(options)(toOutput)
   }
 }

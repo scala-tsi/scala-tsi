@@ -44,7 +44,7 @@ object WriteTSToFiles {
       case e: Throwable =>
         reportFailure(
           """Uncaught exception in scala-tsi output writer.
-            |Please file a bug report at https://github.com/code-star/scala-tsi/issues""".stripMargin,
+            |Please file a bug report at https://github.com/scala-tsi/scala-tsi/issues""".stripMargin,
           e = e
         )
     }

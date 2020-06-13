@@ -1,5 +1,7 @@
 import sbt.Keys.scalacOptions
 
+Global / onChangedBuildSource := ReloadOnSourceChanges
+
 val scala213 = "2.13.2"
 val scala212 = "2.12.11"
 
@@ -18,11 +20,11 @@ lazy val publishSettings = Seq(
   publishTo := Some(if (isSnapshot.value) Opts.resolver.sonatypeSnapshots else Opts.resolver.sonatypeStaging),
   credentials += (sys.env.get("MAVEN_CENTRAL_USER") match {
     case Some(user) => Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, sys.env("MAVEN_CENTRAL_PASSWORD"))
-    case None       => Credentials(Path.userHome / ".ivy2" / ".nl-codestar-maven-central-credentials")
+    case None       => Credentials(Path.userHome / ".sbt" / ".credentials")
   }),
-  licenses := Seq("MIT" -> url("https://github.com/code-star/scala-tsi/blob/master/LICENSE")),
-  homepage := Some(url("https://github.com/code-star/scala-tsi")),
-  scmInfo := Some(ScmInfo(url("https://github.com/code-star/scala-tsi"), "scm:git@github.com:code-star/scala-tsi.git")),
+  licenses := Seq("MIT" -> url("https://github.com/scala-tsi/scala-tsi/blob/master/LICENSE")),
+  homepage := Some(url("https://scala-tsi.com")),
+  scmInfo := Some(ScmInfo(url("https://github.com/scala-tsi/scala-tsi"), "scm:git@github.com:scala-tsi/scala-tsi.git")),
   developers := List(
     Developer(
       id = "dhoepelman",
@@ -137,3 +139,5 @@ lazy val `sbt-scala-tsi` = (project in file("plugin"))
     scalaVersion := "2.12.11",
     crossScalaVersions := Seq("2.12.11")
   )
+
+//lazy val `sbt-scala-tsi-codestart` = `sbt-scala-tsi`.settings(organisation := "nl.codestar")

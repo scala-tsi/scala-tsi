@@ -26,7 +26,7 @@ object TypescriptGenPlugin extends AutoPlugin {
 
   override lazy val projectSettings = Seq(
     // User settings
-    libraryDependencies += "nl.codestar" %% "scala-tsi" % scala_ts_compiler_version,
+    libraryDependencies += "com.scalatsi" %% "scala-tsi" % scala_ts_compiler_version,
     typescriptGenerationImports := Seq(),
     typescriptClassesToGenerateFor := Seq(),
     typescriptOutputFile := target.value / "scala-interfaces.ts",
@@ -50,7 +50,7 @@ object TypescriptGenPlugin extends AutoPlugin {
     typescriptOutputFile: File,
     useSemicolons: Boolean
   ): Seq[File] = {
-    val targetFile = sourceManaged / "nl" / "codestar" / "scala" / "ts" / "generator" / "ApplicationTypescriptGeneration.scala"
+    val targetFile = sourceManaged / "com" / "scalatsi" / "generator" / "ApplicationTypescriptGeneration.scala"
 
     val toWrite: String = txt
       .generateTypescriptApplicationTemplate(
@@ -68,6 +68,6 @@ object TypescriptGenPlugin extends AutoPlugin {
 
   def runTypescriptGeneration: Def.Initialize[Task[Unit]] =
     (runMain in Compile)
-      .toTask(" nl.codestar.scalatsi.generator.ApplicationTypescriptGeneration")
+      .toTask(" com.scalatsi.generator.ApplicationTypescriptGeneration")
       .dependsOn(generateTypescriptGeneratorApplication in Compile)
 }
