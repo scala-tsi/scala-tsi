@@ -1,3 +1,3 @@
 # scala-tsi
 
-See https://github.com/code-star/scala-tsi
+See https://github.com/scala-tsi/scala-tsi
