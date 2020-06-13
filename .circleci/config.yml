@@ -29,6 +29,7 @@ jobs:
             - target/streams
             - project/target/resolution-cache
             - project/target/streams
+            - codestar
             - ~/.sbt
             - ~/.cache
 
