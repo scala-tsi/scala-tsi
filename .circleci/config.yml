@@ -80,7 +80,7 @@ jobs:
       - checkout
 
       - run:
-          command: gpg --import .circleci/circleci.key.asc
+          command: gpg --batch --import .circleci/circleci.key.asc
 
       - restore_cache:
           keys:
@@ -114,7 +114,7 @@ jobs:
       - checkout
 
       - run:
-          command: gpg --import .circleci/circleci.key.asc
+          command: gpg --batch --import .circleci/circleci.key.asc
 
       - restore_cache:
           keys:
@@ -133,7 +133,7 @@ jobs:
       - checkout
 
       - run:
-          command: gpg --import .circleci/circleci.key.asc
+          command: gpg --batch --import .circleci/circleci.key.asc
 
       - restore_cache:
           keys:
