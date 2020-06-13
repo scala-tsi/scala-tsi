@@ -30,7 +30,9 @@ import nl.codestar.scala.ts.interface.dsl._
 implicit val userTsType = TSType.fromCaseClass[User] - "password"
 ```
 
-##### However, this flexibility comes at increased complexity
+##### However, this flexibility increases potential complexity
 
-scala-ts is *much* simpler to use.
-If your project can work within the limitations of scala-ts, we recommend you use scala-ts.
+scala-tsi aims to work as simple and out-of-the-box as possible.
+Since version [0.2.0](https://github.com/scala-tsi/scala-tsi/releases/tag/0.2.0), by default you shouldn't need to specify anything yourself and scala-tsi works similar to scala-ts.
+
+If you are stuck or encounter something that's more difficult than other tools, [please open an issue](https://github.com/scala-tsi/scala-tsi/issues)!
