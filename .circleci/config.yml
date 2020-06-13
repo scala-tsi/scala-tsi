@@ -89,6 +89,7 @@ jobs:
 
       - run:
           command:
+            export GPG_TTY=$(tty) # Fixes gpg error signing failed: Inappropriate ioctl for device
             sbt -batch +publishLocalSigned +sbt-scala-tsi/publishLocalSigned
 
       - run:
@@ -123,6 +124,7 @@ jobs:
 
       - run:
           command:
+            export GPG_TTY=$(tty) # Fixes gpg error signing failed: Inappropriate ioctl for device
             sbt -batch +publishSigned +sbt-scala-tsi/publishSigned sonatypeBundleRelease
 
   publish_codestar:
@@ -142,6 +144,7 @@ jobs:
 
       - run:
           command:
+            export GPG_TTY=$(tty) # Fixes gpg error signing failed: Inappropriate ioctl for device
             sbt -batch +scala-tsi-codestar/publishSigned +sbt-scala-tsi-codestar/publishSigned sonatypeBundleRelease
 
 workflows:
