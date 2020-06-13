@@ -76,7 +76,6 @@ jobs:
           name: "Publish under correct new name"
           command: |
             test -d ~/.ivy2/local/com.scalatsi/sbt-scala-tsi
-            test -d ~/.ivy2/local/com.scalatsi/scala-tsi_2.12
             test -d ~/.ivy2/local/com.scalatsi/scala-tsi_2.13
 
       - run:
@@ -84,7 +83,6 @@ jobs:
           command: |
             sbt -batch scala-tsi-codestar/publishLocal sbt-scala-tsi-codestar/publishLocal
             test -d ~/.ivy2/local/nl.codestar/sbt-scala-tsi
-            test -d ~/.ivy2/local/nl.codestar/scala-tsi_2.12
             test -d ~/.ivy2/local/nl.codestar/scala-tsi_2.13
 
   publish:
