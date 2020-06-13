@@ -20,11 +20,10 @@ lazy val codestarSettings = commonSettings ++ (organization := "nl.codestar")
 /* Settings to publish to maven central */
 lazy val publishSettings = Seq(
   publishMavenStyle := true,
-  publishTo := Some(if (isSnapshot.value) Opts.resolver.sonatypeSnapshots else Opts.resolver.sonatypeStaging),
-  credentials += (sys.env.get("MAVEN_CENTRAL_USER") match {
-    case Some(user) => Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, sys.env("MAVEN_CENTRAL_PASSWORD"))
-    case None       => Credentials(Path.userHome / ".sbt" / ".credentials")
-  }),
+  publishTo := sonatypePublishToBundle.value,
+  credentials ++= sys.env
+    .get("MAVEN_CENTRAL_USER")
+    .map(user => Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, sys.env("MAVEN_CENTRAL_PASSWORD"))),
   licenses := Seq("MIT" -> url("https://github.com/scala-tsi/scala-tsi/blob/master/LICENSE")),
   homepage := Some(url("https://scalatsi.com")),
   scmInfo := Some(ScmInfo(url("https://github.com/scala-tsi/scala-tsi"), "scm:git@github.com:scala-tsi/scala-tsi.git")),

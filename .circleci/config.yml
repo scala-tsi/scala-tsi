@@ -72,25 +72,15 @@ jobs:
       - store_artifacts:
           path: example/model.ts
 
-      - run:
-          name: "Publish under correct new name"
-          command: |
-            test -d ~/.ivy2/local/com.scalatsi/sbt-scala-tsi
-            test -d ~/.ivy2/local/com.scalatsi/scala-tsi_2.13
-
-      - run:
-          name: "Publish under old name"
-          command: |
-            sbt -batch scala-tsi-codestar/publishLocal sbt-scala-tsi-codestar/publishLocal
-            test -d ~/.ivy2/local/nl.codestar/sbt-scala-tsi
-            test -d ~/.ivy2/local/nl.codestar/scala-tsi_2.13
-
-  publish:
+  test_publish:
     working_directory: ~/scala-tsi
     docker:
-      - image: circleci/openjdk:8
+        - image: circleci/openjdk:8
     steps:
       - checkout
+
+      - run:
+          command: apt-get install gpg
 
       - restore_cache:
           keys:
@@ -101,17 +91,30 @@ jobs:
           command:
             sbt -batch +publishSigned +sbt-scala-tsi/publishSigned
 
-      # releases everything from com.scala-tsi, look into releasing only this project
       - run:
-          command:
-            sbt -batch "sonatypeReleaseAll com.scalatsi"
+          name: "Publish under correct new name"
+          command: |
+            test -d ~/.ivy2/local/com.scalatsi/sbt-scala-tsi
+            test -d ~/.ivy2/local/com.scalatsi/scala-tsi_2.12
+            test -d ~/.ivy2/local/com.scalatsi/scala-tsi_2.13
 
-  publish_codestar:
+      - run:
+          name: "Publish under old name"
+          command: |
+            sbt -batch scala-tsi-codestar/publishLocal sbt-scala-tsi-codestar/publishLocal
+            test -d ~/.ivy2/local/nl.codestar/sbt-scala-tsi
+            test -d ~/.ivy2/local/nl.codestar/sbt-scala-tsi
+            test -d ~/.ivy2/local/nl.codestar/scala-tsi_2.13
+
+  publish:
     working_directory: ~/scala-tsi
     docker:
       - image: circleci/openjdk:8
     steps:
       - checkout
+
+      - run:
+          command: apt-get install gpg
 
       - restore_cache:
           keys:
@@ -120,12 +123,26 @@ jobs:
 
       - run:
           command:
-            sbt -batch +scala-tsi-codestar/publishSigned +sbt-scala-tsi-codestar/publishSigned
+            sbt -batch +publishSigned +sbt-scala-tsi/publishSigned sonatypeBundleRelease
 
-      # releases everything from nl.codestar, look into releasing only this project
+  publish_codestar:
+    working_directory: ~/scala-tsi
+    docker:
+      - image: circleci/openjdk:8
+    steps:
+      - checkout
+
+      - run:
+          command: apt-get install gpg
+
+      - restore_cache:
+          keys:
+            - scala-tsi-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
+            - scala-tsi-6
+
       - run:
           command:
-            sbt -batch "sonatypeReleaseAll nl.codestar"
+            sbt -batch +scala-tsi-codestar/publishSigned +sbt-scala-tsi-codestar/publishSigned sonatypeBundleRelease
 
 workflows:
   version: 2
@@ -135,9 +152,14 @@ workflows:
           filters:  # required since `deploy` has tag filters AND requires `build`
             tags:
               only: /.*/
+      - test_publish:
+          filters:  # required since `deploy` has tag filters AND requires `build`
+            tags:
+              only: /.*/
       - publish:
           requires:
             - build
+            - test_publish
           filters:
             branches:
               ignore: /.*/ # Only run for tagged builds
@@ -146,6 +168,7 @@ workflows:
       - publish_codestar:
           requires:
             - build
+            - test_publish
           filters:
             branches:
               ignore: /.*/ # Only run for tagged builds
