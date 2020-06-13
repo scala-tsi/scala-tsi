@@ -120,7 +120,7 @@ jobs:
 
       - run:
           command:
-            sbt -batch +codestar/publishSigned +sbt-scala-tsi-codestar/publishSigned
+            sbt -batch +scala-tsi-codestar/publishSigned +sbt-scala-tsi-codestar/publishSigned
 
       # releases everything from nl.codestar, look into releasing only this project
       - run:
