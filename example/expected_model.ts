@@ -40,4 +40,8 @@ export interface ISealedOption2 {
   bar: number
 }
 
+export type JavaEnum = ("OPTION1" | "OPTION2" | "OPTION3" | "OPTION4")
+
+export type ScalaEnum = ("OPTION1" | "OPTION2" | "OPTION3" | "OPTION4")
+
 export type Sealed = (ISealedOption1 | ISealedOption2)
