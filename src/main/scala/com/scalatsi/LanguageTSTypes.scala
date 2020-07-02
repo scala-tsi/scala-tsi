@@ -1,20 +1,24 @@
 package com.scalatsi
 
 import TypescriptType._
-import scala.reflect.runtime.universe.TypeTag
-import scala.reflect.ClassTag
 
+import scala.reflect.ClassTag
+import scala.reflect.runtime.universe.TypeTag
 
 trait ScalaTSTypes {
   implicit val anyTSType: TSType[Any] = TSType(TSAny)
 
-  implicit def scalaEnumTSType[E <: Enumeration : TypeTag]: TSType[E] = {
-    // When scala 2.12 support is dropped, this should be able to simplify greatly by using singleton type and ValueOf[E]
-    val u = scala.reflect.runtime.universe
-    val loader = u.runtimeMirror(getClass.getClassLoader)
+  implicit def scalaEnumTSType[E <: Enumeration: TypeTag]: TSType[E] = {
+    // When scala 2.12 support is dropped, this should be able to be simplified by using singleton type and ValueOf[E]
+    import scala.reflect.runtime.universe._
+
+    import scala.reflect.runtime.universe
+    val cls          = ct.runtimeClass.asInstanceOf[Class[E]]
+    val mirror       = universe.runtimeMirror(cls.getClassLoader)
+    val moduleSymbol = universe.typeOf[E].termSymbol
     val moduleSymbol = u.typeOf[E].termSymbol.asModule
     val moduleMirror = loader.reflectModule(moduleSymbol)
-    val enum = moduleMirror.instance.asInstanceOf[E]
+    val enum         = moduleMirror.instance.asInstanceOf[E]
 
     val values = enum.values.toSeq.map(_.toString)
     TSType(TSUnion(values.map(TSLiteralString.apply)))
@@ -72,7 +76,7 @@ trait JavaTSTypes {
   implicit val javaUrlTSType: TSType[java.net.URL]    = TSType(TSString)
   implicit val javaUuidTSType: TSType[java.util.UUID] = TSType(TSString)
 
-  implicit def javaEnumTSType[E <: java.lang.Enum[E] : ClassTag]: TSType[E] = {
+  implicit def javaEnumTSType[E <: java.lang.Enum[E]: ClassTag]: TSType[E] = {
 
     val cls = implicitly[ClassTag[E]].runtimeClass
     val values = Option(cls.getEnumConstants)
