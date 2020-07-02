@@ -1,4 +1,4 @@
-package models.enumeration;
+package models.enum;
 
 public enum JavaEnum {
     OPTION1,

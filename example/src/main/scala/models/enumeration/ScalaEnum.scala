@@ -1,4 +1,4 @@
-package models.enumeration
+package models.enum
 
 object ScalaEnum extends Enumeration {
   type ScalaEnum = Value

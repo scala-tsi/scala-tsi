@@ -2,6 +2,7 @@ package com.scalatsi
 
 import TypescriptType._
 import org.scalatest.{Matchers, WordSpec}
+import com.scalatsi.types.JavaEnum
 
 class EnumTests extends WordSpec with Matchers with DefaultTSTypes {
 
@@ -17,4 +18,13 @@ class EnumTests extends WordSpec with Matchers with DefaultTSTypes {
       generated should ===(manual)
     }
   }
+
+  "Java enumerations" should {
+    "have typescript representation" in {
+      val generated = implicitly[TSType[JavaEnum]].get
+      val manual    = TSType.alias[JavaEnum]("JavaEnum", TSLiteralString("ABC") | TSLiteralString("DEF") | TSLiteralString("GHI"))
+      generated should ===(manual)
+    }
+  }
+
 }

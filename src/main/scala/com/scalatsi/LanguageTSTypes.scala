@@ -1,9 +1,24 @@
 package com.scalatsi
 
 import TypescriptType._
+import scala.reflect.runtime.universe.TypeTag
+import scala.reflect.ClassTag
+
 
 trait ScalaTSTypes {
   implicit val anyTSType: TSType[Any] = TSType(TSAny)
+
+  implicit def scalaEnumTSType[E <: Enumeration : TypeTag]: TSType[E] = {
+    // When scala 2.12 support is dropped, this should be able to simplify greatly by using singleton type and ValueOf[E]
+    val u = scala.reflect.runtime.universe
+    val loader = u.runtimeMirror(getClass.getClassLoader)
+    val moduleSymbol = u.typeOf[E].termSymbol.asModule
+    val moduleMirror = loader.reflectModule(moduleSymbol)
+    val enum = moduleMirror.instance.asInstanceOf[E]
+
+    val values = enum.values.toSeq.map(_.toString)
+    TSType(TSUnion(values.map(TSLiteralString.apply)))
+  }
 }
 
 trait CollectionTSTypes extends LowPriorityCollectionTSType {
@@ -56,6 +71,17 @@ trait JavaTSTypes {
   implicit val javaUriTSType: TSType[java.net.URI]    = TSType(TSString)
   implicit val javaUrlTSType: TSType[java.net.URL]    = TSType(TSString)
   implicit val javaUuidTSType: TSType[java.util.UUID] = TSType(TSString)
+
+  implicit def javaEnumTSType[E <: java.lang.Enum[E] : ClassTag]: TSType[E] = {
+
+    val cls = implicitly[ClassTag[E]].getClass
+    val values = Option(cls.getEnumConstants)
+      .getOrElse(throw new IllegalStateException(s"Expected ${cls.getCanonicalName} to be a java.lang.Enum, it was not"))
+      .asInstanceOf[Array[E]]
+      .toSeq
+
+    TSType(TSUnion(values.map(v => TSLiteralString(v.name()))))
+  }
 }
 
 trait TupleTSTypes {
