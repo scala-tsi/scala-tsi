@@ -21,7 +21,7 @@ class EnumTests extends WordSpec with Matchers with DefaultTSTypes {
 
   "Java enumerations" should {
     "have typescript representation" in {
-      val generated = implicitly[TSType[JavaEnum]].get
+      val generated = implicitly[TSType[JavaEnum]]
       val manual    = TSType.alias[JavaEnum]("JavaEnum", TSLiteralString("ABC") | TSLiteralString("DEF") | TSLiteralString("GHI"))
       generated should ===(manual)
     }

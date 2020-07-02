@@ -74,13 +74,16 @@ trait JavaTSTypes {
 
   implicit def javaEnumTSType[E <: java.lang.Enum[E] : ClassTag]: TSType[E] = {
 
-    val cls = implicitly[ClassTag[E]].getClass
+    val cls = implicitly[ClassTag[E]].runtimeClass
     val values = Option(cls.getEnumConstants)
       .getOrElse(throw new IllegalStateException(s"Expected ${cls.getCanonicalName} to be a java.lang.Enum, it was not"))
       .asInstanceOf[Array[E]]
       .toSeq
 
-    TSType(TSUnion(values.map(v => TSLiteralString(v.name()))))
+    TSType.alias[E](
+      cls.getSimpleName,
+      TSUnion(values.map(v => TSLiteralString(v.name())))
+    )
   }
 }
 
