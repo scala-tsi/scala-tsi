@@ -74,10 +74,12 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
     case class A(b: B)
     case class B(a: A)
 
-    @nowarn("cat=unused") implicit val tsA: TSType[A]  = TSType.external("IA")
-    @nowarn("cat=unused") implicit val tsB: TSIType[B] = TSType.fromCaseClass
-    val tsAGenerated: TSIType[A]                       = TSType.fromCaseClass
+    @nowarn("cat=unused") implicit val tsB: TSIType[B] = {
+      implicit val tsA: TSType[A] = TSType.external("IA")
+      TSType.fromCaseClass[B]
+    }
 
+    val tsAGenerated: TSIType[A] = TSType.fromCaseClass
     TypescriptTypeSerializer.emit()(tsAGenerated) should equal("""|export interface IA {
                                                                   |  b: IB
                                                                   |}
