@@ -62,13 +62,13 @@ Note that while the crash is a bug, proper behavior is to give a compiler error,
 You will have to manually define on of the implicits to break the circular reference.
 For example, if you have the following classes
 
-```
+```scala
 case class A(b: B)
 case class B(a: A)
 ```
 
 you can work around this problem by defining an implicit for one of the types, where you set the other type to a reference to "break the loop".
-```
+```scala
 case class A(b: B)
 case class B(a: A)
 object B {
