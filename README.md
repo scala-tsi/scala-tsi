@@ -49,14 +49,36 @@ See [#Example](#Example) or [the example project](example/) for more a more exam
 
 #### Circular refernces
 
-Currently, scala-tsi enter an infinte loop if you have not specified implicits and have circular references in your models.
+Currently, scala-tsi enters an infinte loop if you have not specified implicits and have circular references in your models, [causing the compiler to crash](https://github.com/scala-tsi/scala-tsi/issues/66).
 You will get an error like:
 ```
 [error] java.lang.StackOverflowError
 [error] scala.tools.nsc.typechecker.Contexts$Context.nextOuter(Contexts.scala:809)
+[error] scala.tools.nsc.typechecker.Contexts$Context.implicitss(Contexts.scala:1092)
+[error] scala.tools.nsc.typechecker.Contexts$Context.withOuter$1(Contexts.scala:1095)
 // The above will repeat a lot
 ```
-You will have to manually define on of the models to break the ciruclar reference.
+Note that while the crash is a bug, proper behavior is to give a compiler error, because scala-tsi cannot be sure which output you want without 
+You will have to manually define on of the implicits to break the circular reference.
+For example, if you have the following classes
+
+```
+case class A(b: B)
+case class B(a: A)
+```
+
+you can work around this problem by defining an implicit for one of the types, where you set the other type to a reference to "break the loop".
+```
+case class A(b: B)
+case class B(a: A)
+object B {
+  // This explicit definition is to help scala-tsi with the recursive definition of A and B
+  implicit val bTSI: TSIType[B] = {
+    implicit val aReference: TSType[A] = TSType.external[A]("IA")
+    TSType.fromCaseClass[B]
+  }
+}
+```
 
 ## Configuration
 
