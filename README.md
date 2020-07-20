@@ -47,7 +47,7 @@ export interface IMyClass {
 
 See [#Example](#Example) or [the example project](example/) for more a more examples
 
-#### Circular refernces
+#### Circular references
 
 Currently, scala-tsi enters an infinte loop if you have not specified implicits and have circular references in your models, [causing the compiler to crash](https://github.com/scala-tsi/scala-tsi/issues/66).
 You will get an error like:
