@@ -79,9 +79,13 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
       implicit val aRef: TSType[A] = TSType.external("IA")
       TSType.fromCaseClass[B]
     }
+    implicit val tsA: TSIType[A] = {
+      implicit val aRef: TSType[B] = TSType.external("IB")
+      TSType.fromCaseClass[A]
+    }
 
-    val a = TSType.getOrGenerate[A]
-    val b = TSType.getOrGenerate[B]
+    val a = TSType.get[A]
+    val b = TSType.get[B]
 
     a shouldBe a[TSNamedType[A]]
     b shouldBe a[TSNamedType[B]]
