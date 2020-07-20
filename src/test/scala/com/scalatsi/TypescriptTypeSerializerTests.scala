@@ -70,22 +70,33 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
                               |""".stripMargin)
   }
 
-  it should "handle recursive types" in {
+  // see https://github.com/scala-tsi/scala-tsi/issues/66
+  it should "handle recursive types with a work around" in {
     case class A(b: B)
     case class B(a: A)
 
-    @nowarn("cat=unused") implicit val tsA: TSType[A]  = TSType.external("IA")
-    @nowarn("cat=unused") implicit val tsB: TSIType[B] = TSType.fromCaseClass
-    val tsAGenerated: TSIType[A]                       = TSType.fromCaseClass
+    implicit val tsB: TSIType[B] = {
+      implicit val aRef: TSType[A] = TSType.external("IA")
+      TSType.fromCaseClass[B]
+    }
 
-    TypescriptTypeSerializer.emit()(tsAGenerated) should equal("""|export interface IA {
-                                                                  |  b: IB
-                                                                  |}
-                                                                  |
-                                                                  |export interface IB {
-                                                                  |  a: IA
-                                                                  |}
-                                                                  |""".stripMargin)
+    val a = TSType.getOrGenerate[A]
+    val b = TSType.getOrGenerate[B]
+
+    a shouldBe a[TSNamedType[A]]
+    b shouldBe a[TSNamedType[B]]
+
+    val aNamed = a.asInstanceOf[TSNamedType[A]]
+    val bNamed = b.asInstanceOf[TSNamedType[B]]
+
+    TypescriptTypeSerializer.emits(aNamed, bNamed) should equal("""|export interface IA {
+                                                                   |  b: IB
+                                                                   |}
+                                                                   |
+                                                                   |export interface IB {
+                                                                   |  a: IA
+                                                                   |}
+                                                                   |""".stripMargin)
   }
 
   it should "be able to handle all primitive types" in {

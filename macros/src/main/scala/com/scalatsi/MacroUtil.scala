@@ -12,21 +12,33 @@ private[scalatsi] class MacroUtil[C <: blackbox.Context](val c: C) {
 
     val orLookingUpList = lookingUpList
 
-    val found = try {
-      if (orLookingUpList.exists(alreadyLookingUp => T <:< alreadyLookingUp)) {
-        // We've entered this type before => we've entered a recursive loop and must stop
-        c.universe.EmptyTree
-      } else {
-        lookingUpList = T :: orLookingUpList
-        // look up implicit type, return EmptyTree if not found
-        c.inferImplicitValue(T, silent = true)
+    val found =
+      try {
+        if (orLookingUpList.exists(alreadyLookingUp => T <:< alreadyLookingUp)) {
+          // We've entered this type before => we've entered a recursive loop and must stop
+          c.universe.EmptyTree
+        } else {
+          lookingUpList = T :: orLookingUpList
+          // look up implicit type, return EmptyTree if not found
+          try {
+            c.inferImplicitValue(T, silent = true)
+          } catch {
+            case _: Throwable =>
+              c.error(
+                c.enclosingPosition,
+                s"Recursive definition found while lookup up $T." +
+                  s"Manually breaking the recursion by defining an implicit TSType will speed up compilation"
+              )
+              c.universe.EmptyTree
+          }
+        }
+      } catch {
+        case e: Exception =>
+          c.error(c.enclosingPosition, s"Uncaught exception in scala-tsi implicit lookup $e")
+          c.universe.EmptyTree
+      } finally {
+        lookingUpList = orLookingUpList
       }
-    } catch {
-      case _: Exception =>
-        c.universe.EmptyTree
-    } finally {
-      lookingUpList = orLookingUpList
-    }
 
     Option(found)
       .filter(_ != c.universe.EmptyTree)
