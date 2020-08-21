@@ -28,18 +28,21 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
     prefix.getOrElse("") + symbol.name.toString
   }
 
-  private def macroUtil = new MacroUtil[c.type](c)
+  private val macroUtil = new MacroUtil[c.type](c)
+  import macroUtil._
 
   def getImplicitMappingOrGenerateDefault[T: c.WeakTypeTag, TSType[_]](implicit tsTypeTag: c.WeakTypeTag[TSType[_]]): Tree =
-    macroUtil.lookupOptionalGenericImplicit[T, TSType] match {
-      case Some(value) => value
-      case None        => generateDefaultMapping[T]
+    lookupOptionalImplicit(properType[T, TSType]) match {
+      case Right(Some(value)) => value
+      case Right(None)        => generateDefaultMapping[T]
+      case Left(_)            => ???
     }
 
   def getImplicitInterfaceMappingOrGenerateDefault[T: c.WeakTypeTag, TSType[_]](implicit tsTypeTag: c.WeakTypeTag[TSType[_]]): Tree =
-    macroUtil.lookupOptionalGenericImplicit[T, TSType] match {
-      case Some(value) => value
-      case None        => generateInterfaceFromCaseClass[T]
+    lookupOptionalImplicit(properType[T, TSType]) match {
+      case Right(Some(value)) => value
+      case Right(None)        => generateInterfaceFromCaseClass[T]
+      case Left(_)            => ???
     }
 
   private def generateDefaultMapping[T: c.WeakTypeTag]: Tree = {

@@ -76,10 +76,10 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
 
     // Test work-around for https://github.com/scala-tsi/scala-tsi/issues/66
     // Ideally this should work or give a nice error, not crash
-    @nowarn("cat=unused") implicit val tsB: TSIType[B] = {
-      implicit val tsA: TSType[A] = TSType.external("IA")
-      TSType.fromCaseClass[B]
-    }
+//    @nowarn("cat=unused") implicit val tsB: TSIType[B] = {
+//      implicit val tsA: TSType[A] = TSType.external("IA")
+//      TSType.fromCaseClass[B]
+//    }
 
     val tsAGenerated: TSIType[A] = TSType.fromCaseClass
     TypescriptTypeSerializer.emit()(tsAGenerated) should equal("""|export interface IA {
