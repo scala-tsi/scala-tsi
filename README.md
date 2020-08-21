@@ -3,8 +3,8 @@
 [![CircleCI](https://img.shields.io/circleci/project/github/scala-tsi/scala-tsi/master.svg)](https://circleci.com/gh/scala-tsi/scala-tsi/)
 
 
-[![2.12](https://img.shields.io/maven-central/v/com.scalatsi/scala-tsi_2.12.svg?label=2.12)](https://mvnrepository.com/artifact/com.scalatsi/scalatsi)
-[![2.13](https://img.shields.io/maven-central/v/com.scalatsi/scala-tsi_2.13.svg?label=2.13)](https://mvnrepository.com/artifact/com.scalatsi/scalatsi)
+[![2.12](https://img.shields.io/maven-central/v/com.scalatsi/scala-tsi_2.12.svg?label=2.12)](https://mvnrepository.com/artifact/com.scalatsi/scala-tsi)
+[![2.13](https://img.shields.io/maven-central/v/com.scalatsi/scala-tsi_2.13.svg?label=2.13)](https://mvnrepository.com/artifact/com.scalatsi/scala-tsi)
 
 Scala TSI can automatically generate Typescript Interfaces from your Scala classes.
 
@@ -14,7 +14,7 @@ To use the project add the SBT plugin dependency in `project/plugins.sbt`:
 
 ```scala
 // See badge above for latest version number
-addSbtPlugin("com.scalatsi" % "sbt-scala-tsi" % "0.3.0")
+addSbtPlugin("com.scalatsi" % "sbt-scala-tsi" % "0.3.1")
 ```
 
 And configure the plugin in your project:
