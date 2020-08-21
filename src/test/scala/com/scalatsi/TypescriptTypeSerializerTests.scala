@@ -75,7 +75,7 @@ class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultT
     case class B(a: A)
 
     // Test work-around for circular references
-    // see [[Macros.circularRefError]]
+    // see [[Macros.circularRefError]] and https://github.com/scala-tsi/scala-tsi#circular-references
     @nowarn("cat=unused") implicit val tsB: TSIType[B] = {
       implicit val tsA: TSType[A] = TSType.external("IA")
       TSType.fromCaseClass[B]

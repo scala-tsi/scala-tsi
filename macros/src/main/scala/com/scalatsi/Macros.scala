@@ -33,34 +33,33 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
 
   private def circularRefError(T: c.Type, which: String): Unit = c.error(
     c.enclosingPosition,
-    s"""Circular reference encountered while searching for $which[$T]
+    s"""
+       |Circular reference encountered while searching for $which[$T]
        |Please break the cycle by locally defining an implicit TSType like so:
-       |implicit val tsTypeU: $which[U] = {
+       |implicit val tsType...: $which[...] = {
        |  implicit val tsA: $which[$T] = TSType.external("I$T") // name of your "$T" typescript type here
-       |  $which.getOrGenerate[U]
+       |  $which.getOrGenerate[...]
        |}
        |for more help see https://github.com/scala-tsi/scala-tsi#circular-references
        |""".stripMargin
   )
 
   def getImplicitMappingOrGenerateDefault[T: c.WeakTypeTag, TSType[_]](implicit tsTypeTag: c.WeakTypeTag[TSType[_]]): Tree = {
-    val tpe = properType[T, TSType]
-    lookupOptionalImplicit(tpe) match {
+    lookupOptionalImplicit(properType[T, TSType]) match {
       case Right(Some(value)) => value
       case Right(None)        => generateDefaultMapping[T]
       case Left(CircularReference) =>
-        circularRefError(tpe, "TSType")
+        circularRefError(c.weakTypeOf[T], "TSType")
         q"""com.scalatsi.TypescriptType.TSNever"""
     }
   }
 
   def getImplicitInterfaceMappingOrGenerateDefault[T: c.WeakTypeTag, TSType[_]](implicit tsTypeTag: c.WeakTypeTag[TSType[_]]): Tree = {
-    val tpe = properType[T, TSType]
-    lookupOptionalImplicit(tpe) match {
+    lookupOptionalImplicit(properType[T, TSType]) match {
       case Right(Some(value)) => value
       case Right(None)        => generateInterfaceFromCaseClass[T]
       case Left(CircularReference) =>
-        circularRefError(tpe, "TSIType")
+        circularRefError(c.weakTypeOf[T], "TSIType")
         q"""com.scalatsi.TypescriptType.TSNever"""
     }
   }
