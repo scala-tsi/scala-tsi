@@ -28,19 +28,41 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
     prefix.getOrElse("") + symbol.name.toString
   }
 
-  private def macroUtil = new MacroUtil[c.type](c)
+  private val macroUtil = new MacroUtil[c.type](c)
+  import macroUtil._
 
-  def getImplicitMappingOrGenerateDefault[T: c.WeakTypeTag, TSType[_]](implicit tsTypeTag: c.WeakTypeTag[TSType[_]]): Tree =
-    macroUtil.lookupOptionalGenericImplicit[T, TSType] match {
-      case Some(value) => value
-      case None        => generateDefaultMapping[T]
-    }
+  private def circularRefError(T: c.Type, which: String): Unit = c.error(
+    c.enclosingPosition,
+    s"""
+       |Circular reference encountered while searching for $which[$T]
+       |Please break the cycle by locally defining an implicit TSType like so:
+       |implicit val tsType...: $which[...] = {
+       |  implicit val tsA: $which[$T] = TSType.external("I$T") // name of your "$T" typescript type here
+       |  $which.getOrGenerate[...]
+       |}
+       |for more help see https://github.com/scala-tsi/scala-tsi#circular-references
+       |""".stripMargin
+  )
 
-  def getImplicitInterfaceMappingOrGenerateDefault[T: c.WeakTypeTag, TSType[_]](implicit tsTypeTag: c.WeakTypeTag[TSType[_]]): Tree =
-    macroUtil.lookupOptionalGenericImplicit[T, TSType] match {
-      case Some(value) => value
-      case None        => generateInterfaceFromCaseClass[T]
+  def getImplicitMappingOrGenerateDefault[T: c.WeakTypeTag, TSType[_]](implicit tsTypeTag: c.WeakTypeTag[TSType[_]]): Tree = {
+    lookupOptionalImplicit(properType[T, TSType]) match {
+      case Right(Some(value)) => value
+      case Right(None)        => generateDefaultMapping[T]
+      case Left(CircularReference) =>
+        circularRefError(c.weakTypeOf[T], "TSType")
+        q"""com.scalatsi.TypescriptType.TSNever"""
     }
+  }
+
+  def getImplicitInterfaceMappingOrGenerateDefault[T: c.WeakTypeTag, TSType[_]](implicit tsTypeTag: c.WeakTypeTag[TSType[_]]): Tree = {
+    lookupOptionalImplicit(properType[T, TSType]) match {
+      case Right(Some(value)) => value
+      case Right(None)        => generateInterfaceFromCaseClass[T]
+      case Left(CircularReference) =>
+        circularRefError(c.weakTypeOf[T], "TSIType")
+        q"""com.scalatsi.TypescriptType.TSNever"""
+    }
+  }
 
   private def generateDefaultMapping[T: c.WeakTypeTag]: Tree = {
     val T      = c.weakTypeOf[T]

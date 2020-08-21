@@ -49,17 +49,19 @@ See [#Example](#Example) or [the example project](example/) for more a more exam
 
 #### Circular references
 
-Currently, scala-tsi enters an infinte loop if you have not specified implicits and have circular references in your models, [causing the compiler to crash](https://github.com/scala-tsi/scala-tsi/issues/66).
-You will get an error like:
+Currently, scala-tsi cannot handle circular references.
+You will get an error along the following lines:
+```text
+[error] Circular reference encountered while searching for TSType[B]
+[error] Please break the cycle by locally defining an implicit TSType like so:
+[error] implicit val tsType...: TSType[...] = {
+[error]   implicit val tsA: TSType[B] = TSType.external("IB") // name of your "B" typescript type here
+[error]   TSType.getOrGenerate[...]
+[error] }
+[error] for more help see https://github.com/scala-tsi/scala-tsi#circular-references
 ```
-[error] java.lang.StackOverflowError
-[error] scala.tools.nsc.typechecker.Contexts$Context.nextOuter(Contexts.scala:809)
-[error] scala.tools.nsc.typechecker.Contexts$Context.implicitss(Contexts.scala:1092)
-[error] scala.tools.nsc.typechecker.Contexts$Context.withOuter$1(Contexts.scala:1095)
-// The above will repeat a lot
-```
-Note that while the crash is a bug, proper behavior is to give a compiler error, because scala-tsi cannot be sure which output you want without 
-You will have to manually define on of the implicits to break the circular reference.
+
+To help scala-tsi and break the cycle you will need to define an explicit manual reference.
 For example, if you have the following classes
 
 ```scala
@@ -67,10 +69,8 @@ case class A(b: B)
 case class B(a: A)
 ```
 
-you can work around this problem by defining an implicit for one of the types, where you set the other type to a reference to "break the loop".
+you have to define a local implicit for one of the types, so the loop gets broken
 ```scala
-case class A(b: B)
-case class B(a: A)
 object B {
   // This explicit definition is to help scala-tsi with the recursive definition of A and B
   implicit val bTSI: TSIType[B] = {
@@ -79,6 +79,8 @@ object B {
   }
 }
 ```
+
+There are rare cases where this error might be false. If you are sure of this, [please file a bug report](https://github.com/scala-tsi/scala-tsi/issues).
 
 ## Configuration
 
