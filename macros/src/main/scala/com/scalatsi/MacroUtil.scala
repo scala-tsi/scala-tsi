@@ -5,24 +5,22 @@ import scala.reflect.macros.blackbox
 /** Generic Macro utility not really related to specific scala-tsi logic */
 private[scalatsi] class MacroUtil[C <: blackbox.Context](val c: C) {
 
-  case class CircularReference(T: c.Type)
+  case object CircularReference
 
-  def lookupOptionalImplicit(T: c.Type): Either[CircularReference, Option[c.Tree]] = {
-
-    println(s"$T: ${Thread.currentThread().getStackTrace.length} $isDeepStack")
-
-    val found =
+  def lookupOptionalImplicit(T: c.Type): Either[CircularReference.type, Option[c.Tree]] =
+    if (isDeepStack) {
+      // assume circular reference
+      Left(CircularReference)
+    } else {
       try {
-        c.inferImplicitValue(T, silent = true)
+        Right(
+          Some(c.inferImplicitValue(T, silent = true))
+            .filter(_ != c.universe.EmptyTree)
+        )
       } catch {
-        case _: Exception => c.universe.EmptyTree
+        case _: Exception => Right(None)
       }
-
-    Right(
-      Option(found)
-        .filter(_ != c.universe.EmptyTree)
-    )
-  }
+    }
 
   /** Create a type representing F[T] from a T and a F[_] */
   def properType[T: c.WeakTypeTag, F[_]](implicit tsTypeTag: c.WeakTypeTag[F[_]]) = {
@@ -36,10 +34,10 @@ private[scalatsi] class MacroUtil[C <: blackbox.Context](val c: C) {
     * HACK: Check if we are too deep in the stack to continue
     * Circular references cause an infinite loop while searching for implicits in combination with default values
     * Multiple approaches have been tried, but no "proper" solution worked
-    * Instead, we abort when the stack trace is larger than 768 entries
-    * This is large enough that the nesting must be ridiciously deep before aborting (and at that point the user should define some helper implicits)
+    * Instead, we abort when the stack trace is larger than 512 entries
+    * This is large enough that the nesting must be ridiculously deep before aborting (and at that point the user should define some helper implicits)
     * while not crashing with the default stack size
     */
   private def isDeepStack: Boolean =
-    Thread.currentThread().getStackTrace.length >= 786
+    Thread.currentThread().getStackTrace.length >= 512
 }
