@@ -3,8 +3,8 @@
 [![CircleCI](https://img.shields.io/circleci/project/github/scala-tsi/scala-tsi/master.svg)](https://circleci.com/gh/scala-tsi/scala-tsi/)
 
 
-[![2.12](https://img.shields.io/maven-central/v/com.scalatsi/scala-tsi_2.12.svg?label=2.12)](https://mvnrepository.com/artifact/com.scalatsi/scalatsi)
-[![2.13](https://img.shields.io/maven-central/v/com.scalatsi/scala-tsi_2.13.svg?label=2.13)](https://mvnrepository.com/artifact/com.scalatsi/scalatsi)
+[![2.12](https://img.shields.io/maven-central/v/com.scalatsi/scala-tsi_2.12.svg?label=2.12)](https://mvnrepository.com/artifact/com.scalatsi/scala-tsi)
+[![2.13](https://img.shields.io/maven-central/v/com.scalatsi/scala-tsi_2.13.svg?label=2.13)](https://mvnrepository.com/artifact/com.scalatsi/scala-tsi)
 
 Scala TSI can automatically generate Typescript Interfaces from your Scala classes.
 
@@ -14,7 +14,7 @@ To use the project add the SBT plugin dependency in `project/plugins.sbt`:
 
 ```scala
 // See badge above for latest version number
-addSbtPlugin("com.scalatsi" % "sbt-scala-tsi" % "0.3.0")
+addSbtPlugin("com.scalatsi" % "sbt-scala-tsi" % "0.3.1")
 ```
 
 And configure the plugin in your project:
@@ -47,16 +47,40 @@ export interface IMyClass {
 
 See [#Example](#Example) or [the example project](example/) for more a more examples
 
-#### Circular refernces
+#### Circular references
 
-Currently, scala-tsi enter an infinte loop if you have not specified implicits and have circular references in your models.
-You will get an error like:
+Currently, scala-tsi cannot handle circular references.
+You will get an error along the following lines:
+```text
+[error] Circular reference encountered while searching for TSType[B]
+[error] Please break the cycle by locally defining an implicit TSType like so:
+[error] implicit val tsType...: TSType[...] = {
+[error]   implicit val tsA: TSType[B] = TSType.external("IB") // name of your "B" typescript type here
+[error]   TSType.getOrGenerate[...]
+[error] }
+[error] for more help see https://github.com/scala-tsi/scala-tsi#circular-references
 ```
-[error] java.lang.StackOverflowError
-[error] scala.tools.nsc.typechecker.Contexts$Context.nextOuter(Contexts.scala:809)
-// The above will repeat a lot
+
+To help scala-tsi and break the cycle you will need to define an explicit manual reference.
+For example, if you have the following classes
+
+```scala
+case class A(b: B)
+case class B(a: A)
 ```
-You will have to manually define on of the models to break the ciruclar reference.
+
+you have to define a local implicit for one of the types, so the loop gets broken
+```scala
+object B {
+  // This explicit definition is to help scala-tsi with the recursive definition of A and B
+  implicit val bTSI: TSIType[B] = {
+    implicit val aReference: TSType[A] = TSType.external[A]("IA")
+    TSType.fromCaseClass[B]
+  }
+}
+```
+
+There are rare cases where this error might be false. If you are sure of this, [please file a bug report](https://github.com/scala-tsi/scala-tsi/issues).
 
 ## Configuration
 

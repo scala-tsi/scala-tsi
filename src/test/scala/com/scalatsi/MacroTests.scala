@@ -148,6 +148,14 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     "TSType.getOrGenerate[A]" shouldNot compile
   }
 
+  it should "not crash on recursive definitions" in {
+    case class RecursiveA(b: RecursiveB)
+    case class RecursiveB(a: RecursiveA)
+
+    // Check that this generates the expected compile error, but not crashes the compilation
+    "TSType.getOrGenerate[RecursiveA]" shouldNot compile
+  }
+
   "TSIType.getOrGenerate" should "use available implicit if in scope" in {
     case class A(foo: String)
 
