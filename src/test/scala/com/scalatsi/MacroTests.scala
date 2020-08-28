@@ -157,7 +157,7 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
   }
 
   it should "give an error on non-abstract sealed class" in {
-    sealed class Something {}
+    @nowarn("cat=unused") sealed class Something {}
 
     "TSType.getOrGenerate[Something]" shouldNot compile
   }
