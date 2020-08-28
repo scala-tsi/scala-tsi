@@ -8,13 +8,13 @@ class EnumTests extends WordSpec with Matchers with DefaultTSTypes {
 
   "Scala enumerations" should {
     "have typescript representation" in {
-      object E extends Enumeration {
-        type E = Value
+      object SomeEnum extends Enumeration {
+        type SomeEnum = Value
         val O1, O2 = Value
       }
 
-      val generated = implicitly[TSType[E.type]].get
-      val manual    = TSType.alias[E.type]("E", TSLiteralString("O1") | TSLiteralString("O2"))
+      val generated = implicitly[TSType[SomeEnum.type]]
+      val manual    = TSType.alias[SomeEnum.type]("SomeEnum", TSLiteralString("O1") | TSLiteralString("O2"))
       generated should ===(manual)
     }
   }

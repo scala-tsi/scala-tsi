@@ -8,20 +8,27 @@ import scala.reflect.runtime.universe.TypeTag
 trait ScalaTSTypes {
   implicit val anyTSType: TSType[Any] = TSType(TSAny)
 
-  implicit def scalaEnumTSType[E <: Enumeration: TypeTag]: TSType[E] = {
-    // When scala 2.12 support is dropped, this should be able to be simplified by using singleton type and ValueOf[E]
-    import scala.reflect.runtime.universe._
+  implicit def scalaEnumTSType[E <: Enumeration: TypeTag]: TSNamedType[E] = {
+    // we have to use reflection to call the enum values() method, no easy way to get the object directly in Scala 2.12
+    // might be possible to improve using 2.13+ singleton types
+    val tpe = scala.reflect.runtime.universe.typeOf[E]
+    val name = tpe.typeSymbol.name.toString
+    val members = tpe.members.filter(sym =>
+      // For some reason the types here are not subtypes of E#Value or Enumeration#Value (=:= and <:< return false)
+      // Instead filter out everything but "private[this] val"s. Those shouldn't be in Enumeration's anyway
+      sym.isPrivateThis &&
+        !sym.isMethod &&
+        !sym.isClass &&
+        !sym.isType &&
+        !sym.isModule
+    )
 
-    import scala.reflect.runtime.universe
-    val cls          = ct.runtimeClass.asInstanceOf[Class[E]]
-    val mirror       = universe.runtimeMirror(cls.getClassLoader)
-    val moduleSymbol = universe.typeOf[E].termSymbol
-    val moduleSymbol = u.typeOf[E].termSymbol.asModule
-    val moduleMirror = loader.reflectModule(moduleSymbol)
-    val enum         = moduleMirror.instance.asInstanceOf[E]
+    val values = members
+      .map(_.name.toString.trim)
+      .toSeq
+      .sorted
 
-    val values = enum.values.toSeq.map(_.toString)
-    TSType(TSUnion(values.map(TSLiteralString.apply)))
+    TSType.alias[E](name,TSUnion(values.map(TSLiteralString.apply)))
   }
 }
 
@@ -76,7 +83,7 @@ trait JavaTSTypes {
   implicit val javaUrlTSType: TSType[java.net.URL]    = TSType(TSString)
   implicit val javaUuidTSType: TSType[java.util.UUID] = TSType(TSString)
 
-  implicit def javaEnumTSType[E <: java.lang.Enum[E]: ClassTag]: TSType[E] = {
+  implicit def javaEnumTSType[E <: java.lang.Enum[E]: ClassTag]: TSNamedType[E] = {
 
     val cls = implicitly[ClassTag[E]].runtimeClass
     val values = Option(cls.getEnumConstants)

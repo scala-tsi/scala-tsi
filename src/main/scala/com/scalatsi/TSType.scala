@@ -4,7 +4,6 @@ import TypescriptType._
 
 import scala.annotation.implicitNotFound
 import scala.collection.immutable.ListMap
-import scala.reflect.ClassTag
 
 /** A typeclass that indicates what the Typescript equivalent of a type T is
   * See the methods in the TSType object and the [[dsl]] for how to construct it
@@ -75,7 +74,7 @@ object TSType {
     * @example alias[Foo, String] will generate typescript `type Foo = string`
     * @see sameAs
     */
-  def alias[T, Alias](implicit tsType: TSType[Alias], ct: ClassTag[T]): TSNamedType[T] =
+  def alias[T, Alias](implicit tsType: TSType[Alias], ct: Manifest[T]): TSNamedType[T] =
     alias[T, Alias](ct.runtimeClass.getSimpleName)
 
   /** Create a Typescript alias "name" for type T, with the definition of Alias
@@ -114,7 +113,7 @@ object TSType {
     *
     * @example interface[Foo]("bar" -> TSString) will output "interface IFoo { bar: string }" */
   @deprecated("0.2.3", "Use interface(name, ...), this method confused the Scala overload resolver")
-  def interface[T](members: (String, TypescriptType)*)(implicit ct: ClassTag[T]): TSIType[T] =
+  def interface[T](members: (String, TypescriptType)*)(implicit ct: Manifest[T]): TSIType[T] =
     interface[T]("I" + ct.runtimeClass.getSimpleName, members: _*)
 
   /** Create an indexed interface for T
