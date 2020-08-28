@@ -47,41 +47,6 @@ export interface IMyClass {
 
 See [#Example](#Example) or [the example project](example/) for more a more examples
 
-#### Circular references
-
-Currently, scala-tsi cannot handle circular references.
-You will get an error along the following lines:
-```text
-[error] Circular reference encountered while searching for TSType[B]
-[error] Please break the cycle by locally defining an implicit TSType like so:
-[error] implicit val tsType...: TSType[...] = {
-[error]   implicit val tsA: TSType[B] = TSType.external("IB") // name of your "B" typescript type here
-[error]   TSType.getOrGenerate[...]
-[error] }
-[error] for more help see https://github.com/scala-tsi/scala-tsi#circular-references
-```
-
-To help scala-tsi and break the cycle you will need to define an explicit manual reference.
-For example, if you have the following classes
-
-```scala
-case class A(b: B)
-case class B(a: A)
-```
-
-you have to define a local implicit for one of the types, so the loop gets broken
-```scala
-object B {
-  // This explicit definition is to help scala-tsi with the recursive definition of A and B
-  implicit val bTSI: TSIType[B] = {
-    implicit val aReference: TSType[A] = TSType.external[A]("IA")
-    TSType.fromCaseClass[B]
-  }
-}
-```
-
-There are rare cases where this error might be false. If you are sure of this, [please file a bug report](https://github.com/scala-tsi/scala-tsi/issues).
-
 ## Configuration
 
 | Key | Type | Default | Description |
@@ -180,6 +145,41 @@ export interface IJob {
 ## Usage
 
 [This document](doc/workings.md) contains more detailed explanation of the library and usage
+
+#### Circular references
+
+Currently, scala-tsi cannot handle circular references.
+You will get an error along the following lines:
+```text
+[error] Circular reference encountered while searching for TSType[B]
+[error] Please break the cycle by locally defining an implicit TSType like so:
+[error] implicit val tsType...: TSType[...] = {
+[error]   implicit val tsA: TSType[B] = TSType.external("IB") // name of your "B" typescript type here
+[error]   TSType.getOrGenerate[...]
+[error] }
+[error] for more help see https://github.com/scala-tsi/scala-tsi#circular-references
+```
+
+To help scala-tsi and break the cycle you will need to define an explicit manual reference.
+For example, if you have the following classes
+
+```scala
+case class A(b: B)
+case class B(a: A)
+```
+
+you have to define a local implicit for one of the types, so the loop gets broken
+```scala
+object B {
+  // This explicit definition is to help scala-tsi with the recursive definition of A and B
+  implicit val bTSI: TSIType[B] = {
+    implicit val aReference: TSType[A] = TSType.external[A]("IA")
+    TSType.fromCaseClass[B]
+  }
+}
+```
+
+There are rare cases where this error might be false. If you are sure of this, [please file a bug report](https://github.com/scala-tsi/scala-tsi/issues).
 
 ## Features
 
