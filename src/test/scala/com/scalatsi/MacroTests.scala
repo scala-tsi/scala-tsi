@@ -156,6 +156,12 @@ class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
     "TSType.getOrGenerate[RecursiveA]" shouldNot compile
   }
 
+  it should "give an error on non-abstract sealed class" in {
+    @nowarn("cat=unused") sealed class Something {}
+
+    "TSType.getOrGenerate[Something]" shouldNot compile
+  }
+
   "TSIType.getOrGenerate" should "use available implicit if in scope" in {
     case class A(foo: String)
 

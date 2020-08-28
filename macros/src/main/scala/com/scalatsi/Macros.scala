@@ -81,7 +81,7 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
       val classSymbol = symbol.asClass
       if (classSymbol.isCaseClass)
         generateInterfaceFromCaseClass[T]
-      else if (classSymbol.isSealed)
+      else if (isSealedTraitOrAbstractClass(classSymbol))
         generateUnionFromSealedTrait[T]
       else err()
     }
@@ -149,12 +149,15 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
     symbol.asClass
   }
 
+  private def isSealedTraitOrAbstractClass(symbol: ClassSymbol): Boolean =
+    symbol.isSealed && (symbol.isTrait || symbol.isAbstract)
+
   def generateUnionFromSealedTrait[T: c.WeakTypeTag]: Tree = {
     val T      = c.weakTypeOf[T]
     val symbol = getClassOrTraitSymbol(T)
 
-    if (!symbol.isSealed)
-      c.abort(c.enclosingPosition, s"Expected sealed trait or sealed class, but found: $T")
+    if (!isSealedTraitOrAbstractClass(symbol))
+      c.abort(c.enclosingPosition, s"Expected sealed trait or sealed abstract class, but found: $T")
 
     val name = symbol.name.toString
 
