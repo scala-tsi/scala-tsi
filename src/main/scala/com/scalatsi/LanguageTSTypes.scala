@@ -11,7 +11,7 @@ trait ScalaTSTypes {
   implicit def scalaEnumTSType[E <: Enumeration: TypeTag]: TSNamedType[E] = {
     // we have to use reflection to call the enum values() method, no easy way to get the object directly in Scala 2.12
     // might be possible to improve using 2.13+ singleton types
-    val tpe = scala.reflect.runtime.universe.typeOf[E]
+    val tpe  = scala.reflect.runtime.universe.typeOf[E]
     val name = tpe.typeSymbol.name.toString
     val members = tpe.members.filter(sym =>
       // For some reason the types here are not subtypes of E#Value or Enumeration#Value (=:= and <:< return false)
@@ -28,7 +28,7 @@ trait ScalaTSTypes {
       .toSeq
       .sorted
 
-    TSType.alias[E](name,TSUnion(values.map(TSLiteralString.apply)))
+    TSType.alias[E](name, TSUnion(values.map(TSLiteralString.apply)))
   }
 }
 
