@@ -6,8 +6,8 @@ lazy val root = (project in file("."))
       scalaVersion := "2.13.3",
       organization := "com.scalatsi",
       scalacOptions ++= compilerOptions,
-      typescriptClassesToGenerateFor := Seq("Foo", "Sealed", "Person", "DeepThought"),
-      typescriptGenerationImports := Seq("models._", "ReadmeTSTypes._"),
+      typescriptClassesToGenerateFor := Seq("Foo", "Sealed", "Person", "DeepThought", "ScalaEnum.type", "JavaEnum"),
+      typescriptGenerationImports := Seq("models._", "ReadmeTSTypes._", "models.enumeration._"),
       typescriptOutputFile := baseDirectory.value / "model.ts",
       scalafmtConfig := file("../.scalafmt.conf")
       // Enable to debug macros

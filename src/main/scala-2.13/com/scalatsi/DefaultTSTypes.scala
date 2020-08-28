@@ -8,5 +8,6 @@ trait DefaultTSTypes
   with CollectionTSTypes
   with TupleTSTypes
   with JavaTSTypes
-  with LiteralTSTypes {}
+  with LiteralTSTypes
+  with ScalaEnumTSTypes {}
 object DefaultTSTypes extends DefaultTSTypes
