@@ -2,10 +2,11 @@ package com.scalatsi
 
 import TypescriptType.{TSLiteralBoolean, TSLiteralNumber, TSLiteralString}
 import org.scalactic.source
-import org.scalatest.words.StringVerbBlockRegistration
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.verbs.StringVerbBlockRegistration
+import org.scalatest.wordspec.AnyWordSpec
 
-class LiteralTypeTests extends WordSpec with Matchers with DefaultTSTypes {
+class LiteralTypeTests extends AnyWordSpec with Matchers with DefaultTSTypes {
 
   "Default TS Types should be defined" forWord {
     "literal booleans" in {

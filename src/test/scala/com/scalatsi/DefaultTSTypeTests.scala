@@ -1,9 +1,10 @@
 package com.scalatsi
 
 import TypescriptType._
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class DefaultTSTypeTests extends WordSpec with Matchers with DefaultTSTypes {
+class DefaultTSTypeTests extends AnyWordSpec with Matchers with DefaultTSTypes {
 
   "Default TS Types should be defined" forWord {
     "String" in { "implicitly[TSType[String]]" should compile }
