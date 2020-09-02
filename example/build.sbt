@@ -6,7 +6,7 @@ lazy val root = (project in file("."))
       scalaVersion := "2.13.3",
       organization := "com.scalatsi",
       scalacOptions ++= compilerOptions,
-      typescriptClassesToGenerateFor := Seq("Foo", "Sealed", "Person", "DeepThought", "ScalaEnum.type", "JavaEnum"),
+      typescriptExports := Seq("Foo", "Sealed", "Person", "DeepThought", "ScalaEnum.type", "JavaEnum"),
       typescriptGenerationImports := Seq("models._", "ReadmeTSTypes._", "models.enumeration._"),
       typescriptOutputFile := baseDirectory.value / "model.ts",
       scalafmtConfig := file("../.scalafmt.conf")
@@ -21,6 +21,5 @@ lazy val compilerOptions = Seq(
   "-deprecation",
   "-Xlint",
   "-encoding",
-  "UTF8",
-  "-target:jvm-1.8"
+  "UTF8"
 )

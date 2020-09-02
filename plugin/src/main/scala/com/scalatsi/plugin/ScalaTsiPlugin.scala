@@ -13,13 +13,10 @@ object ScalaTsiPlugin extends AutoPlugin {
     val typescriptStyleSemicolons = settingKey[Boolean]("Whether to add booleans to the exported model")
 
     // tasks
-    val typescriptGenerate = taskKey[Unit]("Generate typescript for this project")
+    val generateTypescript = taskKey[Unit]("Generate typescript for this project")
     val typescriptCreateExporter = taskKey[Seq[File]]("Generate an application that will generate typescript from the classes that are configured")
 
     // deprecated
-    @deprecated("Use typescriptGenerate", "0.4.0")
-    val generateTypescript = taskKey[Unit]("Generate typescript for this project")
-
     @deprecated("Use typescriptExports", "0.4.0")
     val typescriptClassesToGenerateFor = settingKey[Seq[String]]("Types to export typescript version for")
   }
@@ -39,18 +36,18 @@ object ScalaTsiPlugin extends AutoPlugin {
     typescriptOutputFile := target.value / "scala-tsi.ts",
     typescriptStyleSemicolons := false,
     // Task settings
-    typescriptGenerate := runTypescriptGeneration.value,
-    typescriptCreateExporter := createTypescriptExporter(
+    generateTypescript := runTypescriptGeneration.value,
+    typescriptCreateExporter in Compile := createTypescriptExporter(
       typescriptGenerationImports.value,
       typescriptExports.value ++ typescriptClassesToGenerateFor.value,
       sourceManaged.value,
       typescriptOutputFile.value,
       typescriptStyleSemicolons.value
     ),
-    sourceGenerators += typescriptCreateExporter
+    sourceGenerators in Compile += typescriptCreateExporter in Compile
   )
 
-  override lazy val projectSettings = inConfig(Compile)(baseScalaTsiSettings)
+  override lazy val projectSettings = baseScalaTsiSettings
 
   private def createTypescriptExporter(
     imports: Seq[String],
