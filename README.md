@@ -32,7 +32,7 @@ lazy val root = (project in file("."))
     )
 ```
 
-Now `sbt typescriptGenerate` will transform a file like
+Now `sbt generateTypescript` will transform a file like
 ```scala
 case class MyClass(foo: String, bar: Int)
 ```
