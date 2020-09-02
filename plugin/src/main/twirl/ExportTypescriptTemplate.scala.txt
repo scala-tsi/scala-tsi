@@ -2,16 +2,17 @@
 
 package com.scalatsi.generator
 
+import _root_.java.io.File
 import _root_.com.scalatsi._
 import _root_.com.scalatsi.TypescriptType._
-import _root_.java.io.File
+import _root_.com.scalatsi.DefaultTSTypes
 
 /** User imports */
 @for(imp <- imports) {
 import @imp
 }
 
-object ExportTypescript extends _root_.com.scalatsi.DefaultTSTypes {
+object ExportTypescript  {
 
   // If you get a generator or implicit not found error here, make sure you have defined a TSType[T] implicit and imported it
   val toOutput: Set[TypescriptNamedType] = _root_.scala.collection.immutable.SortedSet(
