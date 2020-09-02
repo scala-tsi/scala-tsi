@@ -73,7 +73,7 @@ jobs:
           path: example/model.ts
 
       - run:
-          name: "Publish under correct new name"
+          name: "Publish under new name"
           command: |
             test -d ~/.ivy2/local/com.scalatsi/sbt-scala-tsi
             test -d ~/.ivy2/local/com.scalatsi/scala-tsi_2.13
