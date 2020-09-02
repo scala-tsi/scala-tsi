@@ -1,6 +1,6 @@
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.0")
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-twirl" % "1.4.1")
+addSbtPlugin("com.typesafe.sbt" % "sbt-twirl" % "1.4.2")
 
 // To enable publishing to maven central
 addSbtPlugin("org.xerial.sbt" % "sbt-sonatype"  % "2.5")
