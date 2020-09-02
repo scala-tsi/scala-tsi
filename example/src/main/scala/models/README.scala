@@ -4,9 +4,10 @@ import com.scalatsi._
 import com.scalatsi.DefaultTSTypes._
 import com.scalatsi.dsl._
 
-/*************************************
+/** ***********************************
   * Examples from the project README
-  ************************************/
+  * **********************************
+  */
 
 case class Person(
   name: String,
