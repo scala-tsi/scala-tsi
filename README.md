@@ -23,7 +23,7 @@ And configure the plugin in your project:
 lazy val root = (project in file("."))
     .settings(
       // The classes that you want to generate typescript interfaces for
-      typescriptClassesToGenerateFor := Seq("MyClass"),
+      typescriptExports := Seq("MyClass"),
       // The output file which will contain the typescript interfaces
       typescriptOutputFile := baseDirectory.value / "model.ts",
       // Include the package(s) of the classes here
@@ -51,7 +51,7 @@ See [#Example](#Example) or [the example project](example/) for more a more exam
 
 | Key | Type | Default | Description |
 | --- | ---- | ------- | ----------- |
-| typescriptClassesToGenerateFor | Seq[String] | `Seq()` | A list of all your (top-level) classes that you want to generate interfaces for |
+| typescriptExports | Seq[String] | `Seq()` | A list of all your (top-level) classes that you want to generate interfaces for |
 | typescriptGenerationImports | Seq[String] | `Seq()` | A list of all imports. This should import all classes you defined above, as well as custom `TSType` implicits |
 | typescriptOutputFile | File | `target/scala-interfaces.ts`| The output file with generated typescript interfaces |
 | typescriptStyleSemicolons | Boolean | `false` | Whether to add booleans to the exported model (experimental) |
@@ -121,9 +121,9 @@ And in your build.sbt configure the sbt plugin to output your class:
 ```
 lazy val root = (project in file("."))
   .settings(
-    typescriptClassesToGenerateFor := Seq("Person"),
+    typescriptExports           := Seq("Person"),
     typescriptGenerationImports := Seq("myproject._", "MyModelTSTypes._"),
-    typescriptOutputFile := baseDirectory.value / "model.ts"
+    typescriptOutputFile        := baseDirectory.value / "model.ts"
   )
 ```
 
