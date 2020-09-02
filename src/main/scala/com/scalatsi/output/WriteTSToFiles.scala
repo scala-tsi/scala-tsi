@@ -17,11 +17,11 @@ object WriteTSToFiles {
         Option(targetFile.getParentFile).foreach(_.mkdirs())
         targetFile.createNewFile()
       } // createNewFile will continue if file exists
-      .recover {
-        case e: SecurityException =>
-          reportFailure(s"Could not create file '$targetFile' due to JVM security stopping it", code = 2, e = e)
-        case e: IOException => reportFailure(s"Could not create file '$targetFile' due to I/O problem", code = 2, e = e)
-      }.get
+        .recover {
+          case e: SecurityException =>
+            reportFailure(s"Could not create file '$targetFile' due to JVM security stopping it", code = 2, e = e)
+          case e: IOException => reportFailure(s"Could not create file '$targetFile' due to I/O problem", code = 2, e = e)
+        }.get
 
       // TODO: For some reason scala.util.Using isn't working in 2.12, even though we have the compat library
       //      Using(new FileWriter(targetFile)) { writer =>

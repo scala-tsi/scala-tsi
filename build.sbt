@@ -87,9 +87,10 @@ lazy val compilerOptions = scalacOptions := Seq(
 
 lazy val expandMacros = scalacOptions += "-Ymacro-debug-lite"
 
-/*****************
+/** ***************
   * scala-tsi and macros
-  ****************/
+  * **************
+  */
 
 lazy val `scala-tsi-macros` = (project in file("macros"))
   .settings(
@@ -148,9 +149,10 @@ lazy val `scala-tsi-codestar` = (project in file("codestar/scala-tsi"))
     resourceDirectory := (resourceDirectory in (`scala-tsi`, Compile)).value
   )
 
-/*****************
+/** ***************
   * sbt-scala-tsi
-  ****************/
+  * **************
+  */
 
 lazy val `sbt-scala-tsi` = (project in file("plugin"))
   .enablePlugins(SbtTwirl, BuildInfoPlugin)

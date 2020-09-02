@@ -38,7 +38,7 @@ object TSType {
     * By default
     * Case class will use [[fromCaseClass]]
     * Sealed traits/classes will use [[fromSealed]]
-    * */
+    */
   def getOrGenerate[T]: TSType[T] = macro Macros.getImplicitMappingOrGenerateDefault[T, TSType]
 
   /** Generate a typescript interface for a case class */
@@ -59,14 +59,14 @@ object TSType {
     *
     * `type AorB = A | B`
     * @see [Typescript docs on Discrimintated Unions](https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions)
-    **/
+    */
   def fromSealed[T]: TSNamedType[T] = macro Macros.generateUnionFromSealedTrait[T]
 
   /** Uses the typescript type of Target whenever we're looking for the typescript type of Source
     * This will not generate a `type Source = Target` line like alias
     *
     * @see alias
-    **/
+    */
   def sameAs[Source, Target](implicit tsType: TSType[Target]): TSType[Source] = TSType(tsType.get)
 
   /** Create a Typescript alias "T" for type T, with the definition of Alias
@@ -105,13 +105,15 @@ object TSType {
 
   /** Create an interface "name" for T
     *
-    * @example interface[Foo]("MyFoo", "bar" -> TSString) will output "interface MyFoo { bar: string }" */
+    * @example interface[Foo]("MyFoo", "bar" -> TSString) will output "interface MyFoo { bar: string }"
+    */
   def interface[T](name: String, members: (String, TypescriptType)*): TSIType[T] =
     TSIType(TSInterface(name, ListMap(members: _*)))
 
   /** Create an interface "IClassname" for T
     *
-    * @example interface[Foo]("bar" -> TSString) will output "interface IFoo { bar: string }" */
+    * @example interface[Foo]("bar" -> TSString) will output "interface IFoo { bar: string }"
+    */
   @deprecated("0.2.3", "Use interface(name, ...), this method confused the Scala overload resolver")
   def interface[T](members: (String, TypescriptType)*)(implicit ct: Manifest[T]): TSIType[T] =
     interface[T]("I" + ct.runtimeClass.getSimpleName, members: _*)
@@ -150,7 +152,7 @@ object TSNamedType {
   /** Get an implicit `TSNamedType[T]` or generate a default one
     *
     * @see [[TSType.getOrGenerate]]
-    **/
+    */
   def getOrGenerate[T]: TSNamedType[T] = macro Macros.getImplicitMappingOrGenerateDefault[T, TSNamedType]
 
   implicit def ordering[T]: Ordering[TSNamedType[T]] = Ordering.by[TSNamedType[T], TypescriptNamedType](_.get)

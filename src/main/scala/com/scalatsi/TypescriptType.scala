@@ -83,7 +83,7 @@ object TypescriptType {
     * Not a real Typescript type
     * @note name takes from [Typescript specification](https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#3.8.2)
     * @param impl The implementation of the type if it is known, so that the nested types can be outputted even if not directly referenced
-    * */
+    */
   case class TSTypeReference(name: String, impl: Option[TypescriptType] = None) extends TypescriptNamedType with TypescriptAggregateType {
     override def asReference: TSTypeReference               = this
     override def nested: Set[TypescriptType]                = impl.toSet
@@ -95,7 +95,7 @@ object TypescriptType {
   /** Typescript anonymous indexed interfaces
     * { [indexName:indexType]: valueType }
     * @param indexType index type, TSNumber or TSString
-    **/
+    */
   case class TSIndexedInterface(indexName: String = "key", indexType: TypescriptType, valueType: TypescriptType)
     extends TypescriptAggregateType {
     require(
