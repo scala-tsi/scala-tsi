@@ -1,10 +1,11 @@
 package com.scalatsi
 
 import TypescriptType._
-import org.scalatest.{Matchers, WordSpec}
 import com.scalatsi.types.JavaEnum
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class EnumTests extends WordSpec with Matchers with DefaultTSTypes {
+class EnumTests extends AnyWordSpec with Matchers with DefaultTSTypes {
 
   "Scala enumerations" should {
     "have typescript representation" in {

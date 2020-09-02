@@ -1,7 +1,7 @@
 package com.scalatsi.util
 
 import org.scalactic.source
-import org.scalatest.words.StringVerbBlockRegistration
+import org.scalatest.verbs.StringVerbBlockRegistration
 
 trait ForWord {
   val leftSideString: String
