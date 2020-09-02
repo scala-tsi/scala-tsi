@@ -3,11 +3,12 @@ package com.scalatsi
 import com.scalatsi.output.StyleOptions
 import TypescriptType._
 import dsl._
-import org.scalatest.{FlatSpec, Matchers}
 
 import scala.annotation.nowarn
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class TypescriptTypeSerializerTests extends FlatSpec with Matchers with DefaultTSTypes {
+class TypescriptTypeSerializerTests extends AnyFlatSpec with Matchers with DefaultTSTypes {
 
   "The Typescript serializer" should "serialize to a simple interface" in {
     case class Person(name: String, age: Int)
