@@ -1,13 +1,14 @@
 package com.scalatsi
 
-import org.scalatest.{FlatSpec, Matchers}
 import TypescriptType._
 
 import scala.annotation.nowarn
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 case class Person(name: String, age: Int)
 
-class MacroTests extends FlatSpec with Matchers with DefaultTSTypes {
+class MacroTests extends AnyFlatSpec with Matchers with DefaultTSTypes {
   "The case class to TypeScript type macro" should "be able to translate a simple case class" in {
     case class Person(name: String, age: Int)
     TSType.fromCaseClass[Person] shouldBe TSType.interface("IPerson", "name" -> TSString, "age" -> TSNumber)
