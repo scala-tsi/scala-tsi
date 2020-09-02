@@ -5,7 +5,7 @@ package com.scalatsi.generator
 import _root_.java.io.File
 import _root_.com.scalatsi._
 import _root_.com.scalatsi.TypescriptType._
-import _root_.com.scalatsi.DefaultTSTypes
+import _root_.com.scalatsi.DefaultTSTypes._
 
 /** User imports */
 @for(imp <- imports) {
