@@ -1,4 +1,9 @@
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.2")
 
-val scala_tsi_version = "0.4.0-SNAPSHOT"
+lazy val scala_tsi_version = {
+  val v = sys.props.get("plugin.version").getOrElse("0.3.2")
+  ConsoleLogger().info(s"Using scala-tsi $v")
+  v
+}
+
 addSbtPlugin("com.scalatsi" % "sbt-scala-tsi" % scala_tsi_version)

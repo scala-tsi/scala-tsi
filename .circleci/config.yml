@@ -46,15 +46,21 @@ jobs:
             sbt scalafmtSbtCheck scalafmtCheckAll exit
 
       - run:
+          name: "Run scala-tsi tests"
           command:
-            sbt test scala-tsi-macros/test sbt-scala-tsi/test exit
+            sbt test scala-tsi-macros/test exit
+
+      - run:
+          name: "Run sbt-scala-tsi scripted tests"
+          command:
+            sbt sbt-scala-tsi/scripted
 
       - store_test_results:
           path: target/test-reports
 
       - run:
           command:
-            sbt -batch publishLocal sbt-scala-tsi/publishLocal
+            sbt -batch publishLocalSigned sbt-scala-tsi/publishLocalSigned
 
       - run:
           name: "test and generate example project"
@@ -62,6 +68,7 @@ jobs:
           working_directory: example
 
       - run:
+          # This is also done with sbt-scala-tsi, but that it a little easier to accidentally disable than this
           name: "Check example project output"
           command: diff model.ts expected_model.ts
           working_directory: example
