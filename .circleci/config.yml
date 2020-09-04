@@ -64,7 +64,10 @@ jobs:
 
       - run:
           name: "test and generate example project"
-          command: sbt -batch test generateTypescript scalafmtSbtCheck scalafmtCheckAll exit
+          command: |
+            VERSION=$(sbt "show version" | grep -E "\[info\] [0-9]+\.[0-9]+\.[0-9]+" | cut -c8-)
+            echo "VERSION=$VERSION"
+            sbt -Dplugin.version="$VERSION" -batch test generateTypescript scalafmtSbtCheck scalafmtCheckAll exit
           working_directory: example
 
       - run:
