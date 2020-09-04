@@ -11,13 +11,13 @@ import _root_.com.scalatsi.DefaultTSTypes._
 import @imp }
 
 object ExportTypescript  {
-  import { _root_.com.scalatsi => ts }
-  import { _root_.scala.collection.immutable => im }
+  import _root_.com.{ scalatsi => ts }
+  import _root_.scala.collection.{ immutable => im }
 
   // If you get a generator or implicit not found error here, make sure you have defined a TSType[T] implicit and imported it
   val toOutput: im.Map[ts.TypescriptType] = im.Map[ts.TypescriptType](
     @for(userClass <- classes) {
-      ts.TSType.getOrGenerate[@userClass].get, }
+      """@userClass""" -> ts.TSType.getOrGenerate[@userClass].get, }
   )
 
   val options = ts.output.OutputOptions(
@@ -28,6 +28,6 @@ object ExportTypescript  {
   )
 
   def main(args: Array[String]): Unit = {
-    ts.output.WriteTSToFiles.write(options)(toOutput)
+    ts.output.WriteTSToFiles.generate(options)(toOutput)
   }
 }
