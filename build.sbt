@@ -1,4 +1,5 @@
 import sbt.Keys.scalacOptions
+import sbt.ScriptedPlugin.autoImport.scriptedBufferLog
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
@@ -21,10 +22,10 @@ lazy val codestarSettings = commonSettings ++ (organization := "nl.codestar")
 lazy val publishSettings = Seq(
   publishMavenStyle := true,
   publishTo := Some(if (isSnapshot.value) Opts.resolver.sonatypeSnapshots else Opts.resolver.sonatypeStaging),
-  credentials += (sys.env.get("MAVEN_CENTRAL_USER") match {
-    case Some(user) => Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, sys.env("MAVEN_CENTRAL_PASSWORD"))
-    case None       => Credentials(Path.userHome / ".sbt" / ".credentials")
-  }),
+  credentials ++= sys.env
+    .get("MAVEN_CENTRAL_USER")
+    .map(user => Seq(Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, sys.env("MAVEN_CENTRAL_PASSWORD"))))
+    .getOrElse(Seq()),
   licenses := Seq("MIT" -> url("https://github.com/scala-tsi/scala-tsi/blob/master/LICENSE")),
   homepage := Some(url("https://scalatsi.com")),
   scmInfo := Some(ScmInfo(url("https://github.com/scala-tsi/scala-tsi"), "scm:git@github.com:scala-tsi/scala-tsi.git")),
@@ -111,6 +112,7 @@ lazy val `scala-tsi` = (project in file("."))
   // Depend and include the macro project, instead of having to publish a separate macro project
   .dependsOn(`scala-tsi-macros` % "compile-internal, test-internal")
   .settings(macroDependencies)
+lazy val scalaTsiPublishLocal = (publishLocal in `scala-tsi`).scopedKey
 
 lazy val scalatsiSettings = Seq(
   name := "scala-tsi",
@@ -155,10 +157,19 @@ lazy val `scala-tsi-codestar` = (project in file("codestar/scala-tsi"))
   */
 
 lazy val `sbt-scala-tsi` = (project in file("plugin"))
-  .enablePlugins(SbtTwirl, BuildInfoPlugin)
+  .enablePlugins(SbtTwirl, BuildInfoPlugin, SbtPlugin)
   .settings(commonSettings)
   .settings(publishSettings)
   .settings(pluginSettings)
+  .settings(
+    scriptedLaunchOpts := {
+      scriptedLaunchOpts.value ++
+        Seq("-Xmx1024M", "-XX:MaxPermSize=256M", "-Dplugin.version=" + version.value)
+    },
+    //scriptedBufferLog := false,
+    // Make sure to publish the library locally first
+    scripted := (scripted dependsOn scalaTsiPublishLocal).evaluated
+  )
 
 lazy val pluginSettings = Seq(
   name := "sbt-scala-tsi",
@@ -167,12 +178,12 @@ lazy val pluginSettings = Seq(
   buildInfoKeys := Seq[BuildInfoKey](version),
   buildInfoPackage := "sbt.info",
   // sbt 1 uses scala 2.12
-  scalaVersion := "2.12.11",
-  crossScalaVersions := Seq("2.12.11")
+  scalaVersion := scala212,
+  crossScalaVersions := Seq(scala212)
 )
 
 lazy val `sbt-scala-tsi-codestar` = (project in file("codestar/sbt-scala-tsi"))
-  .enablePlugins(SbtTwirl, BuildInfoPlugin)
+  .enablePlugins(SbtTwirl, BuildInfoPlugin, SbtPlugin)
   .settings(codestarSettings)
   .settings(publishSettings)
   .settings(pluginSettings)

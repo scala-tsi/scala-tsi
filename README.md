@@ -53,7 +53,7 @@ See [#Example](#Example) or [the example project](example/) for more a more exam
 | --- | ---- | ------- | ----------- |
 | typescriptExports | Seq[String] | `Seq()` | A list of all your (top-level) classes that you want to generate interfaces for |
 | typescriptGenerationImports | Seq[String] | `Seq()` | A list of all imports. This should import all classes you defined above, as well as custom `TSType` implicits |
-| typescriptOutputFile | File | `target/scala-interfaces.ts`| The output file with generated typescript interfaces |
+| typescriptOutputFile | File | `target/scala-tsi.ts`| The output file with generated typescript interfaces |
 | typescriptStyleSemicolons | Boolean | `false` | Whether to add booleans to the exported model (experimental) |
 
 ## Example
