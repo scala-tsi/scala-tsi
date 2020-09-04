@@ -68,7 +68,7 @@ jobs:
           working_directory: example
 
       - run:
-          # This is also done with sbt-scala-tsi, but that it a little easier to accidentally disable than this
+          # This is also done with sbt-scala-tsi/scripted, but that it a little easier to accidentally disable than this
           name: "Check example project output"
           command: diff model.ts expected_model.ts
           working_directory: example
