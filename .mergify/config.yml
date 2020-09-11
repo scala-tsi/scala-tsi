@@ -1,0 +1,11 @@
+pull_request_rules:
+  - name: automatically merge scala-steward PRs
+    conditions:
+      - author=scala-steward
+      - "status-success=ci/circleci: build"
+      - -title~=.*pgp.*
+      - body~=labels:.*semver-((minor)|(patch)).*
+    actions:
+      merge:
+        method: squash
+        strict: true
