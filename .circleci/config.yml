@@ -59,8 +59,15 @@ jobs:
           path: target/test-reports
 
       - run:
-          command:
-            sbt -batch publishLocalSigned sbt-scala-tsi/publishLocalSigned
+          name: Publish locally
+          command: |
+            set -x
+            if [ -z "$CIRCLE_PR_USERNAME" ]; then
+              # On forked PR, do an unsigned publish
+              sbt -batch publishLocalSigned sbt-scala-tsi/publishLocalSigned
+            else
+              sbt -batch publishLocal sbt-scala-tsi/publishLocal
+            fi
 
       - run:
           name: "test and generate example project"

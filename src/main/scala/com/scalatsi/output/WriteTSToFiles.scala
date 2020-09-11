@@ -35,8 +35,8 @@ object WriteTSToFiles {
           try { writer.write(output) }
           finally { writer.close() }
         }
-      } yield ()).recover {
-        case e: IOException => reportFailure(s"Could not write typescript to file '$targetFile' due to I/O problem", code = 2, e = e)
+      } yield ()).recover { case e: IOException =>
+        reportFailure(s"Could not write typescript to file '$targetFile' due to I/O problem", code = 2, e = e)
       }.get
 
       ()

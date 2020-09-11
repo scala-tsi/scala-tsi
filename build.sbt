@@ -42,14 +42,13 @@ lazy val publishSettings = Seq(
   // CI-only settings, enabled if $CI env variable is set to "true"
   sys.env
     .get("CI")
-    .collect({
-      case "true" =>
-        Seq(
-          usePgpKeyHex("6044257F427C2854A6F9A0C211A02377A6DD0E59"),
-          pgpSecretRing := file(".circleci/circleci.key.asc"),
-          pgpPublicRing := file(".circleci/circleci.pub.asc"),
-          pgpPassphrase := sys.env.get("GPG_passphrase").map(_.toCharArray)
-        )
+    .collect({ case "true" =>
+      Seq(
+        usePgpKeyHex("6044257F427C2854A6F9A0C211A02377A6DD0E59"),
+        pgpSecretRing := file(".circleci/circleci.key.asc"),
+        pgpPublicRing := file(".circleci/circleci.pub.asc"),
+        pgpPassphrase := sys.env.get("GPG_passphrase").map(_.toCharArray)
+      )
     })
     .getOrElse(Seq())
 

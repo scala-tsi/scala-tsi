@@ -85,9 +85,8 @@ object TypescriptTypeSerializer {
       case TSInterface(name, members) =>
         def symbol(required: Boolean) = if (required) ":" else "?:"
 
-        val mbs = members.map({
-          case (memberName, TSInterfaceEntry(tp, required)) =>
-            s"  $memberName${symbol(required)} ${serialize(tp)}"
+        val mbs = members.map({ case (memberName, TSInterfaceEntry(tp, required)) =>
+          s"  $memberName${symbol(required)} ${serialize(tp)}"
         })
 
         Some(s"""export interface $name {
