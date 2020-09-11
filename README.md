@@ -14,7 +14,7 @@ To use the project add the SBT plugin dependency in `project/plugins.sbt`:
 
 ```scala
 // See badge above for latest version number
-addSbtPlugin("com.scalatsi" % "sbt-scala-tsi" % "0.3.2")
+addSbtPlugin("com.scalatsi" % "sbt-scala-tsi" % "0.4.0")
 ```
 
 And configure the plugin in your project:
