@@ -7,8 +7,8 @@ import com.scalatsi.TypescriptType.TypescriptNamedType
 
 object WriteTSToFiles {
   def generate(options: OutputOptions)(types: Map[String, TypescriptType]): Unit = {
-    val namedTypes = types.values.collect {
-      case named: TypescriptNamedType => named
+    val namedTypes = types.values.collect { case named: TypescriptNamedType =>
+      named
     }.toSet
     val unnamedTypes = types.filter {
       case (_, _: TypescriptNamedType) => false
@@ -22,8 +22,8 @@ object WriteTSToFiles {
   /** Tell the user the unnamed types will be ignored */
   private def warnUnnamed(types: Map[String, TypescriptType]): Unit = {
     logger.warn("Could not export some of your types to typescript because they do not have names:")
-    types.foreach {
-      case (userType, tsType) => logger.warn(s"$userType\t->\t${TypescriptTypeSerializer.serialize(tsType)}")
+    types.foreach { case (userType, tsType) =>
+      logger.warn(s"$userType\t->\t${TypescriptTypeSerializer.serialize(tsType)}")
     }
   }
 
