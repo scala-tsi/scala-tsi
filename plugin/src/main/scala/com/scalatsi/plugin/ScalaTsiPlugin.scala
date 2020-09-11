@@ -8,13 +8,15 @@ object ScalaTsiPlugin extends AutoPlugin {
   object autoImport {
     // user settings
     val typescriptExports = settingKey[Seq[String]]("Types to export typescript version for")
-    val typescriptGenerationImports = settingKey[Seq[String]]("Additional imports, i.e. your packages so you don't need to prefix your classes.")
+    val typescriptGenerationImports =
+      settingKey[Seq[String]]("Additional imports, i.e. your packages so you don't need to prefix your classes.")
     val typescriptOutputFile      = settingKey[File]("File where all typescript interfaces will be written to")
     val typescriptStyleSemicolons = settingKey[Boolean]("Whether to add booleans to the exported model")
 
     // tasks
     val generateTypescript = taskKey[Unit]("Generate typescript for this project")
-    val typescriptCreateExporter = taskKey[Seq[File]]("Generate an application that will generate typescript from the classes that are configured")
+    val typescriptCreateExporter =
+      taskKey[Seq[File]]("Generate an application that will generate typescript from the classes that are configured")
 
     // deprecated
     @deprecated("Use typescriptExports", "0.4.0")
@@ -58,7 +60,8 @@ object ScalaTsiPlugin extends AutoPlugin {
   ): Seq[File] = {
     val targetFile = sourceManaged / "com" / "scalatsi" / "generator" / "ExportTypescript.scala"
 
-    val toWrite: String = txt.ExportTypescriptTemplate(
+    val toWrite: String = txt
+      .ExportTypescriptTemplate(
         imports,
         typesToGenerate,
         typescriptOutputFile.getAbsolutePath,

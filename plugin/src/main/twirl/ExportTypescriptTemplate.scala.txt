@@ -2,32 +2,31 @@
 
 package com.scalatsi.generator
 
-import _root_.java.io.File
 import _root_.com.scalatsi._
 import _root_.com.scalatsi.TypescriptType._
-import _root_.com.scalatsi.DefaultTSTypes._
 
 /** User imports */
 @for(imp <- imports) {
-import @imp
-}
+import @imp }
 
-object ExportTypescript  {
+object ExportTypescript extends DefaultTSTypes {
+  import _root_.com.{ scalatsi => ts }
+  import _root_.scala.collection.{ immutable => im }
 
   // If you get a generator or implicit not found error here, make sure you have defined a TSType[T] implicit and imported it
-  val toOutput: Set[TypescriptNamedType] = _root_.scala.collection.immutable.SortedSet(
+  val toOutput: im.Map[String, ts.TypescriptType] = im.Map[String, ts.TypescriptType](
     @for(userClass <- classes) {
-      TSNamedType.getOrGenerate[@userClass].get, }
+      """@userClass""" -> ts.TSType.getOrGenerate[@userClass].get, }
   )
 
-  val options = _root_.com.scalatsi.output.OutputOptions(
-    targetFile = new File("""@targetFile"""), // Warning: always use literal string here for windows paths with \
-    styleOptions = _root_.com.scalatsi.output.StyleOptions(
-        semicolons = @useSemicolons
+  val options = ts.output.OutputOptions(
+    targetFile = new _root_.java.io.File("""@targetFile"""), // Warning: always use literal string here for windows paths with \
+    styleOptions = ts.output.StyleOptions(
+      semicolons = @useSemicolons
     )
   )
 
   def main(args: Array[String]): Unit = {
-    _root_.com.scalatsi.output.WriteTSToFiles.write(options)(toOutput)
+    ts.output.WriteTSToFiles.generate(options)(toOutput)
   }
 }

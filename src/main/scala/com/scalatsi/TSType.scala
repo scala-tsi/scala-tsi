@@ -135,7 +135,7 @@ object TSType {
   "Could not find an implicit TSNamedType[${T}] in scope. Make sure you created and imported a named typescript mapping for the type."
 )
 trait TSNamedType[T] extends TSType[T] { self =>
-  def get: TypescriptNamedType
+  override def get: TypescriptNamedType
   override def toString: String = s"TSNamedType($get)"
 
   def withName(newName: String): TSNamedType[T] = TSNamedType(get.withName(newName))

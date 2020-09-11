@@ -35,7 +35,7 @@ object TypescriptTypeSerializer {
   }
 
   @deprecated("0.2.0", "Use emit[T]()")
-  def emit[T](implicit tsType: TSNamedType[T]): String = emit[T]()
+  def emit[T](implicit tsType: TSNamedType[T]): String = emit[T]()(tsType)
 
   def emit[T](styleOptions: StyleOptions = StyleOptions())(implicit tsType: TSNamedType[T]): String =
     emits(styleOptions, types = Set(tsType.get))
