@@ -63,9 +63,9 @@ jobs:
             if [ -z "$CIRCLE_PR_USERNAME" ]; then
               # On forked PR, do an unsigned publish
               echo "Forked PR, unsigned publish"
-              sbt -batch publishLocal sbt-scala-tsi/publishLocal
-            else
               sbt -batch publishLocalSigned sbt-scala-tsi/publishLocalSigned
+            else
+              sbt -batch publishLocal sbt-scala-tsi/publishLocal
             fi
 
       - run:
