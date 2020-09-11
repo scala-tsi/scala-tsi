@@ -26,7 +26,7 @@ private[scalatsi] object OutputLogging {
     final def warn(msg: String, e: Throwable = null): Unit  = log(WARN_INT, msg, e)
     final def error(msg: String, e: Throwable = null): Unit = log(ERROR_INT, msg, e)
 
-    private def prefix (lvl: Int) = lvl match {
+    private def prefix(lvl: Int) = lvl match {
       case INFO_INT  => s"[${color(lvl)}info$resetColor] "
       case WARN_INT  => s"[${color(lvl)}warn$resetColor] "
       case ERROR_INT => s"[${color(lvl)}error$resetColor] "
