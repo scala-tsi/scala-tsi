@@ -14,9 +14,9 @@ private[scalatsi] object OutputLogging {
     protected val resetColor: String
 
     private def log(lvl: Int, msg: String, e: Throwable = null): Unit = {
-      Console.err.println(s"${color(lvl)}$msg$resetColor")
+      Console.err.println(s"${prefix(lvl)}$msg")
       if (e != null) {
-        Console.err.print(color(lvl))
+        Console.err.print(s"${prefix(lvl)}${color(lvl)}")
         e.printStackTrace()
         Console.err.print(resetColor)
       }
@@ -25,6 +25,12 @@ private[scalatsi] object OutputLogging {
     final def info(msg: String): Unit                       = log(INFO_INT, msg)
     final def warn(msg: String, e: Throwable = null): Unit  = log(WARN_INT, msg, e)
     final def error(msg: String, e: Throwable = null): Unit = log(ERROR_INT, msg, e)
+
+    private def prefix (lvl: Int) = lvl match {
+      case INFO_INT  => s"[${color(lvl)}info$resetColor] "
+      case WARN_INT  => s"[${color(lvl)}warn$resetColor] "
+      case ERROR_INT => s"[${color(lvl)}error$resetColor] "
+    }
 
     final def exit(msg: String, code: Int = 1, e: Throwable = null): Nothing = {
       require(code > 0, "Should exist with a non-zero exit code on failure")
