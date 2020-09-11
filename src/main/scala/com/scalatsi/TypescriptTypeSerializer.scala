@@ -43,13 +43,6 @@ object TypescriptTypeSerializer {
   def emits(types: TypescriptNamedType*): String =
     emits(styleOptions = StyleOptions(), types = types.toSet)
 
-  /**
-    *
-    * @param styleOptions
-    * @param types
-    * @param recursive
-    * @return
-    */
   def emits(styleOptions: StyleOptions = StyleOptions(), types: Set[TypescriptNamedType]): String =
     types
       .flatMap(discoverNestedNames)

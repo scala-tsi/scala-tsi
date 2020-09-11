@@ -2,7 +2,7 @@ package com.scalatsi.output
 
 import java.io.{FileWriter, IOException}
 import scala.util.Try
-import com.scalatsi.{ TypescriptType, TypescriptTypeSerializer }
+import com.scalatsi.{TypescriptType, TypescriptTypeSerializer}
 import com.scalatsi.TypescriptType.TypescriptNamedType
 
 object WriteTSToFiles {
@@ -12,10 +12,10 @@ object WriteTSToFiles {
     }.toSet
     val unnamedTypes = types.filter {
       case (_, _: TypescriptNamedType) => false
-      case (_, _) => true
+      case (_, _)                      => true
     }
 
-    if(unnamedTypes.nonEmpty) warnUnnamed(unnamedTypes)
+    if (unnamedTypes.nonEmpty) warnUnnamed(unnamedTypes)
     write(options)(namedTypes)
   }
 
