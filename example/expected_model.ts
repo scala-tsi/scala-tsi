@@ -1,3 +1,5 @@
+export type DiscriminatedUnion = (IDU1 | IDU2)
+
 export interface IBar {
   value: string
 }
@@ -5,6 +7,16 @@ export interface IBar {
 export interface IBaz {
   boo: boolean
   bar: number
+}
+
+export interface IDU1 {
+  type: "type1"
+  field1: string
+}
+
+export interface IDU2 {
+  type: "type2"
+  field2: string
 }
 
 export interface IDeepThought {

@@ -24,7 +24,7 @@ trait TSType[T] { self =>
   def |(other: TSType[_]): TSUnion      = this | other.get
 }
 
-object TSType {
+object TSType extends DefaultTSTypes {
   private class TSTypeImpl[T](override val get: TypescriptType) extends TSType[T]
   def apply[T](tt: TypescriptType): TSType[T] = new TSTypeImpl(tt)
 

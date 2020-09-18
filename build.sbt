@@ -1,5 +1,4 @@
 import sbt.Keys.scalacOptions
-import sbt.ScriptedPlugin.autoImport.scriptedBufferLog
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 

@@ -54,7 +54,10 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
     }
   }
 
-  def getImplicitInterfaceMappingOrGenerateDefault[T: c.WeakTypeTag, TSType[_]](implicit tsTypeTag: c.WeakTypeTag[TSType[_]]): Tree = {
+  def getImplicitInterfaceMappingOrGenerateDefault[T, TSType[_]](implicit
+    tt: c.WeakTypeTag[T],
+    tsTypeTag: c.WeakTypeTag[TSType[_]]
+  ): Tree = {
     lookupOptionalImplicit(properType[T, TSType]) match {
       case Right(Some(value)) => value
       case Right(None)        => generateInterfaceFromCaseClass[T]
@@ -64,26 +67,32 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
     }
   }
 
+  /** Generate an implicit not found message */
+  private def notFound[T: c.WeakTypeTag]: String = {
+    val T = c.weakTypeOf[T]
+    // Help the user a little more with some basic types
+    val isDefault = T =:= c.typeOf[String] || T =:= c.typeOf[String] || T <:< c.weakTypeOf[Iterable[_]]
+    if (isDefault)
+      s"Missing implicit for default TSType[$T]. Bring it in scope with `import DefaultTSTypes._` or `extends DefaultTSTypes`"
+    else
+      s"Missing implicit for TSType[$T] in scope and could not generate one. Did you create and import it?"
+  }
+
   private def generateDefaultMapping[T: c.WeakTypeTag]: Tree = {
     val T      = c.weakTypeOf[T]
     val symbol = T.typeSymbol
 
-    def err() = {
-      c.abort(
-        c.enclosingPosition,
-        s"Could not find an implicit TSType[$T] in scope and could not generate one. Did you create and import it?"
-      )
-    }
+    def notSupported() = c.abort(c.enclosingPosition, notFound[T])
 
     if (!symbol.isClass) {
-      err()
+      notSupported()
     } else {
       val classSymbol = symbol.asClass
       if (classSymbol.isCaseClass)
         generateInterfaceFromCaseClass[T]
       else if (isSealedTraitOrAbstractClass(classSymbol))
         generateUnionFromSealedTrait[T]
-      else err()
+      else notSupported()
     }
   }
 
@@ -173,6 +182,7 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
         q"""{
          import _root_.com.scalatsi.TypescriptType
          import _root_.com.scalatsi.TSNamedType
+         import TypescriptType.TSAlias
          TSNamedType(TSAlias($name, TypescriptType.nameOrType(${getTSType(singleChild.asType.toType)}.get)))
         }"""
       case children =>
