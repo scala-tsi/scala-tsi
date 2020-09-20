@@ -13,10 +13,12 @@ object ExportTypescript extends DefaultTSTypes {
   import _root_.com.{ scalatsi => ts }
   import _root_.scala.collection.{ immutable => im }
 
+  val logger = _root_.com.scalatsi.output.OutputLogging.logger
+
   // If you get a generator or implicit not found error here, make sure you have defined a TSType[T] implicit and imported it
   val toOutput: im.Map[String, ts.TypescriptType] = im.Map[String, ts.TypescriptType](
     @for(userClass <- classes) {
-      """@userClass""" -> ts.TSType.getOrGenerate[@userClass].get, }
+      checkImplicit("""@userClass""",ts.TSType.getOrGenerate[@userClass]), }
   )
 
   val options = ts.output.OutputOptions(
@@ -28,5 +30,13 @@ object ExportTypescript extends DefaultTSTypes {
 
   def main(args: Array[String]): Unit = {
     ts.output.WriteTSToFiles.generate(options)(toOutput)
+  }
+
+  def checkImplicit[T](name: String, tsType: TSType[T]): (String, ts.TypescriptType) = {
+    if(tsType == null) {
+      logger.exit(s"Implicit TSType[$name] was null. This is usually caused by doing: implicit val ...: TSType[T] = TSType.getOrGenerate[T]")
+    } else {
+      name -> tsType.get
+    }
   }
 }
