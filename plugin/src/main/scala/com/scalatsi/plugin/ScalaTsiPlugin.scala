@@ -41,17 +41,18 @@ object ScalaTsiPlugin extends AutoPlugin {
     typescriptOutputFile := target.value / "scala-tsi.ts",
     typescriptStyleSemicolons := false,
     // Task settings
-    generateTypescript := typescriptDeleteExporter.dependsOn(typescriptRunExporter).dependsOn(typescriptCreateExporter).value,
+    generateTypescript := Def.sequential(typescriptRunExporter, typescriptDeleteExporter).value,
     typescriptCreateExporter in Compile := createTypescriptExporter.value,
     typescriptRunExporter := runTypescriptExporter.value,
     typescriptDeleteExporter := deleteTypescriptExporter.value,
-    sourceGenerators in Compile += (typescriptCreateExporter in Compile)
+    // Instruct SBT
+    sourceGenerators in Compile += (typescriptCreateExporter in Compile),
+    cleanFiles += typescriptOutputFile.value
   )
 
   override lazy val projectSettings: Seq[Def.Setting[_]] = baseScalaTsiSettings
 
   private lazy val targetFile               = Def.setting { sourceManaged.value / "com" / "scalatsi" / "generator" / "ExportTypescript.scala" }
-  private lazy val runTypescriptExporter    = (runMain in Compile).toTask(" com.scalatsi.generator.ExportTypescript")
   private lazy val deleteTypescriptExporter = Def.task(IO.delete(targetFile.value))
 
   private lazy val createTypescriptExporter = Def.task {
@@ -71,4 +72,8 @@ object ScalaTsiPlugin extends AutoPlugin {
     IO.write(target, toWrite)
     Seq(target)
   }
+
+  private lazy val runTypescriptExporter = (runMain in Compile)
+    .toTask(" com.scalatsi.generator.ExportTypescript")
+    .dependsOn(createTypescriptExporter)
 }

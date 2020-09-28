@@ -1,0 +1,9 @@
+# Create the exporter and check the path we're testing
+> typescriptCreateExporter
+$ exists target/scala-2.13/src_managed/com/scalatsi/generator/ExportTypescript.scala
+# Run typescript generation
+> generateTypescript
+# Must exist a model
+$ exists model.ts
+# But not the generated file
+$ absent target/scala-2.13/src_managed/com/scalatsi/generator/ExportTypescript.scala
