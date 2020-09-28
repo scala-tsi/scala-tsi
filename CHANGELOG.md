@@ -1,3 +1,22 @@
+## 0.4.1
+
+* Exporter application will now be deleted after generation (#106)
+
+## 0.4.0 - 2020-09-11
+
+* Generate typescript based on TSType, not just TSNamedType (#98)
+* Rename typescriptClassesToGenerateFor sbt setting to typescriptExports
+
+
+## 0.3.2 - 2020-08-28
+
+* Support Scala and Java enumerations out of the box (#75)
+* Fix bug where no error was given when no typescript mapping is available for a non-abstract sealed class (#80)
+
+## 0.3.1 - 2020-08-22
+
+Fixes the compiler crashing on circular references with this plugin (#67)
+
 ## 0.3.0 - 2020-06-12
 
 * Change package from `nl.codestar` to `com.scalatsi`
