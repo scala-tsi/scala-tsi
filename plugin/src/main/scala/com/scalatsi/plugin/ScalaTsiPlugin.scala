@@ -7,23 +7,24 @@ import sbt.info.BuildInfo
 object ScalaTsiPlugin extends AutoPlugin {
   object autoImport {
     // user settings
-    val typescriptExports = settingKey[Seq[String]]("Types to export typescript version for")
-    val typescriptGenerationImports =
-      settingKey[Seq[String]]("Additional imports, i.e. your packages so you don't need to prefix your classes.")
-    val typescriptOutputFile      = settingKey[File]("File where all typescript interfaces will be written to")
-    val typescriptStyleSemicolons = settingKey[Boolean]("Whether to add booleans to the exported model")
+    val typescriptExports = settingKey[Seq[String]]("Types to export typescript version for").withRank(KeyRanks.ASetting)
+    val typescriptGenerationImports = settingKey[Seq[String]](
+      "Additional imports, i.e. your packages so you don't need to prefix your classes."
+    ).withRank(KeyRanks.BSetting)
+    val typescriptOutputFile      = settingKey[File]("File where all typescript interfaces will be written to").withRank(KeyRanks.BSetting)
+    val typescriptStyleSemicolons = settingKey[Boolean]("Whether to add booleans to the exported model").withRank(KeyRanks.BMinusSetting)
 
     // tasks
     val generateTypescript = taskKey[Unit]("Generate typescript for this project").withRank(KeyRanks.ATask)
-    val typescriptCreateExporter =
-      taskKey[Seq[File]]("Generate an application that will generate typescript from the classes that are configured")
-    val typescriptRunExporter = taskKey[Unit]("Run the application created by typescriptCreateExporter")
-    val typescriptDeleteExporter =
-      taskKey[Unit]("Remove the application created by typescriptCreateExporter")
+    val typescriptCreateExporter = taskKey[Seq[File]](
+      "Generate an application that will generate typescript from the classes that are configured"
+    ).withRank(KeyRanks.CTask)
+    val typescriptRunExporter    = taskKey[Unit]("Run the application created by typescriptCreateExporter").withRank(KeyRanks.CTask)
+    val typescriptDeleteExporter = taskKey[Unit]("Remove the application created by typescriptCreateExporter").withRank(KeyRanks.CTask)
 
     // deprecated
     @deprecated("Use typescriptExports", "0.4.0")
-    val typescriptClassesToGenerateFor = settingKey[Seq[String]]("Types to export typescript version for")
+    val typescriptClassesToGenerateFor = settingKey[Seq[String]]("Types to export typescript version for").withRank(KeyRanks.DSetting)
   }
 
   import autoImport._
