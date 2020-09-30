@@ -79,7 +79,7 @@ object TypescriptType {
     override def withName(newName: String): TSEnum = copy(name = newName)
   }
 
-  /** This type is used as a marker that a type with this name exists and is either already defined or externally defined
+  /** This type is used as a marker that a type with this name exists and is either already defined or externally defined.
     * Not a real Typescript type
     * @note name takes from [Typescript specification](https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#3.8.2)
     * @param impl The implementation of the type if it is known, so that the nested types can be outputted even if not directly referenced
