@@ -11,6 +11,7 @@ trait ScalaTSTypes {
 }
 
 trait CollectionTSTypes extends LowPriorityCollectionTSType {
+
   /** Represent an Option[E] with a Typescript (E | undefined) */
   implicit def tsOption[E](implicit e: TSType[E]): TSType[Option[E]] = TSType(e | TSUndefined)
   implicit val noneTSType: TSType[None.type]                         = TSType(TSNull)
@@ -26,6 +27,7 @@ trait CollectionTSTypes extends LowPriorityCollectionTSType {
 }
 
 trait LowPriorityCollectionTSType {
+
   /** Provides a TSType for any scala collection of E to a typescript array of E */
   implicit def tsTraversable[E, F[_]](implicit e: TSType[E], ev: F[E] <:< Iterable[E]): TSType[F[E]] = TSType(e.get.array)
 }
