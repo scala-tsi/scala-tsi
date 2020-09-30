@@ -3,6 +3,7 @@ import sbt.Keys._
 ThisBuild / onChangedBuildSource := ReloadOnSourceChanges
 
 lazy val root = (project in file("."))
+  .enablePlugins(ScalaTsiPlugin)
   .settings(
     Seq(
       scalaVersion := "2.13.3",

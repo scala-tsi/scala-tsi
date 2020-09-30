@@ -21,6 +21,7 @@ And configure the plugin in your project:
 ```scala
 // Replace with your project definition
 lazy val root = (project in file("."))
+    .enablePlugins(ScalaTsiPlugin)
     .settings(
       // The classes that you want to generate typescript interfaces for
       typescriptExports := Seq("MyClass"),

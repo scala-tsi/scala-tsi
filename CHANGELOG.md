@@ -2,6 +2,12 @@
 
 `TSType` now extends `DefaultTSTypes`, because of this you don't need `extends DefaultTSTypes` or `import DefaultTSTypes._` anymore.
 
+## 0.4.1
+
+* Exporter application will now be deleted after generation (#106)
+* It is now recommended adding `.enablePlugins(ScalaTsiPlugin)` to your sbt project. This will become mandatory in a future release (#110)
+* Improve error message on missing implicits (#111)
+
 ## 0.4.0 - 2020-09-11
 
 * Generate typescript based on TSType, not just TSNamedType (#98)

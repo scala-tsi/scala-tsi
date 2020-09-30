@@ -110,7 +110,11 @@ lazy val `scala-tsi` = (project in file("."))
   // Depend and include the macro project, instead of having to publish a separate macro project
   .dependsOn(`scala-tsi-macros` % "compile-internal, test-internal")
   .settings(macroDependencies)
-lazy val scalaTsiPublishLocal = (publishLocal in `scala-tsi`).scopedKey
+
+lazy val scalaTsiPublishLocal = (`scala-tsi` / publishLocal).scopedKey
+val pub                       = taskKey[Unit]("publish locally for testing")
+pub := (`sbt-scala-tsi` / publishLocal).value
+scripted := (`sbt-scala-tsi` / scripted).evaluated
 
 lazy val scalatsiSettings = Seq(
   name := "scala-tsi",
@@ -160,13 +164,16 @@ lazy val `sbt-scala-tsi` = (project in file("plugin"))
   .settings(publishSettings)
   .settings(pluginSettings)
   .settings(
+    publishLocal := publishLocal.dependsOn(scalaTsiPublishLocal).value
+  )
+  .settings(
     scriptedLaunchOpts := {
       scriptedLaunchOpts.value ++
         Seq("-Xmx1024M", "-XX:MaxPermSize=256M", "-Dplugin.version=" + version.value)
     },
-    //scriptedBufferLog := false,
+    scriptedBufferLog := false,
     // Make sure to publish the library locally first
-    scripted := (scripted dependsOn scalaTsiPublishLocal).evaluated
+    scripted := scripted.dependsOn(publishLocal).evaluated
   )
 
 lazy val pluginSettings = Seq(
