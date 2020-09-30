@@ -1,6 +1,7 @@
 ## 0.4.1
 
 * Exporter application will now be deleted after generation (#106)
+* It is now recommended adding `.enablePlugins(ScalaTsiPlugin)` to your sbt project. This will become mandatory in a future release (#110)
 
 ## 0.4.0 - 2020-09-11
 

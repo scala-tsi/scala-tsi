@@ -29,6 +29,8 @@ object ScalaTsiPlugin extends AutoPlugin {
 
   import autoImport._
 
+  // TODO: On breaking release, change allRequirements into noTrigger to not automatically enable the plugin
+  //override def trigger = noTrigger
   override def trigger = allRequirements
 
   private val scala_ts_compiler_version = BuildInfo.version
