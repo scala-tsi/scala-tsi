@@ -5,13 +5,13 @@ import TypescriptType._
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe.TypeTag
 
+
 trait ScalaTSTypes {
   implicit val anyTSType: TSType[Any] = TSType(TSAny)
 }
 
 trait CollectionTSTypes extends LowPriorityCollectionTSType {
-  // This chooses null union to represent Option types.
-  // When defining interfaces however Option will be represented with undefined union
+  /** Represent an Option[E] with a Typescript (E | undefined) */
   implicit def tsOption[E](implicit e: TSType[E]): TSType[Option[E]] = TSType(e | TSUndefined)
   implicit val noneTSType: TSType[None.type]                         = TSType(TSNull)
   implicit def tsSome[E](implicit e: TSType[E]): TSType[Some[E]]     = TSType(e.get)
@@ -26,12 +26,8 @@ trait CollectionTSTypes extends LowPriorityCollectionTSType {
 }
 
 trait LowPriorityCollectionTSType {
-  // Provides a TSType for any scala collection of E to a typescript array of E
-  implicit def tsTraversable[E, F[_]](implicit
-    e: TSType[E],
-    ev: F[E] <:< Iterable[E]
-  ): TSType[F[E]] =
-    TSType(e.get.array)
+  /** Provides a TSType for any scala collection of E to a typescript array of E */
+  implicit def tsTraversable[E, F[_]](implicit e: TSType[E], ev: F[E] <:< Iterable[E]): TSType[F[E]] = TSType(e.get.array)
 }
 
 trait ScalaEnumTSTypes {
