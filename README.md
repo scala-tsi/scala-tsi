@@ -12,13 +12,13 @@ Scala TSI can automatically generate Typescript Interfaces from your Scala class
 
 To use the project add the SBT plugin dependency in `project/plugins.sbt`:
 
-```scala
+```sbt
 // See badge above for latest version number
 addSbtPlugin("com.scalatsi" % "sbt-scala-tsi" % "0.4.1")
 ```
 
 And configure the plugin in your project:
-```scala
+```sbt
 // Replace with your project definition
 lazy val root = (project in file("."))
     .enablePlugins(ScalaTsiPlugin)
@@ -47,6 +47,14 @@ export interface IMyClass {
 ```
 
 See [#Example](#Example) or [the example project](example/) for more a more examples
+
+#### Without sbt plugin
+
+The sbt plugin will add the required dependency to your project. It can be added manually if you don't use the plugin:
+
+```sbt
+libraryDependencies += "com.scalatsi" %% "scala-tsi" % "<version>"
+```
 
 ## Configuration
 
@@ -181,7 +189,3 @@ object B {
 ```
 
 There are rare cases where this error might be false. If you are sure of this, [please file a bug report](https://github.com/scala-tsi/scala-tsi/issues).
-
-## Features
-
-See [this list](https://github.com/scala-tsi/scala-tsi/issues/1) for an overview of completed features, and issues for open feature ideas.
