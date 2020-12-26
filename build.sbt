@@ -122,9 +122,9 @@ lazy val scalatsiSettings = Seq(
   description := "Generate Typescript interfaces from your scala classes",
   libraryDependencies ++= Seq(
     // To support @nowarn in 2.12
-    "org.scala-lang.modules" %% "scala-collection-compat" % "2.2.0",
+    "org.scala-lang.modules" %% "scala-collection-compat" % "2.3.2",
     // testing framework
-    "org.scalatest" %% "scalatest" % "3.2.2" % "test"
+    "org.scalatest" %% "scalatest" % "3.2.3" % "test"
   )
 )
 
