@@ -30,7 +30,7 @@ object WriteTSToFiles {
   private def write(options: OutputOptions)(types: Set[TypescriptNamedType]): Unit = {
     try {
       val targetFile = options.targetFile
-      val output     = TypescriptTypeSerializer.emits(options.styleOptions, types)
+      val output     = options.header.map(_ + "\n\n").getOrElse("") + TypescriptTypeSerializer.emits(options.styleOptions, types)
 
       Try {
         Option(targetFile.getParentFile).foreach(_.mkdirs())
