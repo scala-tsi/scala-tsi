@@ -3,7 +3,7 @@ import sbt.ScriptedPlugin.autoImport.scriptedBufferLog
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-val scala213 = "2.13.3"
+val scala213 = "2.13.5"
 val scala212 = "2.13.5"
 
 lazy val commonSettings = Seq(
