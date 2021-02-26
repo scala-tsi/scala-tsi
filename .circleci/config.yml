@@ -15,13 +15,17 @@ jobs:
       - run:
           name: Compile and test for 2.13
           command: |
-            scalav=$(sbt --error "print scala213Version")
+            scalavoutput=$(sbt "print scala213Version")
+            echo $scalavoutput
+            scalav=$(echo $"scalavoutput" | grep "2\\.")
             sbt -batch ++"$scalav" compile test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
 
       - run:
           name: Compile and test for 2.12
           command: |
-            scalav=$(sbt --error "print scala212Version")
+            scalavoutput=$(sbt --error "print scala212Version")
+            echo $scalavoutput
+            scalav=$(echo $"scalavoutput" | grep "2\\.")
             sbt -batch ++"$scalav" compile test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
 
       - save_cache:
