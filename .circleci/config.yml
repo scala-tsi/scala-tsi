@@ -65,16 +65,16 @@ jobs:
           command: |
             set -x
             if [ -z "$CIRCLE_PR_USERNAME" ]; then
-              # On forked PR, do an unsigned publish
               sbt -batch publishLocalSigned sbt-scala-tsi/publishLocalSigned
             else
+              # On forked PR, do an unsigned publish
               sbt -batch publishLocal sbt-scala-tsi/publishLocal
             fi
 
       - run:
           name: "test and generate example project"
           command: |
-            VERSION=$(cd ../ && sbt --error 'set showSuccess := false' "print version" exit)
+            VERSION=$(cd ../ && sbt --no-colors --error "print version" | xargs)
             sbt -batch -Dplugin.version="$VERSION" test generateTypescript scalafmtSbtCheck scalafmtCheckAll exit
           working_directory: example
 
