@@ -15,14 +15,12 @@ jobs:
       - run:
           name: Compile and test for 2.13
           command:
-            scalav=$(sbt --error "print scala213Version")
-            sbt -batch ++"$scalav" compile test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
+            sbt -batch ++$(sbt --error "print scala213Version") compile test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
 
       - run:
           name: Compile and test for 2.12
           command:
-            scalav=$(sbt --error "print scala213Version")
-            sbt -batch ++"$scalav" compile test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
+            sbt -batch ++$(sbt --error "print scala212Version") compile test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
 
       - save_cache:
           key:  scala-tsi-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
