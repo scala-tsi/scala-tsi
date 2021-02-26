@@ -15,20 +15,16 @@ jobs:
       - run:
           name: Compile and test for 2.13
           command: |
-            scalav=$(sbt --error "print scala213Version")
-            if [[ $scalav != "2.13.5" ]]; then
-              echo "scala version mismatch: $scalav vs 2.13.5"
-            fi
-            sbt -batch ++2.13.5 compile test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
+            scalav=$(sbt --error "print scala213Version" | tr "\n" " ")
+            echo "Using scala $scalav"
+            sbt -batch ++"$scalav" compile test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
 
       - run:
           name: Compile and test for 2.12
           command: |
-            scalavoutput=$(sbt --error "print scala212Version")
-            if [[ $scalav != "2.12.13" ]]; then
-              echo "scala version mismatch: $scalav vs 2.13.5"
-            fi
-            sbt -batch ++2.12.13 compile test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
+            scalav=$(sbt --error "print scala212Version" | tr "\n" " ")
+            echo "Using scala $scalav"
+            sbt -batch ++"$scalav" compile test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
 
       - save_cache:
           key:  scala-tsi-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
