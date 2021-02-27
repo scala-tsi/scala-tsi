@@ -43,7 +43,7 @@ object ScalaTsiPlugin extends AutoPlugin {
     typescriptExports := Seq(),
     typescriptClassesToGenerateFor := Seq(),
     typescriptOutputFile := target.value / "scala-tsi.ts",
-    typescriptHeader := None,
+    typescriptHeader := Some("// DO NOT EDIT: generated file by scala-tsi"),
     typescriptStyleSemicolons := false,
     // Task settings
     generateTypescript := Def.sequential(typescriptRunExporter, typescriptDeleteExporter).value,
