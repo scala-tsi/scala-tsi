@@ -4,7 +4,7 @@ lazy val root = (project in file("."))
   .enablePlugins(ScalaTsiPlugin)
   .settings(
     Seq(
-      scalaVersion := "2.13.3",
+      scalaVersion := "2.13.5",
       organization := "com.scalatsi",
       scalacOptions ++= compilerOptions,
       typescriptExports := Seq("Foo", "Sealed", "Person", "DeepThought", "ScalaEnum.type", "JavaEnum", "Integer"),
