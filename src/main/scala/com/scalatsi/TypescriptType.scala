@@ -7,8 +7,8 @@ import TypescriptType._
 
 sealed trait TypescriptType {
   def |(tt: TypescriptType): TSUnion = this match {
-    case TSUnion(of) => TSUnion(of :+ tt)
-    case _           => TSUnion.of(this, tt)
+    case TSUnion(of, tagged) => TSUnion(of :+ tt, tagged)
+    case _                   => TSUnion.of(this, tt)
   }
 
   def array: TSArray = TSArray(this)
@@ -139,11 +139,12 @@ object TypescriptType {
   }
 
   case object TSUndefined extends TypescriptType
-  case class TSUnion(of: Seq[TypescriptType]) extends TypescriptAggregateType {
+  case class TSUnion(of: Seq[TypescriptType], tagged: Boolean = false) extends TypescriptAggregateType {
     def nested: Set[TypescriptType] = of.toSet
   }
   object TSUnion {
-    def of(of: TypescriptType*): TSUnion = TSUnion(of)
+    def of(of: TypescriptType*): TSUnion     = TSUnion(of, false)
+    def tagged(of: TypescriptType*): TSUnion = TSUnion(of, true)
   }
   case object TSVoid extends TypescriptType
 

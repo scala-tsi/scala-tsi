@@ -38,7 +38,7 @@ class MacroTests extends AnyFlatSpec with Matchers with DefaultTSTypes {
 
     TSType.fromSealed[FooOrBar] shouldBe TSType.alias(
       "FooOrBar",
-      TSTypeReference("IFoo", Some(foo)) | TSTypeReference("IBar", Some(bar))
+      TSUnion.tagged(TSTypeReference("IFoo", Some(foo)), TSTypeReference("IBar", Some(bar)))
     )
   }
 
@@ -56,7 +56,7 @@ class MacroTests extends AnyFlatSpec with Matchers with DefaultTSTypes {
 
     TSType.fromSealed[FooOrBar] shouldBe TSType.alias(
       "FooOrBar",
-      TSTypeReference("IFoo", Some(tsFoo.get)) | TSTypeReference("IBar", Some(tsBar.get))
+      TSUnion.tagged(TSTypeReference("IFoo", Some(tsFoo.get)), TSTypeReference("IBar", Some(tsBar.get)))
     )
   }
 
@@ -71,7 +71,7 @@ class MacroTests extends AnyFlatSpec with Matchers with DefaultTSTypes {
     tsFoo shouldBe TSType.interface("IFoo", "foo" -> TSString)
     tsBar.get shouldBe TSNumber
 
-    TSType.fromSealed[FooOrBar] shouldBe TSType.alias("FooOrBar", TSTypeReference("IFoo", Some(tsFoo.get)) | TSNumber)
+    TSType.fromSealed[FooOrBar] shouldBe TSType.alias("FooOrBar", TSUnion.tagged(TSTypeReference("IFoo", Some(tsFoo.get)), TSNumber))
   }
 
   it should "handle sealed traits with recursive definitions" in {
@@ -80,9 +80,9 @@ class MacroTests extends AnyFlatSpec with Matchers with DefaultTSTypes {
     case class Node(value: Int, next: LinkedList = Nil) extends LinkedList
 
     @nowarn("cat=unused") implicit val nilType: TSType[Nil.type] = TSType(TSNull)
-    implicit val llType: TSType[Node]                            = TSType.alias("INode", TSNull | TSTypeReference("ILinkedList"))
+    implicit val llType: TSType[Node]                            = TSType.alias("INode", TSUnion.tagged(TSNull, TSTypeReference("ILinkedList")))
 
-    TSType.fromSealed[LinkedList] shouldBe TSType.alias("LinkedList", TSNull | TSTypeReference("INode", Some(llType.get)))
+    TSType.fromSealed[LinkedList] shouldBe TSType.alias("LinkedList", TSUnion.tagged(TSNull, TSTypeReference("INode", Some(llType.get))))
   }
 
   it should "handle sealed traits without subclasses" in {

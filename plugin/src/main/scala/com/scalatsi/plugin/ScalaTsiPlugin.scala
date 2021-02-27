@@ -12,8 +12,9 @@ object ScalaTsiPlugin extends AutoPlugin {
       "Additional imports, i.e. your packages so you don't need to prefix your classes."
     ).withRank(KeyRanks.BSetting)
     val typescriptOutputFile      = settingKey[File]("File where all typescript interfaces will be written to").withRank(KeyRanks.BSetting)
-    val typescriptStyleSemicolons = settingKey[Boolean]("Whether to add booleans to the exported model").withRank(KeyRanks.BMinusSetting)
+    val typescriptStyleSemicolons = settingKey[Boolean]("Whether to add semicolons to the exported model").withRank(KeyRanks.BMinusSetting)
     val typescriptHeader          = settingKey[Option[String]]("Optional header for the output file")
+    val typescriptTaggedUnionDiscriminator = settingKey[Option[String]]("The discriminator field for tagged unions, or None to disable tagged unions").withRank(KeyRanks.BMinusSetting)
 
     // tasks
     val generateTypescript = taskKey[Unit]("Generate typescript for this project").withRank(KeyRanks.ATask)
@@ -45,6 +46,7 @@ object ScalaTsiPlugin extends AutoPlugin {
     typescriptOutputFile := target.value / "scala-tsi.ts",
     typescriptHeader := Some("// DO NOT EDIT: generated file by scala-tsi"),
     typescriptStyleSemicolons := false,
+    typescriptTaggedUnionDiscriminator := Some("type"),
     // Task settings
     generateTypescript := Def.sequential(typescriptRunExporter, typescriptDeleteExporter).value,
     typescriptCreateExporter in Compile := createTypescriptExporter.value,

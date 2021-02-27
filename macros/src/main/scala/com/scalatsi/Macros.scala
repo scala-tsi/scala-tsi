@@ -195,7 +195,7 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
         import TypescriptType.{TSAlias, TSUnion}
         import _root_.com.scalatsi.TSNamedType
         import _root_.scala.collection.immutable.Vector
-        TSNamedType(TSAlias($name, TSUnion(Vector(..$operands))))
+        TSNamedType(TSAlias($name, TSUnion(Vector(..$operands), tagged = true)))
       }"""
     }
   }
