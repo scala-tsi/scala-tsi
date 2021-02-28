@@ -64,6 +64,7 @@ libraryDependencies += "com.scalatsi" %% "scala-tsi" % "<version>"
 | typescriptGenerationImports | Seq[String] | `Seq()` | A list of all imports. This should import all classes you defined above, as well as custom `TSType` implicits |
 | typescriptOutputFile | File | `target/scala-tsi.ts`| The output file with generated typescript interfaces |
 | typescriptStyleSemicolons | Boolean | `false` | Whether to add semicolons to the exported model (experimental) |
+| typescriptHeader | Option[String] | `None` | An optional header for the output file |
 
 ## Example
 
