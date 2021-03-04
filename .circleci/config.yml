@@ -14,13 +14,15 @@ jobs:
 
       - run:
           name: Compile and test for 2.13
-          command:
-            sbt -batch ++2.13.3 compile test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
+          command: |
+            scalav=$(sbt --no-colors --error "print scala213Version" | xargs)
+            sbt -batch ++"$scalav" compile test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
 
       - run:
           name: Compile and test for 2.12
-          command:
-            sbt -batch ++2.12.11 compile test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
+          command: |
+            scalav=$(sbt --no-colors --error "print scala212Version" | xargs)
+            sbt -batch ++"$scalav" compile test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
 
       - save_cache:
           key:  scala-tsi-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
@@ -63,16 +65,16 @@ jobs:
           command: |
             set -x
             if [ -z "$CIRCLE_PR_USERNAME" ]; then
-              # On forked PR, do an unsigned publish
               sbt -batch publishLocalSigned sbt-scala-tsi/publishLocalSigned
             else
+              # On forked PR, do an unsigned publish
               sbt -batch publishLocal sbt-scala-tsi/publishLocal
             fi
 
       - run:
           name: "test and generate example project"
           command: |
-            VERSION=$(cd ../ && sbt --error 'set showSuccess := false' "print version" exit)
+            VERSION=$(cd ../ && sbt --no-colors --error "print version" | xargs)
             sbt -batch -Dplugin.version="$VERSION" test generateTypescript scalafmtSbtCheck scalafmtCheckAll exit
           working_directory: example
 

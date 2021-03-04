@@ -1,3 +1,5 @@
+// DO NOT EDIT: generated file by scala-tsi
+
 export interface IBar {
   value: string
 }

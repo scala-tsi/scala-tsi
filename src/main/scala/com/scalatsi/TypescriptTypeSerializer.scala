@@ -52,7 +52,7 @@ object TypescriptTypeSerializer {
       .mkString("", "\n\n", "\n")
 
   private object TSInterfaceEntry {
-    def unapply(typescriptType: TypescriptType): Option[(TypescriptType, Boolean)] =
+    def unapply(typescriptType: TypescriptType): Some[(TypescriptType, Boolean)] =
       typescriptType match {
         case TSUnion(members) if members.contains(TSUndefined) =>
           Some((TSUnion(members.filter(_ != TSUndefined)), false))

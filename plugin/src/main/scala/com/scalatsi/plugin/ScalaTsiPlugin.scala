@@ -13,6 +13,7 @@ object ScalaTsiPlugin extends AutoPlugin {
     ).withRank(KeyRanks.BSetting)
     val typescriptOutputFile      = settingKey[File]("File where all typescript interfaces will be written to").withRank(KeyRanks.BSetting)
     val typescriptStyleSemicolons = settingKey[Boolean]("Whether to add booleans to the exported model").withRank(KeyRanks.BMinusSetting)
+    val typescriptHeader          = settingKey[Option[String]]("Optional header for the output file")
 
     // tasks
     val generateTypescript = taskKey[Unit]("Generate typescript for this project").withRank(KeyRanks.ATask)
@@ -42,6 +43,7 @@ object ScalaTsiPlugin extends AutoPlugin {
     typescriptExports := Seq(),
     typescriptClassesToGenerateFor := Seq(),
     typescriptOutputFile := target.value / "scala-tsi.ts",
+    typescriptHeader := Some("// DO NOT EDIT: generated file by scala-tsi"),
     typescriptStyleSemicolons := false,
     // Task settings
     generateTypescript := Def.sequential(typescriptRunExporter, typescriptDeleteExporter).value,
@@ -67,7 +69,8 @@ object ScalaTsiPlugin extends AutoPlugin {
         typescriptGenerationImports.value,
         typesToGenerate,
         typescriptOutputFile.value.getAbsolutePath,
-        typescriptStyleSemicolons.value
+        typescriptStyleSemicolons.value,
+        typescriptHeader.value.getOrElse("")
       )
       .body
       .stripMargin
