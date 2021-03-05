@@ -129,6 +129,20 @@ object TSType extends DefaultTSTypes {
     valueType: TypescriptType
   ): TSNamedType[T] =
     TSNamedType(TSInterfaceIndexed(name, indexName, indexType, valueType))
+
+  /** Create a tagged primitive type */
+  def taggedPrimitive[@@[_, _], P, T]: TSNamedType[@@[P, T]] = {
+    val primitive = getTypeName[P] match {
+      case "String" => TSString
+      case "Int" | "Float" | "Long" | "Double" => TSNumber
+      case t => throw new RuntimeException(s"Cannot handle primitive type $t")
+    }
+    val tName = getTypeName[T]
+    assert(tName.takeRight(3) == "Tag", s"The tag name $tName violates the naming convention.")
+    TSNamedType(TSAlias(tName.dropRight(3), TSTaggedPrimitive(tName.dropRight(3), primitive)))
+  }
+
+  private def getTypeName[T]: String = macro Macros.getTypeName[T]
 }
 
 @implicitNotFound(

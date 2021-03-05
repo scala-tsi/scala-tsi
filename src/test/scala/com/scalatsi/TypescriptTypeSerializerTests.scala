@@ -273,4 +273,18 @@ class TypescriptTypeSerializerTests extends AnyFlatSpec with Matchers {
     output.trim should equal(expected)
   }
 
+  it should "handle tagged primitives" in {
+    trait Tagged[U]
+    type @@[T, U] = T with Tagged[U]
+    sealed trait NameTag
+    @nowarn type Name = String @@ NameTag
+
+    val tsName = TSType.taggedPrimitive[@@, String, NameTag]
+    val output = TypescriptTypeSerializer.emit()(tsName)
+
+    val expected = """export type Name = string & { __tag: "Name" }"""
+
+    output should equal(expected)
+  }
+
 }

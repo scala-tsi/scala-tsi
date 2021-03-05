@@ -31,6 +31,7 @@ object TypescriptTypeSerializer {
       case TSLiteralBoolean(v)    => v.toString()
       case TSLiteralNumber(v)     => v.toString()
       case TSLiteralString(v)     => s""""${v.replace("\"", "\"\"")}""""
+      case TSTaggedPrimitive(tag, underlying) => s"${serialize(underlying)} & { __tag: '$tag'}}"
     }
   }
 

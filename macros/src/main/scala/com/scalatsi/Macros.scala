@@ -28,6 +28,11 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
     prefix.getOrElse("") + symbol.name.toString
   }
 
+  def getTypeName[T: c.WeakTypeTag]: Tree = {
+    val name = c.weakTypeOf[T].typeSymbol.name.toString
+    q"$name"
+  }
+
   private val macroUtil = new MacroUtil[c.type](c)
   import macroUtil._
 
