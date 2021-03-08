@@ -24,9 +24,9 @@ object TypescriptTypeSerializer {
       case TSTuple(members)       => s"[${members.map(serialize) mkString ", "}]"
       case TSString               => "string"
       case TSUndefined            => "undefined"
-      case TSUnion(Seq(), _)      => serialize(TSNever)
-      case TSUnion(Seq(e), _)     => serialize(e)
-      case TSUnion(of, _)         => s"(${of.map(serialize) mkString " | "})"
+      case TSUnion(Seq())         => serialize(TSNever)
+      case TSUnion(Seq(e))        => serialize(e)
+      case TSUnion(of)            => s"(${of.map(serialize) mkString " | "})"
       case TSVoid                 => "void"
       case TSLiteralBoolean(v)    => v.toString()
       case TSLiteralNumber(v)     => v.toString()
@@ -54,8 +54,8 @@ object TypescriptTypeSerializer {
   private object TSInterfaceEntry {
     def unapply(typescriptType: TypescriptType): Some[(TypescriptType, Boolean)] =
       typescriptType match {
-        case TSUnion(members, tagged) if members.contains(TSUndefined) =>
-          Some((TSUnion(members.filter(_ != TSUndefined), tagged), false))
+        case TSUnion(members) if members.contains(TSUndefined) =>
+          Some((TSUnion(members.filter(_ != TSUndefined)), false))
         case other => Some((other, true))
       }
   }
@@ -104,15 +104,15 @@ object TypescriptTypeSerializer {
       case union: TSUnion =>
         union.nested
           .map {
-            case TSTypeReference(ref, Some(TSInterface(name, members))) =>
+            case TSTypeReference(ref, Some(TSInterface(name, members)), Some(discriminatorValue)) =>
               TSTypeReference(
                 ref,
                 Some(
                   TSInterface(
                     name,
                     options.taggedUnionDiscriminator match {
-                      case Some(discriminator) =>
-                        members.+((discriminator, TSLiteralString(name.drop(1)))) // Drop 1 to get rid of the "I" to get the case class name
+                      case Some(discriminatorField) =>
+                        members.+((discriminatorField, TSLiteralString(discriminatorValue)))
                       case None => members
                     }
                   )

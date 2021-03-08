@@ -241,9 +241,9 @@ class TypescriptTypeSerializerTests extends AnyFlatSpec with Matchers with Defau
     val taggedUnion =
       TSType.alias(
         "Un",
-        TSUnion.tagged(
-          TSTypeReference("IA", Some(TSInterface("IA", ListMap(("s", TSString))))),
-          TSTypeReference("IB", Some(TSInterface("IB", ListMap(("s", TSString)))))
+        TSUnion.of(
+          TSTypeReference("IA", Some(TSInterface("IA", ListMap(("s", TSString)))), Some("A")),
+          TSTypeReference("IB", Some(TSInterface("IB", ListMap(("s", TSString)))), Some("B"))
         )
       )
 

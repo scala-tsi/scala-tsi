@@ -187,7 +187,7 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
         }"""
       case children =>
         val operands = children map { symbol =>
-          q"TypescriptType.nameOrType(${getTSType(symbol.asType.toType)}.get)"
+          q"TypescriptType.nameOrType(${getTSType(symbol.asType.toType)}.get, discriminator = Some(${symbol.name.toString}))"
         }
 
         q"""{
@@ -195,7 +195,7 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
         import TypescriptType.{TSAlias, TSUnion}
         import _root_.com.scalatsi.TSNamedType
         import _root_.scala.collection.immutable.Vector
-        TSNamedType(TSAlias($name, TSUnion(Vector(..$operands), tagged = true)))
+        TSNamedType(TSAlias($name, TSUnion(Vector(..$operands))))
       }"""
     }
   }

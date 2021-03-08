@@ -7,8 +7,8 @@ import TypescriptType._
 
 sealed trait TypescriptType {
   def |(tt: TypescriptType): TSUnion = this match {
-    case TSUnion(of, tagged) => TSUnion(of :+ tt, tagged)
-    case _                   => TSUnion.of(this, tt)
+    case TSUnion(of) => TSUnion(of :+ tt)
+    case _           => TSUnion.of(this, tt)
   }
 
   def array: TSArray = TSArray(this)
@@ -30,8 +30,8 @@ object TypescriptType {
     }
 
   /** Get a reference to a named type, or the type itself if it is unnamed or built-in */
-  def nameOrType(tpe: TypescriptType): TypescriptType = tpe match {
-    case named: TypescriptNamedType => named.asReference
+  def nameOrType(tpe: TypescriptType, discriminator: Option[String] = None): TypescriptType = tpe match {
+    case named: TypescriptNamedType => named.asReference(discriminator)
     case anonymous                  => anonymous
   }
 
@@ -40,7 +40,7 @@ object TypescriptType {
     def name: String
     require(isValidTSName(name), s"Not a valid TypeScript identifier: $name")
 
-    def asReference: TSTypeReference = TSTypeReference(name, Some(this))
+    def asReference(discriminator: Option[String] = None): TSTypeReference = TSTypeReference(name, Some(this), discriminator)
 
     def withName(newName: String): TypescriptNamedType
   }
@@ -83,11 +83,14 @@ object TypescriptType {
     * Not a real Typescript type
     * @note name takes from [Typescript specification](https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#3.8.2)
     * @param impl The implementation of the type if it is known, so that the nested types can be outputted even if not directly referenced
+    * @param discriminator the discrimininator value for the type if this type is part of a discriminated union
     */
-  case class TSTypeReference(name: String, impl: Option[TypescriptType] = None) extends TypescriptNamedType with TypescriptAggregateType {
-    override def asReference: TSTypeReference               = this
-    override def nested: Set[TypescriptType]                = impl.toSet
-    override def withName(newName: String): TSTypeReference = copy(name = newName)
+  case class TSTypeReference(name: String, impl: Option[TypescriptType] = None, discriminator: Option[String] = None)
+    extends TypescriptNamedType
+    with TypescriptAggregateType {
+    override def asReference(discriminator: Option[String] = None): TSTypeReference = this
+    override def nested: Set[TypescriptType]                                        = impl.toSet
+    override def withName(newName: String): TSTypeReference                         = copy(name = newName)
   }
   @deprecated("0.2.0", "Renamed to TSTypeReference")
   type TSExternalName = TSTypeReference
@@ -139,12 +142,11 @@ object TypescriptType {
   }
 
   case object TSUndefined extends TypescriptType
-  case class TSUnion(of: Seq[TypescriptType], tagged: Boolean = false) extends TypescriptAggregateType {
+  case class TSUnion(of: Seq[TypescriptType]) extends TypescriptAggregateType {
     def nested: Set[TypescriptType] = of.toSet
   }
   object TSUnion {
-    def of(of: TypescriptType*): TSUnion     = TSUnion(of, false)
-    def tagged(of: TypescriptType*): TSUnion = TSUnion(of, true)
+    def of(of: TypescriptType*): TSUnion = TSUnion(of)
   }
   case object TSVoid extends TypescriptType
 
