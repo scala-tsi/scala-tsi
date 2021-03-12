@@ -1,4 +1,4 @@
-@(imports: Seq[String], classes: Seq[String], targetFile: String, useSemicolons: Boolean, header: String)
+@(imports: Seq[String], classes: Seq[String], targetFile: String, useSemicolons: Boolean, header: String, taggedUnionDiscriminator: String)
 
 package com.scalatsi.generator
 
@@ -22,7 +22,8 @@ object ExportTypescript extends DefaultTSTypes {
   val options = ts.output.OutputOptions(
     targetFile = new _root_.java.io.File("""@targetFile"""), // Warning: always use literal string here for windows paths with \
     styleOptions = ts.output.StyleOptions(
-      semicolons = @useSemicolons
+      semicolons = @useSemicolons,
+      taggedUnionDiscriminator = if("""@taggedUnionDiscriminator""" == "") None else Some("""@taggedUnionDiscriminator""")
     ),
     header = if("""@header""" == "") None else Some("""@header""")
   )

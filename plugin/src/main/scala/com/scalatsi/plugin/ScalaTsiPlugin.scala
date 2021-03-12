@@ -68,11 +68,12 @@ object ScalaTsiPlugin extends AutoPlugin {
 
     val toWrite: String = txt
       .ExportTypescriptTemplate(
-        typescriptGenerationImports.value,
-        typesToGenerate,
-        typescriptOutputFile.value.getAbsolutePath,
-        typescriptStyleSemicolons.value,
-        typescriptHeader.value.getOrElse("")
+        imports = typescriptGenerationImports.value,
+        classes = typesToGenerate,
+        targetFile = typescriptOutputFile.value.getAbsolutePath,
+        useSemicolons = typescriptStyleSemicolons.value,
+        header = typescriptHeader.value.getOrElse(""),
+        taggedUnionDiscriminator = typescriptTaggedUnionDiscriminator.value.getOrElse("")
       )
       .body
       .stripMargin

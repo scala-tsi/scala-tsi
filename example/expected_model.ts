@@ -36,12 +36,12 @@ export interface IPerson {
 
 export interface ISealedOption1 {
   foo: string
-  type: "SealedOption1"
+  kind: "SealedOption1"
 }
 
 export interface ISealedOption2 {
   bar: number
-  type: "SealedOption2"
+  kind: "SealedOption2"
 }
 
 export type JavaEnum = ("OPTION1" | "OPTION2" | "OPTION3" | "OPTION4")
