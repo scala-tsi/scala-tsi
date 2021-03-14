@@ -24,7 +24,7 @@ trait TSType[T] { self =>
   def |(other: TSType[_]): TSUnion      = this | other.get
 }
 
-object TSType {
+object TSType extends DefaultTSTypes {
   private class TSTypeImpl[T](override val get: TypescriptType) extends TSType[T]
   def apply[T](tt: TypescriptType): TSType[T] = new TSTypeImpl(tt)
 
@@ -141,7 +141,7 @@ trait TSNamedType[T] extends TSType[T] { self =>
   def withName(newName: String): TSNamedType[T] = TSNamedType(get.withName(newName))
 }
 
-object TSNamedType {
+object TSNamedType extends DefaultTSTypes {
   private class TSNamedTypeImpl[T](override val get: TypescriptNamedType) extends TSNamedType[T]
   def apply[T](tt: TypescriptNamedType): TSNamedType[T] =
     new TSNamedTypeImpl(tt)
