@@ -5,7 +5,7 @@ import java.io.File
 case class OutputOptions(
   targetFile: File,
   styleOptions: StyleOptions = StyleOptions(),
-  header: Option[String]
+  header: Option[String] = None
 )
 
 case class StyleOptions(

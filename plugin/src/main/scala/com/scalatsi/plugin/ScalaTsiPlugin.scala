@@ -14,7 +14,8 @@ object ScalaTsiPlugin extends AutoPlugin {
     val typescriptOutputFile      = settingKey[File]("File where all typescript interfaces will be written to").withRank(KeyRanks.BSetting)
     val typescriptStyleSemicolons = settingKey[Boolean]("Whether to add semicolons to the exported model").withRank(KeyRanks.BMinusSetting)
     val typescriptHeader          = settingKey[Option[String]]("Optional header for the output file")
-    val typescriptTaggedUnionDiscriminator = settingKey[Option[String]]("The discriminator field for tagged unions, or None to disable tagged unions").withRank(KeyRanks.BMinusSetting)
+    val typescriptTaggedUnionDiscriminator =
+      settingKey[Option[String]]("The discriminator field for tagged unions, or None to disable tagged unions").withRank(KeyRanks.BSetting)
 
     // tasks
     val generateTypescript = taskKey[Unit]("Generate typescript for this project").withRank(KeyRanks.ATask)
@@ -73,7 +74,7 @@ object ScalaTsiPlugin extends AutoPlugin {
         targetFile = typescriptOutputFile.value.getAbsolutePath,
         useSemicolons = typescriptStyleSemicolons.value,
         header = typescriptHeader.value.getOrElse(""),
-        taggedUnionDiscriminator = typescriptTaggedUnionDiscriminator.value.getOrElse("")
+        taggedUnionDiscriminator = typescriptTaggedUnionDiscriminator.value
       )
       .body
       .stripMargin
