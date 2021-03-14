@@ -34,8 +34,8 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
   private def circularRefError(T: c.Type, which: String): Unit = c.error(
     c.enclosingPosition,
     s"""
-       |Circular reference encountered while searching for $which[$T]
-       |Please break the cycle by locally defining an implicit TSType like so:
+       |Circular reference or very deep nesting encountered while searching for $which[$T]
+       |Please break the cycle or lower the nesting by locally defining an implicit TSType like so:
        |implicit val tsType...: $which[...] = {
        |  implicit val tsA: $which[$T] = TSType.external("I$T") // name of your "$T" typescript type here
        |  $which.getOrGenerate[...]
