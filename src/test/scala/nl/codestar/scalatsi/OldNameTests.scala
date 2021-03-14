@@ -2,11 +2,9 @@ package nl.codestar.scalatsi
 
 import com.scalatsi.convertToStringHasWrapperForVerb
 
-import scala.annotation.nowarn
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-@nowarn("cat=deprecation")
 class OldNameTests extends AnyWordSpec with Matchers {
   "Old names should still compile" forWord {
     "String" in { "implicitly[TSType[String]]" should compile }
