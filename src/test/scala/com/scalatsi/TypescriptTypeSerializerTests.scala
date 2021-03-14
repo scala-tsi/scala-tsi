@@ -10,7 +10,7 @@ import org.scalatest.matchers.should.Matchers
 
 import scala.collection.immutable.ListMap
 
-class TypescriptTypeSerializerTests extends AnyFlatSpec with Matchers with DefaultTSTypes {
+class TypescriptTypeSerializerTests extends AnyFlatSpec with Matchers {
 
   "The Typescript serializer" should "serialize to a simple interface" in {
     case class Person(name: String, age: Int)

@@ -6,7 +6,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.verbs.StringVerbBlockRegistration
 import org.scalatest.wordspec.AnyWordSpec
 
-class LiteralTypeTests extends AnyWordSpec with Matchers with DefaultTSTypes {
+class LiteralTypeTests extends AnyWordSpec with Matchers {
 
   "Default TS Types should be defined" forWord {
     "literal booleans" in {

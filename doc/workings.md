@@ -40,7 +40,6 @@ scala-tsi also defines a small DSL which you can use to construct custom definit
 ```scala
 import com.scalatsi._
 import com.scalatsi.dsl._
-import DefaultTSTypes._
 
 // Includes implicit conversion from literal values to literal typescript types
 val literal42: TypescriptType = 42

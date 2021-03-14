@@ -7,7 +7,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 @nowarn("cat=deprecation")
-class OldNameTests extends AnyWordSpec with Matchers with DefaultTSTypes {
+class OldNameTests extends AnyWordSpec with Matchers {
   "Old names should still compile" forWord {
     "String" in { "implicitly[TSType[String]]" should compile }
     "dsl" in {
