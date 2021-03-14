@@ -9,7 +9,8 @@ case class OutputOptions(
 )
 
 case class StyleOptions(
-  semicolons: Boolean = false
+  semicolons: Boolean = false,
+  taggedUnionDiscriminator: Option[String] = Some("type")
 ) {
   private[scalatsi] val sc: String = if (semicolons) ";" else ""
 }

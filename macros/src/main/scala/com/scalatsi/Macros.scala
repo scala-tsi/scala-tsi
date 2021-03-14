@@ -187,7 +187,7 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
         }"""
       case children =>
         val operands = children map { symbol =>
-          q"TypescriptType.nameOrType(${getTSType(symbol.asType.toType)}.get)"
+          q"TypescriptType.nameOrType(${getTSType(symbol.asType.toType)}.get, discriminator = Some(${symbol.name.toString}))"
         }
 
         q"""{

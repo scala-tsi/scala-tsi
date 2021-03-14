@@ -58,7 +58,7 @@ object TSType {
     * wil produce
     *
     * `type AorB = A | B`
-    * @see [Typescript docs on Discrimintated Unions](https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions)
+    * @see [Typescript docs on Discriminated Unions](https://www.typescriptlang.org/docs/handbook/unions-and-intersections.html#discriminating-unions)
     */
   def fromSealed[T]: TSNamedType[T] = macro Macros.generateUnionFromSealedTrait[T]
 

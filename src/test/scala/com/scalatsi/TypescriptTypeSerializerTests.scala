@@ -8,6 +8,8 @@ import scala.annotation.nowarn
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
+import scala.collection.immutable.ListMap
+
 class TypescriptTypeSerializerTests extends AnyFlatSpec with Matchers with DefaultTSTypes {
 
   "The Typescript serializer" should "serialize to a simple interface" in {
@@ -233,6 +235,33 @@ class TypescriptTypeSerializerTests extends AnyFlatSpec with Matchers with Defau
 
     TypescriptTypeSerializer.emit()(x).trim should equal(expected)
     TypescriptTypeSerializer.emit()(y).trim should equal(expected)
+  }
+
+  it should "serialize tagged unions correctly" in {
+    val taggedUnion =
+      TSType.alias(
+        "Un",
+        TSUnion.of(
+          TSTypeReference("IA", Some(TSInterface("IA", ListMap(("s", TSString)))), Some("A")),
+          TSTypeReference("IB", Some(TSInterface("IB", ListMap(("s", TSString)))), Some("B"))
+        )
+      )
+
+    val output = TypescriptTypeSerializer.emit(StyleOptions(taggedUnionDiscriminator = Some("kind")))(taggedUnion)
+
+    val expected =
+      """|export interface IA {
+         |  s: string
+         |  kind: "A"
+         |}
+         |
+         |export interface IB {
+         |  s: string
+         |  kind: "B"
+         |}
+         |
+         |export type Un = (IA | IB)""".stripMargin
+    output.trim should equal(expected)
   }
 
 }
