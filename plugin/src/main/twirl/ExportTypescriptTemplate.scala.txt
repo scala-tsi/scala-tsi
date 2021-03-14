@@ -9,7 +9,7 @@ import _root_.com.scalatsi.TypescriptType._
 @for(imp <- imports) {
 import @imp }
 
-object ExportTypescript extends DefaultTSTypes {
+object ExportTypescript {
   import _root_.com.{ scalatsi => ts }
   import _root_.scala.collection.{ immutable => im }
 

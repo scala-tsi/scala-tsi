@@ -1,7 +1,6 @@
 package models
 
 import com.scalatsi._
-import com.scalatsi.DefaultTSTypes._
 import com.scalatsi.dsl._
 
 /** ***********************************

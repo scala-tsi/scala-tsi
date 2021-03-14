@@ -5,7 +5,7 @@ import com.scalatsi.types.JavaEnum
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-class EnumTests extends AnyWordSpec with Matchers with DefaultTSTypes {
+class EnumTests extends AnyWordSpec with Matchers {
 
   "Scala enumerations" should {
     "have typescript representation" in {
