@@ -30,14 +30,13 @@ private[scalatsi] class MacroUtil[C <: blackbox.Context](val c: C) {
     c.universe.appliedType(typeConstructor, c.weakTypeOf[T])
   }
 
-  /**
-    * HACK: Check if we are too deep in the stack to continue
+  /** HACK: Check if we are too deep in the stack to continue
     * Circular references cause an infinite loop while searching for implicits in combination with default values
     * Multiple approaches have been tried, but no "proper" solution worked
-    * Instead, we abort when the stack trace is larger than 512 entries
+    * Instead, we abort when the stack trace is larger than 1024 entries
     * This is large enough that the nesting must be ridiculously deep before aborting (and at that point the user should define some helper implicits)
     * while not crashing with the default stack size
     */
   private def isDeepStack: Boolean =
-    Thread.currentThread().getStackTrace.length >= 512
+    Thread.currentThread().getStackTrace.length >= 1024
 }
