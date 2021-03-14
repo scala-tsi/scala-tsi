@@ -1,4 +1,4 @@
-## 0.5.0 - ???
+## 0.5.0 - 2021-03-14
 
 * Sealed traits will now add a field with the class name to the output, defaulting to `type: "ClassName"`. (#140 by @vincentdehaan)
      This behavior can be disabled with the `typescriptTaggedUnionDiscriminator` SBT setting
