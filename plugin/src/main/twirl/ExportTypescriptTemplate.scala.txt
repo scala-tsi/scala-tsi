@@ -23,7 +23,10 @@ object ExportTypescript extends DefaultTSTypes {
     targetFile = new _root_.java.io.File("""@targetFile"""), // Warning: always use literal string here for windows paths with \
     styleOptions = ts.output.StyleOptions(
       semicolons = @useSemicolons,
-      taggedUnionDiscriminator = @taggedUnionDiscriminator.map(s => Some("""@s""").getOrElse("None")
+      taggedUnionDiscriminator = @taggedUnionDiscriminator match {
+        case Some(s) => { Some("""@s""") }
+        case None => { None }
+      }
     ),
     header = if("""@header""" == "") None else Some("""@header""")
   )
