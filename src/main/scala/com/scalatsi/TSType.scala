@@ -123,10 +123,10 @@ object TSType extends DefaultTSTypes {
     * @example interfaceIndexed[Foo]("IFooLookup", "key", TSString, TSInt) will output "interface IFooLookup { [key: string] : Int }"
     */
   def interfaceIndexed[T](
-    name: String,
-    indexName: String = "key",
-    indexType: TypescriptType = TSString,
-    valueType: TypescriptType
+      name: String,
+      indexName: String = "key",
+      indexType: TypescriptType = TSString,
+      valueType: TypescriptType
   ): TSNamedType[T] =
     TSNamedType(TSInterfaceIndexed(name, indexName, indexType, valueType))
 }

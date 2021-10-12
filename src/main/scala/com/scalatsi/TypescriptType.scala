@@ -73,8 +73,8 @@ object TypescriptType {
   case class TSLiteralBoolean(value: Boolean)   extends TSLiteralType[Boolean]
 
   case class TSEnum(name: String, const: Boolean, entries: ListMap[String, Option[Int]])
-    extends TypescriptNamedType
-    with TypescriptAggregateType {
+      extends TypescriptNamedType
+      with TypescriptAggregateType {
     def nested: Set[TypescriptType]                = Set(TSNumber)
     override def withName(newName: String): TSEnum = copy(name = newName)
   }
@@ -86,8 +86,8 @@ object TypescriptType {
     * @param discriminator the discrimininator value for the type if this type is part of a discriminated union
     */
   case class TSTypeReference(name: String, impl: Option[TypescriptType] = None, discriminator: Option[String] = None)
-    extends TypescriptNamedType
-    with TypescriptAggregateType {
+      extends TypescriptNamedType
+      with TypescriptAggregateType {
     override def asReference(discriminator: Option[String] = None): TSTypeReference = this
     override def nested: Set[TypescriptType]                                        = impl.toSet
     override def withName(newName: String): TSTypeReference                         = copy(name = newName)
@@ -100,7 +100,7 @@ object TypescriptType {
     * @param indexType index type, TSNumber or TSString
     */
   case class TSIndexedInterface(indexName: String = "key", indexType: TypescriptType, valueType: TypescriptType)
-    extends TypescriptAggregateType {
+      extends TypescriptAggregateType {
     require(
       indexType == TSString || indexType == TSNumber,
       s"TypeScript indexed interface can only have index type string or number, not $indexType"
@@ -108,8 +108,8 @@ object TypescriptType {
     def nested: Set[TypescriptType] = Set(indexType, valueType)
   }
   case class TSInterfaceIndexed(name: String, indexName: String = "key", indexType: TypescriptType, valueType: TypescriptType)
-    extends TypescriptNamedType
-    with TypescriptAggregateType {
+      extends TypescriptNamedType
+      with TypescriptAggregateType {
     require(
       indexType == TSString || indexType == TSNumber,
       s"TypeScript indexed interface $name can only have index type string or number, not $indexType"
