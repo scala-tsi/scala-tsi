@@ -106,16 +106,16 @@ class TypescriptTypeSerializerTests extends AnyFlatSpec with Matchers {
 
   it should "be able to handle all primitive types" in {
     case class PrimitiveTypes(
-      char: Char,
-      string: String,
-      byte: Byte,
-      short: Short,
-      int: Int,
-      long: Long,
-      float: Float,
-      double: Double,
-      boolean: Boolean,
-      stringSeq: Seq[String]
+        char: Char,
+        string: String,
+        byte: Byte,
+        short: Short,
+        int: Int,
+        long: Long,
+        float: Float,
+        double: Double,
+        boolean: Boolean,
+        stringSeq: Seq[String]
     )
 
     implicit val primitiveTypesTSType: TSIType[PrimitiveTypes] =
@@ -140,7 +140,7 @@ class TypescriptTypeSerializerTests extends AnyFlatSpec with Matchers {
 
   it should "serialize an indexed interface" in {
     case class Something(
-      values: Map[String, String] = Map("a" -> "b")
+        values: Map[String, String] = Map("a" -> "b")
     )
 
     implicit val somethingTSType: TSIType[Something] = TSType.fromCaseClass
@@ -167,7 +167,7 @@ class TypescriptTypeSerializerTests extends AnyFlatSpec with Matchers {
 
   it should "serialize a named indexed interface" in {
     case class Something(
-      values: Map[String, String] = Map("a" -> "b")
+        values: Map[String, String] = Map("a" -> "b")
     )
 
     implicit val somethingTSType: TSNamedType[Something] =
