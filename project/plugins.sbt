@@ -1,8 +1,8 @@
 // code formatting
-addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.2")
+addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.3")
 
 // Templating engine for the generator application
-addSbtPlugin("com.typesafe.sbt" % "sbt-twirl" % "1.5.0")
+addSbtPlugin("com.typesafe.sbt" % "sbt-twirl" % "1.5.1")
 
 // To enable publishing to maven central
 addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "2.6")
