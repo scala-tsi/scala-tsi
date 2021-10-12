@@ -29,9 +29,9 @@ class LiteralTypeTests extends AnyWordSpec with Matchers {
   "Literal numbers" should {
     "work in other types" in {
       case class Literal(
-        a: "Hello!",
-        b: 42,
-        c: true
+          a: "Hello!",
+          b: 42,
+          c: true
       )
 
       implicit val tsType = TSType.fromCaseClass[Literal]
