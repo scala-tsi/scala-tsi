@@ -108,6 +108,7 @@ class TypescriptTypeSerializerTests extends AnyFlatSpec with Matchers {
     case class PrimitiveTypes(
         char: Char,
         string: String,
+        nill: Null,
         byte: Byte,
         short: Short,
         int: Int,
@@ -126,6 +127,7 @@ class TypescriptTypeSerializerTests extends AnyFlatSpec with Matchers {
     typescript should equal("""export interface IPrimitiveTypes {
                               |  char: number
                               |  string: string
+                              |  nill: null
                               |  byte: number
                               |  short: number
                               |  int: number
