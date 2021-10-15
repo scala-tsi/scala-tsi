@@ -2,6 +2,7 @@ package com.scalatsi
 
 import TypescriptType._
 
+import scala.annotation.nowarn
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe.TypeTag
 
@@ -82,9 +83,8 @@ trait JavaTSTypes {
   implicit val javaUrlTSType: TSType[java.net.URL]    = TSType(TSString)
   implicit val javaUuidTSType: TSType[java.util.UUID] = TSType(TSString)
 
-  implicit def javaEnumTSType[E <: java.lang.Enum[E]: ClassTag]: TSNamedType[E] = {
-
-    val cls = implicitly[ClassTag[E]].runtimeClass
+  implicit def javaEnumTSType[E <: java.lang.Enum[E]](implicit ct: ClassTag[E], @nowarn("cat=unused-params") ev: E Neq Null): TSNamedType[E] = {
+    val cls = ct.runtimeClass
     val values = Option(cls.getEnumConstants)
       .getOrElse(throw new IllegalStateException(s"Expected ${cls.getCanonicalName} to be a java.lang.Enum, it was not"))
       .asInstanceOf[Array[E]]
