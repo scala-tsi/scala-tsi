@@ -55,8 +55,8 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
   }
 
   def getImplicitInterfaceMappingOrGenerateDefault[T, TSType[_]](implicit
-    tt: c.WeakTypeTag[T],
-    tsTypeTag: c.WeakTypeTag[TSType[_]]
+      tt: c.WeakTypeTag[T],
+      tsTypeTag: c.WeakTypeTag[TSType[_]]
   ): Tree = {
     lookupOptionalImplicit(properType[T, TSType]) match {
       case Right(Some(value)) => value

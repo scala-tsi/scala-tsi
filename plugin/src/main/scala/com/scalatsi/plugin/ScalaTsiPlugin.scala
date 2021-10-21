@@ -41,18 +41,18 @@ object ScalaTsiPlugin extends AutoPlugin {
   lazy val baseScalaTsiSettings: Seq[Def.Setting[_]] = Seq(
     // User settings
     libraryDependencies += "com.scalatsi" %% "scala-tsi" % scala_ts_compiler_version,
-    typescriptGenerationImports := Seq(),
-    typescriptExports := Seq(),
-    typescriptClassesToGenerateFor := Seq(),
-    typescriptOutputFile := target.value / "scala-tsi.ts",
-    typescriptHeader := Some("// DO NOT EDIT: generated file by scala-tsi"),
-    typescriptStyleSemicolons := false,
-    typescriptTaggedUnionDiscriminator := Some("type"),
+    typescriptGenerationImports           := Seq(),
+    typescriptExports                     := Seq(),
+    typescriptClassesToGenerateFor        := Seq(),
+    typescriptOutputFile                  := target.value / "scala-tsi.ts",
+    typescriptHeader                      := Some("// DO NOT EDIT: generated file by scala-tsi"),
+    typescriptStyleSemicolons             := false,
+    typescriptTaggedUnionDiscriminator    := Some("type"),
     // Task settings
-    generateTypescript := Def.sequential(typescriptRunExporter, typescriptDeleteExporter).value,
+    generateTypescript                  := Def.sequential(typescriptRunExporter, typescriptDeleteExporter).value,
     typescriptCreateExporter in Compile := createTypescriptExporter.value,
-    typescriptRunExporter := runTypescriptExporter.value,
-    typescriptDeleteExporter := deleteTypescriptExporter.value,
+    typescriptRunExporter               := runTypescriptExporter.value,
+    typescriptDeleteExporter            := deleteTypescriptExporter.value,
     // Instruct SBT
     sourceGenerators in Compile += (typescriptCreateExporter in Compile),
     cleanFiles += typescriptOutputFile.value
@@ -60,7 +60,7 @@ object ScalaTsiPlugin extends AutoPlugin {
 
   override lazy val projectSettings: Seq[Def.Setting[_]] = baseScalaTsiSettings
 
-  private lazy val targetFile               = Def.setting { sourceManaged.value / "com" / "scalatsi" / "generator" / "ExportTypescript.scala" }
+  private lazy val targetFile = Def.setting { sourceManaged.value / "com" / "scalatsi" / "generator" / "ExportTypescript.scala" }
   private lazy val deleteTypescriptExporter = Def.task(IO.delete(targetFile.value))
 
   private lazy val createTypescriptExporter = Def.task {
