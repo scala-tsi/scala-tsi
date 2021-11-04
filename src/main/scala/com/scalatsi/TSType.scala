@@ -155,6 +155,11 @@ object TSNamedType extends DefaultTSTypes {
     */
   def getOrGenerate[T]: TSNamedType[T] = macro Macros.getImplicitMappingOrGenerateDefault[T, TSNamedType]
 
+  /** Uses the typescript type of Target whenever we're looking for the typescript type of Source
+    * This will not generate a `type Source = Target` line like alias
+    */
+  def sameAs[Source, Target](implicit tsType: TSNamedType[Target]): TSNamedType[Source] = TSNamedType(tsType.get)
+
   implicit def ordering[T]: Ordering[TSNamedType[T]] = Ordering.by[TSNamedType[T], TypescriptNamedType](_.get)
 }
 
@@ -179,4 +184,9 @@ object TSIType {
     * @see [[TSType.getOrGenerate]]
     */
   def getOrGenerate[T]: TSIType[T] = macro Macros.getImplicitInterfaceMappingOrGenerateDefault[T, TSIType]
+
+  /** Uses the typescript type of Target whenever we're looking for the typescript type of Source
+    * This will not generate a `type Source = Target` line like alias
+    */
+  def sameAs[Source, Target](implicit tsType: TSIType[Target]): TSIType[Source] = TSIType(tsType.get)
 }
