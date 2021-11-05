@@ -67,6 +67,7 @@ class DefaultTSTypeTests extends AnyWordSpec with Matchers {
       "implicitly[TSType[IndexedSeq[Int]]]" should compile
       "implicitly[TSType[List[Int]]]" should compile
       "implicitly[TSType[Vector[Int]]]" should compile
+      "implicitly[TSType[Seq[Seq[Int]]]]" should compile
     }
 
     "Set[_]" in {

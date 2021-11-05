@@ -6,8 +6,24 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
   import c.universe._
 
   /** Tree to use to get a TSType[T] */
-  private def getTSType(T: Type): Tree =
-    q"""_root_.com.scalatsi.TSType.getOrGenerate[$T]"""
+  private def getTSType(T: Type): Tree = {
+
+    T.typeArgs match {
+      case Seq() => q"""_root_.com.scalatsi.TSType.getOrGenerate[$T]"""
+      case targs =>
+        // We need to explicitly create separate implicit for the type parameters of T
+        // In case they need to be generated: https://github.com/scala-tsi/scala-tsi/issues/176#issuecomment-961698736
+        val firstIndices = targs.zipWithIndex.reverse.toMap
+        val targImplicits =
+          targs.distinct.map(TArg => q"""implicit val `${TermName("tparam" + firstIndices(TArg))}` = getOrGenerate[$TArg]""")
+        q"""{
+          import _root_.com.scalatsi.TSType.getOrGenerate
+          ..$targImplicits
+          getOrGenerate[$T]
+        }"""
+    }
+
+  }
 
   private def mapToNever[T: c.WeakTypeTag]: Tree =
     q"""{
