@@ -13,11 +13,6 @@ export interface IDeepNestingTopLevel {
   prop2: INest1
 }
 
-export interface IListObj {
-  a: string
-  b: string
-}
-
 export interface INest1 {
   prop3: string
   prop4: INest2
