@@ -8,22 +8,31 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
   /** Tree to use to get a TSType[T] */
   private def getTSType(T: Type): Tree = {
 
-    T.typeArgs match {
-      case Seq() => q"""_root_.com.scalatsi.TSType.getOrGenerate[$T]"""
-      case targs =>
-        // We need to explicitly create separate implicit for the type parameters of T
-        // In case they need to be generated: https://github.com/scala-tsi/scala-tsi/issues/176#issuecomment-961698736
-        val firstIndices = targs.zipWithIndex.reverse.toMap
-        val targImplicits =
-          targs.distinct.map(TArg => q"""implicit val `${TermName("tparam" + firstIndices(TArg))}` = getOrGenerate[$TArg]""")
-        q"""{
+    if (T.typeArgs.isEmpty) {
+      q"""_root_.com.scalatsi.TSType.getOrGenerate[$T]"""
+    } else {
+      val allTypeArguments = findNestedTypeParameters(T)
+      val targImplicits =
+        allTypeArguments.distinct.zipWithIndex
+          .map({ case (targ, i) =>
+            q"""implicit val `${TermName(s"targ$i")}` = getOrGenerate[$targ]"""
+          })
+          .toSeq
+      q"""{
           import _root_.com.scalatsi.TSType.getOrGenerate
           ..$targImplicits
           getOrGenerate[$T]
         }"""
     }
-
   }
+
+  /** Generating TSTypes based on implicit conversion might fail if we still have to generate a nested type.
+    * For example `TSType[Seq[CaseClass]]` will fail if `TSType[CaseClass]` doesn't exist yet.
+    *
+    * To combat this, traverse all generic type parameters bottom-up, and get or generate them.
+    */
+  private def findNestedTypeParameters(T: Type): Iterator[Type] =
+    T.typeArgs.iterator.flatMap(findNestedTypeParameters) concat Iterator(T)
 
   private def mapToNever[T: c.WeakTypeTag]: Tree =
     q"""{
