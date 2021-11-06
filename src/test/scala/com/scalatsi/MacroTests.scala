@@ -42,7 +42,7 @@ class MacroTests extends AnyFlatSpec with Matchers {
       "IRoot",
       "listField"   -> tsElement.array,
       "eitherField" -> (TSString | tsElement),
-      "tuple3Field" -> (tsElement | TSString | TSNumber)
+      "tuple3Field" -> TSTuple.of(tsElement, TSString, TSNumber)
     )
   }
 
@@ -50,7 +50,7 @@ class MacroTests extends AnyFlatSpec with Matchers {
     case class Element(foo: String)
     case class Root(
         twoLevels: Seq[Seq[Element]],
-        treeLevels: Seq[Seq[Seq[Element]]],
+        threeLevels: Seq[Seq[Seq[Element]]],
         branched: Either[String, Either[Int, Seq[Element]]]
     )
 
@@ -60,7 +60,7 @@ class MacroTests extends AnyFlatSpec with Matchers {
       "IRoot",
       "twoLevels"   -> tsElement.array.array,
       "threeLevels" -> tsElement.array.array.array,
-      "branched"    -> (TSString | TSNumber | tsElement.array)
+      "branched"    -> (TSString | TSUnion.of(TSNumber, tsElement.array))
     )
   }
 

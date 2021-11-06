@@ -1,5 +1,13 @@
 // DO NOT EDIT: generated file by scala-tsi
 
+export interface IA {
+  field: string
+}
+
+export interface IB {
+  a: IA
+}
+
 export interface IDeepNestingTopLevel {
   prop1: string
   prop2: INest1
@@ -45,9 +53,9 @@ export interface INest7 {
   prop15: number
 }
 
-export interface IParentObj {
-  coolList: IListObj[]
-  coolEnum: MyEnum
+export interface INestedGenerated {
+  direct: IA
+  indirect: IB
+  inList: IA[]
+  inDoubleList: IA[][]
 }
-
-export type MyEnum = ("No" | "Yes")
