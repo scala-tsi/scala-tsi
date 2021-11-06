@@ -15,6 +15,7 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
       val targImplicits =
         allTypeArguments.distinct.zipWithIndex
           .map({ case (targ, i) =>
+            // Note: the implicit *must not* be annotated with TSType[$targ], otherwise the implicit lookup will be self-referential
             q"""implicit val `${TermName(s"targ$i")}` = getOrGenerate[$targ]"""
           })
           .toSeq
