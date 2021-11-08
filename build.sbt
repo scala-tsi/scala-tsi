@@ -12,7 +12,7 @@ scala212Version := scala212
 
 lazy val commonSettings = Seq(
   organization       := "com.scalatsi",
-  version            := "0.5.1",
+  version            := "0.5.2-SNAPSHOT",
   scalaVersion       := scala213,
   crossScalaVersions := Seq(scala212, scala213),
   compilerOptions,
