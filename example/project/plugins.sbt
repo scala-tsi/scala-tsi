@@ -2,7 +2,7 @@ addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.3")
 
 lazy val logger = ConsoleLogger()
 
-val publishedVersion = "0.5.0"
+val publishedVersion = "0.5.1"
 
 lazy val scala_tsi_version = {
   val v = sys.env.get("CI") match {
