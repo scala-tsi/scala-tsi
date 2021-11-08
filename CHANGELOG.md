@@ -1,3 +1,7 @@
+## 0.5.1 - 2021-11-08
+
+* When using your own classes inside generic types like `Seq[T]`, it is no longer requires to explicitly create the `implicit val`s  (bugfix: #180)
+
 ## 0.5.0 - 2021-03-14
 
 * Sealed traits will now add a field with the class name to the output, defaulting to `type: "ClassName"`. (#140 by @vincentdehaan)
