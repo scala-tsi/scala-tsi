@@ -14,9 +14,12 @@ class EnumTests extends AnyWordSpec with Matchers {
         val O1, O2 = Value
       }
 
-      val generated = implicitly[TSType[SomeEnum.type]]
-      val manual    = TSType.alias[SomeEnum.type]("SomeEnum", TSLiteralString("O1") | TSLiteralString("O2"))
+      val generated      = implicitly[TSType[SomeEnum.type]]
+      val generatedValue = implicitly[TSType[SomeEnum.Value]]
+      // val generatedValue = DefaultTSTypes.scalaEnumValueTStype[SomeEnum.type, SomeEnum.Value]
+      val manual = TSType.alias[SomeEnum.type]("SomeEnum", TSLiteralString("O1") | TSLiteralString("O2"))
       generated should ===(manual)
+      generatedValue should ===(manual)
     }
   }
 
