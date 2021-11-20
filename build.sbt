@@ -3,11 +3,20 @@ import sbt.ScriptedPlugin.autoImport.scriptedBufferLog
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-val scala213        = "2.13.7"
-val scala213Version = settingKey[String]("Scala 2.13 version")
+Global / excludeLintKeys ++= Set(
+  // Used by CI to share the scala version during builds
+  scala212Version,
+  scala213Version,
+  // TODO: Remove codestar
+  `scala-tsi-codestar` / resourceDirectory,
+  `sbt-scala-tsi-codestar` / resourceDirectory
+)
+
+val scala213             = "2.13.7"
+lazy val scala213Version = settingKey[String]("Scala 2.13 version")
 scala213Version := scala213
-val scala212        = "2.12.15"
-val scala212Version = settingKey[String]("Scala 2.12 version")
+val scala212             = "2.12.15"
+lazy val scala212Version = settingKey[String]("Scala 2.12 version")
 scala212Version := scala212
 
 lazy val commonSettings = Seq(
@@ -78,6 +87,7 @@ lazy val compilerOptions = scalacOptions := Seq(
 ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
   case Some((2, 13)) =>
     Seq(
+      // TODO: nowarn has been ported to scala 2.12 so should be moved to general settings
       "-Xfatal-warnings" // fatal warnings is possible now warnings can be supressed with 2.13.2's @nowarn
     )
   case Some((2, 12)) =>
@@ -103,9 +113,9 @@ lazy val `scala-tsi-macros` = (project in file("macros"))
     description                            := "Macros for scala-tsi",
     libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value,
     // Disable publishing
-    publish         := {},
-    publishLocal    := {},
-    skip in publish := true
+    publish        := {},
+    publishLocal   := {},
+    publish / skip := true,
   )
 
 lazy val `scala-tsi` = (project in file("."))
@@ -125,6 +135,7 @@ lazy val scalatsiSettings = Seq(
   name        := "scala-tsi",
   description := "Generate Typescript interfaces from your scala classes",
   libraryDependencies ++= Seq(
+    // TODO: nowarn has been ported to scala 2.12 so can be removed
     // To support @nowarn in 2.12
     "org.scala-lang.modules" %% "scala-collection-compat" % "2.6.0",
     // testing framework
@@ -136,13 +147,11 @@ lazy val macroDependencies = Seq(
   // Add dependencies from the macro project
   libraryDependencies ++= (`scala-tsi-macros` / libraryDependencies).value,
   // include the macro classes and resources in the main jar
-  mappings in (Compile, packageBin) ++= mappings
-    .in(`scala-tsi-macros`, Compile, packageBin)
-    .value,
+  Compile / packageBin / mappings ++=
+    (`scala-tsi-macros` / Compile / packageBin / mappings).value,
   // include the macro sources in the main source jar
-  mappings in (Compile, packageSrc) ++= mappings
-    .in(`scala-tsi-macros`, Compile, packageSrc)
-    .value
+  Compile / packageSrc / mappings ++=
+    (`scala-tsi-macros` / Compile / packageSrc / mappings).value
 )
 
 // For publishing under old group id
@@ -154,8 +163,8 @@ lazy val `scala-tsi-codestar` = (project in file("codestar/scala-tsi"))
   .dependsOn(`scala-tsi-macros` % "compile-internal, test-internal")
   .settings(macroDependencies)
   .settings(
-    sourceDirectory   := (sourceDirectory in (`scala-tsi`, Compile)).value,
-    resourceDirectory := (resourceDirectory in (`scala-tsi`, Compile)).value
+    sourceDirectory   := (`scala-tsi` / Compile / sourceDirectory).value,
+    resourceDirectory := (`scala-tsi` / Compile / resourceDirectory).value
   )
 
 /** ***************
@@ -198,6 +207,6 @@ lazy val `sbt-scala-tsi-codestar` = (project in file("codestar/sbt-scala-tsi"))
   .settings(publishSettings)
   .settings(pluginSettings)
   .settings(
-    sourceDirectory   := (sourceDirectory in (`scala-tsi-codestar`, Compile)).value,
-    resourceDirectory := (resourceDirectory in (`scala-tsi-codestar`, Compile)).value
+    sourceDirectory   := (`scala-tsi-codestar` / Compile / sourceDirectory).value,
+    resourceDirectory := (`scala-tsi-codestar` / Compile / resourceDirectory).value
   )
