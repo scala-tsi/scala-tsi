@@ -8,6 +8,10 @@ export interface IB {
   a: IA
 }
 
+export interface IC {
+  field: number
+}
+
 export interface IDeepNestingTopLevel {
   prop1: string
   prop2: INest1
@@ -53,4 +57,7 @@ export interface INestedGenerated {
   indirect: IB
   inList: IA[]
   inDoubleList: IA[][]
+  inEither: (number | IC)
+  inTuple: [IA, number, string]
+  deepNested: (IA | (number | IB))
 }
