@@ -16,13 +16,13 @@ jobs:
           name: Compile and test for 2.13
           command: |
             scalav=$(sbt --no-colors --error "print scala213Version" | xargs)
-            sbt -batch ++"$scalav" compile test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
+            sbt -batch ++"$scalav" compile test/compile sbt-scala-tsi/compile sbt-scala-tsi/test/compile exit
 
       - run:
           name: Compile and test for 2.12
           command: |
             scalav=$(sbt --no-colors --error "print scala212Version" | xargs)
-            sbt -batch ++"$scalav" compile test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
+            sbt -batch ++"$scalav" compile test/compile sbt-scala-tsi/compile sbt-scala-tsi/test/compile exit
 
       - save_cache:
           key:  scala-tsi-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
@@ -90,10 +90,15 @@ jobs:
           path: example/model.ts
 
       - run:
-          name: "Publish under new name"
+          name: "Publish in correct directory"
           command: |
             test -d ~/.ivy2/local/com.scalatsi/sbt-scala-tsi
             test -d ~/.ivy2/local/com.scalatsi/scala-tsi_2.13
+
+      - run:
+          name: "Check compatibility guarantees"
+          command:
+            sbt versionPolicyCheck
 
   publish:
     working_directory: ~/scala-tsi
@@ -109,7 +114,7 @@ jobs:
 
       - run:
           command:
-            sbt -batch +publishSigned +sbt-scala-tsi/publishSigned
+            sbt -batch versionCheck +publishSigned +sbt-scala-tsi/publishSigned
 
       # releases everything from com.scala-tsi, look into releasing only this project
       - run:

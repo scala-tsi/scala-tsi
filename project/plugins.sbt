@@ -8,8 +8,11 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-twirl" % "1.5.1")
 addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "2.6")
 addSbtPlugin("com.jsuereth"   % "sbt-pgp"      % "1.1.2-1")
 
-// Enable version infromation in the build
+// Enable version information in the build
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.10.0")
 
 // To test our own SBT plugin
 libraryDependencies += { "org.scala-sbt" %% "scripted-plugin" % sbtVersion.value }
+
+// Enforce version compatibility
+addSbtPlugin("ch.epfl.scala" % "sbt-version-policy" % "2.0.1")
