@@ -3,6 +3,7 @@
 Removes deprecated features:
 
 * Library is no longer published under `nl.codestar.scalatsi`, deprecated since 0.3.0
+* All deprecated methods and settings have been removed
 
 ## 0.5.1 - 2021-11-08
 
