@@ -1,6 +1,5 @@
 import sbt.Keys.scalacOptions
 import sbt.ScriptedPlugin.autoImport.scriptedBufferLog
-import com.typesafe.tools.mima.core._
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
@@ -83,20 +82,17 @@ lazy val compilerOptions = scalacOptions := Seq(
   "-Ywarn-unused:params",
   "-Ywarn-unused:patvars",
   "-Ywarn-unused:privates",
-  "-language:experimental.macros"
+  "-language:experimental.macros",
+  "-Xfatal-warnings",
+  // "-Wconf:src=src_managed/.*:i,src=.*.scala.txt:i", // Ignore twirl warnings
 ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
-  case Some((2, 13)) =>
-    Seq(
-      // TODO: nowarn has been ported to scala 2.12 so should be moved to general settings
-      "-Xfatal-warnings" // fatal warnings is possible now warnings can be suppressed with 2.13.2's @nowarn
-    )
   case Some((2, 12)) =>
     Seq(
       "-Yno-adapted-args",
       "-Xfuture",
       "-language:higherKinds"
     )
-  case _ => throw new IllegalArgumentException(s"Unconfigured scala version ${scalaVersion.value}")
+  case _ => Seq()
 })
 
 lazy val expandMacros = scalacOptions += "-Ymacro-debug-lite"
@@ -137,12 +133,15 @@ lazy val scalatsiSettings = Seq(
   // versionPolicyIntention := Compatibility.BinaryCompatible, // If next version is minor
   // versionPolicyIntention := Compatibility.BinaryAndSourceCompatible, // If next version is patch
   mimaPreviousArtifacts := Set(organization.value %% name.value % publishedVersion.value),
-  mimaBinaryIssueFilters ++= Seq(
-    // Part of macro module
-    ProblemFilters.exclude[MissingClassProblem]("com.scalatsi.Macros"),
-    ProblemFilters.exclude[MissingClassProblem]("com.scalatsi.MacroUtil"),
-    ProblemFilters.exclude[MissingClassProblem]("com.scalatsi.MacroUtil$CircularReference$")
-  ),
+  mimaBinaryIssueFilters ++= {
+    import com.typesafe.tools.mima.core._
+    Seq(
+      // Part of macro module
+      ProblemFilters.exclude[MissingClassProblem]("com.scalatsi.Macros"),
+      ProblemFilters.exclude[MissingClassProblem]("com.scalatsi.MacroUtil"),
+      ProblemFilters.exclude[MissingClassProblem]("com.scalatsi.MacroUtil$CircularReference$")
+    )
+  },
   libraryDependencies ++= Seq(
     // TODO: nowarn has been ported to scala 2.12 so can be removed
     // To support @nowarn in 2.12
