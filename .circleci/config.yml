@@ -16,13 +16,13 @@ jobs:
           name: Compile and test for 2.13
           command: |
             scalav=$(sbt --no-colors --error "print scala213Version" | xargs)
-            sbt -batch ++"$scalav" compile test/compile sbt-scala-tsi/compile sbt-scala-tsi/test/compile exit
+            sbt -batch ++"$scalav" compile Test/compile sbt-scala-tsi/compile sbt-scala-tsi/Test/compile exit
 
       - run:
           name: Compile and test for 2.12
           command: |
             scalav=$(sbt --no-colors --error "print scala212Version" | xargs)
-            sbt -batch ++"$scalav" compile test/compile sbt-scala-tsi/compile sbt-scala-tsi/test/compile exit
+            sbt -batch ++"$scalav" compile Test/compile sbt-scala-tsi/compile sbt-scala-tsi/Test/compile exit
 
       - save_cache:
           key:  scala-tsi-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
