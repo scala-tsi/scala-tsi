@@ -130,11 +130,11 @@ pub      := (`sbt-scala-tsi` / publishLocal).value
 scripted := (`sbt-scala-tsi` / scripted).evaluated
 
 lazy val scalatsiSettings = Seq(
-  name          := "scala-tsi",
-  description   := "Generate Typescript interfaces from your scala classes",
-  versionScheme := Some("early-semver"), // semver, but also be compatible in 0.x
-  // versionPolicyIntention := Compatibility.None,   // If next version is major
-  versionPolicyIntention := Compatibility.BinaryCompatible, // If next version is minor
+  name                   := "scala-tsi",
+  description            := "Generate Typescript interfaces from your scala classes",
+  versionScheme          := Some("early-semver"), // semver, but also be compatible in 0.x
+  versionPolicyIntention := Compatibility.None,   // If next version is major
+  // versionPolicyIntention := Compatibility.BinaryCompatible, // If next version is minor
   // versionPolicyIntention := Compatibility.BinaryAndSourceCompatible, // If next version is patch
   mimaPreviousArtifacts := Set(organization.value %% name.value % publishedVersion.value),
   mimaBinaryIssueFilters ++= Seq(
