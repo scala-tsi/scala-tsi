@@ -110,14 +110,6 @@ object TSType extends DefaultTSTypes {
   def interface[T](name: String, members: (String, TypescriptType)*): TSIType[T] =
     TSIType(TSInterface(name, ListMap(members: _*)))
 
-  /** Create an interface "IClassname" for T
-    *
-    * @example interface[Foo]("bar" -> TSString) will output "interface IFoo { bar: string }"
-    */
-  @deprecated("0.2.3", "Use interface(name, ...), this method confused the Scala overload resolver")
-  def interface[T](members: (String, TypescriptType)*)(implicit ct: Manifest[T]): TSIType[T] =
-    interface[T]("I" + ct.runtimeClass.getSimpleName, members: _*)
-
   /** Create an indexed interface for T
     *
     * @example interfaceIndexed[Foo]("IFooLookup", "key", TSString, TSInt) will output "interface IFooLookup { [key: string] : Int }"
