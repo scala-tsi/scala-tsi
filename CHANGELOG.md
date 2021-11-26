@@ -1,3 +1,9 @@
+## 0.6.0 - ...
+
+Removes deprecated features:
+
+* Library is no longer published under `nl.codestar.scalatsi`, deprecated since 0.3.0
+
 ## 0.5.1 - 2021-11-08
 
 * When using your own classes inside generic types like `Seq[T]`, it is no longer requires to explicitly create the `implicit val`s  (bugfix: #180)
