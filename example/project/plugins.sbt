@@ -1,4 +1,4 @@
-addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.4")
+addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.5")
 
 lazy val logger = ConsoleLogger()
 
