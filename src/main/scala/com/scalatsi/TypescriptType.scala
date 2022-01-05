@@ -141,6 +141,7 @@ object TypescriptType {
   }
 
   case object TSUndefined extends TypescriptType
+  case object TSUnknown   extends TypescriptType
   // TODO: Flatten union on initialization
   case class TSUnion(of: Seq[TypescriptType]) extends TypescriptAggregateType {
     def nested: Set[TypescriptType] = of.toSet

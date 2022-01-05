@@ -1,5 +1,8 @@
 ## 0.6.0 - ...
 
+Improvements:
+* Adds `unknown`
+
 Breaking changes:
 * `TSTuple` is no longer generic
 
