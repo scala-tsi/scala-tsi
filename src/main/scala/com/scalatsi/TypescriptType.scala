@@ -133,10 +133,11 @@ object TypescriptType {
   case object TSString extends TypescriptType
 
   /** Typescript tuple: `[0.type, 1.type, ... n.type]` */
-  // TODO: Why does this have a generic parameters? Remove?
-  case class TSTuple[E](of: Seq[TypescriptType]) extends TypescriptAggregateType { def nested: Set[TypescriptType] = of.toSet }
+  case class TSTuple(of: Seq[TypescriptType]) extends TypescriptAggregateType {
+    def nested: Set[TypescriptType] = of.toSet
+  }
   object TSTuple {
-    def of(of: TypescriptType*): TSTuple[Any] = TSTuple(of)
+    def of(of: TypescriptType*): TSTuple = TSTuple(of)
   }
 
   case object TSUndefined                     extends TypescriptType
