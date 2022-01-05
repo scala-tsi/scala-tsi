@@ -139,9 +139,17 @@ object TypescriptType {
     def of(of: TypescriptType*): TSTuple[Any] = TSTuple(of)
   }
 
-  case object TSUndefined extends TypescriptType
-  // TODO: Flatten union on initialization
+  case object TSUndefined                     extends TypescriptType
   case class TSUnion(of: Seq[TypescriptType]) extends TypescriptAggregateType {
+
+    /** Recursively flatten this union */
+    def flatten: TSUnion =
+      if (of.exists(_.isInstanceOf[TSUnion]))
+        TSUnion(of.flatMap({
+          case nested: TSUnion => nested.flatten.of
+          case other           => Seq(other)
+        }))
+      else this
     def nested: Set[TypescriptType] = of.toSet
   }
   object TSUnion {

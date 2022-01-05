@@ -1,6 +1,9 @@
 ## 0.6.0 - ...
 
-Removes deprecated features:
+Breaking changes:
+* `TSTuple` is no longer generic
+
+Removed deprecated features:
 
 * sbt-plugin no longer automatically activates, `.enablePlugins(ScalaTsiPlugin)` is now required, recommended since 0.4.1 
 * Library is no longer published under `nl.codestar.scalatsi`, deprecated since 0.3.0
