@@ -24,6 +24,7 @@ object TypescriptTypeSerializer {
       case TSTuple(members)       => s"[${members.map(serialize) mkString ", "}]"
       case TSString               => "string"
       case TSUndefined            => "undefined"
+      case TSUnknown              => "unknown"
       case TSUnion(Seq())         => serialize(TSNever)
       case TSUnion(Seq(e))        => serialize(e)
       case TSUnion(of)            => s"(${of.map(serialize) mkString " | "})"
