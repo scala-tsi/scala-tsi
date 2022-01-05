@@ -129,7 +129,7 @@ object MyModelTSTypes {
 ```
 
 And in your build.sbt configure the sbt plugin to output your class:
-```
+```sbt
 lazy val root = (project in file("."))
   .settings(
     typescriptExports           := Seq("Person"),
@@ -139,7 +139,7 @@ lazy val root = (project in file("."))
 ```
 
 this will generate in your project root a `model.ts`:
-```
+```typescript
 export interface IPerson {
   name : string
   email : string
