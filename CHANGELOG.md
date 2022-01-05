@@ -1,5 +1,9 @@
 ## 0.6.0 - ...
 
+Improvements:
+* Adds `unknown`
+* Unions are now flattened more often
+
 Breaking changes:
 * `TSTuple` is no longer generic
 

@@ -59,5 +59,5 @@ export interface INestedGenerated {
   inDoubleList: IA[][]
   inEither: (number | IC)
   inTuple: [IA, number, string]
-  deepNested: (IA | (number | IB))
+  deepNested: (IA | number | IB)
 }
