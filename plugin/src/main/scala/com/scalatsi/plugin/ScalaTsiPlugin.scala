@@ -24,10 +24,6 @@ object ScalaTsiPlugin extends AutoPlugin {
     ).withRank(KeyRanks.CTask)
     val typescriptRunExporter    = taskKey[Unit]("Run the application created by typescriptCreateExporter").withRank(KeyRanks.CTask)
     val typescriptDeleteExporter = taskKey[Unit]("Remove the application created by typescriptCreateExporter").withRank(KeyRanks.CTask)
-
-    // deprecated
-    @deprecated("Use typescriptExports", "0.4.0")
-    val typescriptClassesToGenerateFor = settingKey[Seq[String]]("Types to export typescript version for").withRank(KeyRanks.DSetting)
   }
 
   import autoImport._
@@ -41,7 +37,6 @@ object ScalaTsiPlugin extends AutoPlugin {
     libraryDependencies += "com.scalatsi" %% "scala-tsi" % scala_ts_compiler_version,
     typescriptGenerationImports           := Seq(),
     typescriptExports                     := Seq(),
-    typescriptClassesToGenerateFor        := Seq(),
     typescriptOutputFile                  := target.value / "scala-tsi.ts",
     typescriptHeader                      := Some("// DO NOT EDIT: generated file by scala-tsi"),
     typescriptStyleSemicolons             := false,
@@ -62,13 +57,12 @@ object ScalaTsiPlugin extends AutoPlugin {
   private lazy val deleteTypescriptExporter = Def.task(IO.delete(targetFile.value))
 
   private lazy val createTypescriptExporter = Def.task {
-    val target          = targetFile.value
-    val typesToGenerate = typescriptExports.value ++ typescriptClassesToGenerateFor.value
+    val target = targetFile.value
 
     val toWrite: String = txt
       .ExportTypescriptTemplate(
         imports = typescriptGenerationImports.value,
-        classes = typesToGenerate,
+        classes = typescriptExports.value,
         targetFile = typescriptOutputFile.value.getAbsolutePath,
         useSemicolons = typescriptStyleSemicolons.value,
         header = typescriptHeader.value.getOrElse(""),

@@ -92,8 +92,6 @@ object TypescriptType {
     override def nested: Set[TypescriptType]                                        = impl.toSet
     override def withName(newName: String): TSTypeReference                         = copy(name = newName)
   }
-  @deprecated("0.2.0", "Renamed to TSTypeReference")
-  type TSExternalName = TSTypeReference
 
   /** Typescript anonymous indexed interfaces
     * { [indexName:indexType]: valueType }
