@@ -6,12 +6,8 @@ import scala.collection.immutable.ListMap
 import TypescriptType._
 
 sealed trait TypescriptType {
-  def |(tt: TypescriptType): TSUnion = this match {
-    case TSUnion(of) => TSUnion(of :+ tt)
-    case _           => TSUnion.of(this, tt)
-  }
-
-  def array: TSArray = TSArray(this)
+  def |(tt: TypescriptType): TSUnion = TSUnion.of(this, tt).flatten
+  def array: TSArray                 = TSArray(this)
 }
 
 object TypescriptType {

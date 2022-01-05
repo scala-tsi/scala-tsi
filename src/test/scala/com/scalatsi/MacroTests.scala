@@ -60,7 +60,7 @@ class MacroTests extends AnyFlatSpec with Matchers {
       "IRoot",
       "twoLevels"   -> tsElement.array.array,
       "threeLevels" -> tsElement.array.array.array,
-      "branched"    -> (TSString | TSUnion.of(TSNumber, tsElement.array))
+      "branched"    -> (TSString | TSNumber | tsElement.array)
     )
   }
 
