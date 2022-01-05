@@ -24,7 +24,7 @@ trait TSType[T] { self =>
   def |(other: TSType[_]): TSUnion      = this | other.get
 }
 
-object TSType {
+object TSType extends DefaultTSTypes {
   private class TSTypeImpl[T](override val get: TypescriptType) extends TSType[T]
   def apply[T](tt: TypescriptType): TSType[T] = new TSTypeImpl(tt)
 
@@ -58,7 +58,7 @@ object TSType {
     * wil produce
     *
     * `type AorB = A | B`
-    * @see [Typescript docs on Discrimintated Unions](https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions)
+    * @see [Typescript docs on Discriminated Unions](https://www.typescriptlang.org/docs/handbook/unions-and-intersections.html#discriminating-unions)
     */
   def fromSealed[T]: TSNamedType[T] = macro Macros.generateUnionFromSealedTrait[T]
 
@@ -110,23 +110,15 @@ object TSType {
   def interface[T](name: String, members: (String, TypescriptType)*): TSIType[T] =
     TSIType(TSInterface(name, ListMap(members: _*)))
 
-  /** Create an interface "IClassname" for T
-    *
-    * @example interface[Foo]("bar" -> TSString) will output "interface IFoo { bar: string }"
-    */
-  @deprecated("0.2.3", "Use interface(name, ...), this method confused the Scala overload resolver")
-  def interface[T](members: (String, TypescriptType)*)(implicit ct: Manifest[T]): TSIType[T] =
-    interface[T]("I" + ct.runtimeClass.getSimpleName, members: _*)
-
   /** Create an indexed interface for T
     *
     * @example interfaceIndexed[Foo]("IFooLookup", "key", TSString, TSInt) will output "interface IFooLookup { [key: string] : Int }"
     */
   def interfaceIndexed[T](
-    name: String,
-    indexName: String = "key",
-    indexType: TypescriptType = TSString,
-    valueType: TypescriptType
+      name: String,
+      indexName: String = "key",
+      indexType: TypescriptType = TSString,
+      valueType: TypescriptType
   ): TSNamedType[T] =
     TSNamedType(TSInterfaceIndexed(name, indexName, indexType, valueType))
 }
@@ -141,7 +133,7 @@ trait TSNamedType[T] extends TSType[T] { self =>
   def withName(newName: String): TSNamedType[T] = TSNamedType(get.withName(newName))
 }
 
-object TSNamedType {
+object TSNamedType extends DefaultTSTypes {
   private class TSNamedTypeImpl[T](override val get: TypescriptNamedType) extends TSNamedType[T]
   def apply[T](tt: TypescriptNamedType): TSNamedType[T] =
     new TSNamedTypeImpl(tt)
@@ -154,6 +146,11 @@ object TSNamedType {
     * @see [[TSType.getOrGenerate]]
     */
   def getOrGenerate[T]: TSNamedType[T] = macro Macros.getImplicitMappingOrGenerateDefault[T, TSNamedType]
+
+  /** Uses the typescript type of Target whenever we're looking for the typescript type of Source
+    * This will not generate a `type Source = Target` line like alias
+    */
+  def sameAs[Source, Target](implicit tsType: TSNamedType[Target]): TSNamedType[Source] = TSNamedType(tsType.get)
 
   implicit def ordering[T]: Ordering[TSNamedType[T]] = Ordering.by[TSNamedType[T], TypescriptNamedType](_.get)
 }
@@ -179,4 +176,9 @@ object TSIType {
     * @see [[TSType.getOrGenerate]]
     */
   def getOrGenerate[T]: TSIType[T] = macro Macros.getImplicitInterfaceMappingOrGenerateDefault[T, TSIType]
+
+  /** Uses the typescript type of Target whenever we're looking for the typescript type of Source
+    * This will not generate a `type Source = Target` line like alias
+    */
+  def sameAs[Source, Target](implicit tsType: TSIType[Target]): TSIType[Source] = TSIType(tsType.get)
 }

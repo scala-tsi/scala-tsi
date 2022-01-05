@@ -8,7 +8,9 @@ import scala.annotation.nowarn
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class TypescriptTypeSerializerTests extends AnyFlatSpec with Matchers with DefaultTSTypes {
+import scala.collection.immutable.ListMap
+
+class TypescriptTypeSerializerTests extends AnyFlatSpec with Matchers {
 
   "The Typescript serializer" should "serialize to a simple interface" in {
     case class Person(name: String, age: Int)
@@ -93,18 +95,27 @@ class TypescriptTypeSerializerTests extends AnyFlatSpec with Matchers with Defau
                                                                   |""".stripMargin)
   }
 
+  // Due to the circular nature of this test, it slows down compilation/testing by *a lot*. Disabled by default
+  //  it should "not crash on circular references" in {
+  //    case class A(b: B)
+  //    case class B(a: A)
+  //
+  //    // shouldn't compile but don't crash, but also shouldn't crash the compiler
+  //    """TSType.fromCaseClass[A]""" shouldNot compile
+  //  }
+
   it should "be able to handle all primitive types" in {
     case class PrimitiveTypes(
-      char: Char,
-      string: String,
-      byte: Byte,
-      short: Short,
-      int: Int,
-      long: Long,
-      float: Float,
-      double: Double,
-      boolean: Boolean,
-      stringSeq: Seq[String]
+        char: Char,
+        string: String,
+        byte: Byte,
+        short: Short,
+        int: Int,
+        long: Long,
+        float: Float,
+        double: Double,
+        boolean: Boolean,
+        stringSeq: Seq[String]
     )
 
     implicit val primitiveTypesTSType: TSIType[PrimitiveTypes] =
@@ -129,7 +140,7 @@ class TypescriptTypeSerializerTests extends AnyFlatSpec with Matchers with Defau
 
   it should "serialize an indexed interface" in {
     case class Something(
-      values: Map[String, String] = Map("a" -> "b")
+        values: Map[String, String] = Map("a" -> "b")
     )
 
     implicit val somethingTSType: TSIType[Something] = TSType.fromCaseClass
@@ -156,7 +167,7 @@ class TypescriptTypeSerializerTests extends AnyFlatSpec with Matchers with Defau
 
   it should "serialize a named indexed interface" in {
     case class Something(
-      values: Map[String, String] = Map("a" -> "b")
+        values: Map[String, String] = Map("a" -> "b")
     )
 
     implicit val somethingTSType: TSNamedType[Something] =
@@ -233,6 +244,33 @@ class TypescriptTypeSerializerTests extends AnyFlatSpec with Matchers with Defau
 
     TypescriptTypeSerializer.emit()(x).trim should equal(expected)
     TypescriptTypeSerializer.emit()(y).trim should equal(expected)
+  }
+
+  it should "serialize tagged unions correctly" in {
+    val taggedUnion =
+      TSType.alias(
+        "Un",
+        TSUnion.of(
+          TSTypeReference("IA", Some(TSInterface("IA", ListMap(("s", TSString)))), Some("A")),
+          TSTypeReference("IB", Some(TSInterface("IB", ListMap(("s", TSString)))), Some("B"))
+        )
+      )
+
+    val output = TypescriptTypeSerializer.emit(StyleOptions(taggedUnionDiscriminator = Some("kind")))(taggedUnion)
+
+    val expected =
+      """|export interface IA {
+         |  s: string
+         |  kind: "A"
+         |}
+         |
+         |export interface IB {
+         |  s: string
+         |  kind: "B"
+         |}
+         |
+         |export type Un = (IA | IB)""".stripMargin
+    output.trim should equal(expected)
   }
 
   it should "serialize function members of interfaces" in {

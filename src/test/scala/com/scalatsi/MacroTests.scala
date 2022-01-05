@@ -8,7 +8,7 @@ import org.scalatest.matchers.should.Matchers
 
 case class Person(name: String, age: Int)
 
-class MacroTests extends AnyFlatSpec with Matchers with DefaultTSTypes {
+class MacroTests extends AnyFlatSpec with Matchers {
   "The case class to TypeScript type macro" should "be able to translate a simple case class" in {
     case class Person(name: String, age: Int)
     TSType.fromCaseClass[Person] shouldBe TSType.interface("IPerson", "name" -> TSString, "age" -> TSNumber)
@@ -28,6 +28,42 @@ class MacroTests extends AnyFlatSpec with Matchers with DefaultTSTypes {
     TSType.fromCaseClass[B] shouldBe TSType.interface("IB", "a" -> tsA.get)
   }
 
+  it should "handle polymorphic members with parameter type that is itself generated" in {
+    case class Element(foo: String)
+    case class Root(
+        listField: Seq[Element],
+        eitherField: Either[String, Element],
+        tuple3Field: (Element, String, Int)
+    )
+
+    val tsElement: TypescriptType = TSType.fromCaseClass[Element].get
+
+    TSType.fromCaseClass[Root] shouldBe TSType.interface(
+      "IRoot",
+      "listField"   -> tsElement.array,
+      "eitherField" -> (TSString | tsElement),
+      "tuple3Field" -> TSTuple.of(tsElement, TSString, TSNumber)
+    )
+  }
+
+  it should "handle nested polymorphic members " in {
+    case class Element(foo: String)
+    case class Root(
+        twoLevels: Seq[Seq[Element]],
+        threeLevels: Seq[Seq[Seq[Element]]],
+        branched: Either[String, Either[Int, Seq[Element]]]
+    )
+
+    val tsElement: TypescriptType = TSType.fromCaseClass[Element].get
+
+    TSType.fromCaseClass[Root] shouldBe TSType.interface(
+      "IRoot",
+      "twoLevels"   -> tsElement.array.array,
+      "threeLevels" -> tsElement.array.array.array,
+      "branched"    -> (TSString | TSUnion.of(TSNumber, tsElement.array))
+    )
+  }
+
   "The sealed trait/class to Typescript type macro" should "handle sealed traits" in {
     sealed trait FooOrBar
     case class Foo(foo: String) extends FooOrBar
@@ -38,7 +74,7 @@ class MacroTests extends AnyFlatSpec with Matchers with DefaultTSTypes {
 
     TSType.fromSealed[FooOrBar] shouldBe TSType.alias(
       "FooOrBar",
-      TSTypeReference("IFoo", Some(foo)) | TSTypeReference("IBar", Some(bar))
+      TSTypeReference("IFoo", Some(foo), Some("Foo")) | TSTypeReference("IBar", Some(bar), Some("Bar"))
     )
   }
 
@@ -56,7 +92,7 @@ class MacroTests extends AnyFlatSpec with Matchers with DefaultTSTypes {
 
     TSType.fromSealed[FooOrBar] shouldBe TSType.alias(
       "FooOrBar",
-      TSTypeReference("IFoo", Some(tsFoo.get)) | TSTypeReference("IBar", Some(tsBar.get))
+      TSTypeReference("IFoo", Some(tsFoo.get), Some("Foo")) | TSTypeReference("IBar", Some(tsBar.get), Some("Bar"))
     )
   }
 
@@ -71,7 +107,7 @@ class MacroTests extends AnyFlatSpec with Matchers with DefaultTSTypes {
     tsFoo shouldBe TSType.interface("IFoo", "foo" -> TSString)
     tsBar.get shouldBe TSNumber
 
-    TSType.fromSealed[FooOrBar] shouldBe TSType.alias("FooOrBar", TSTypeReference("IFoo", Some(tsFoo.get)) | TSNumber)
+    TSType.fromSealed[FooOrBar] shouldBe TSType.alias("FooOrBar", TSTypeReference("IFoo", Some(tsFoo.get), Some("Foo")) | TSNumber)
   }
 
   it should "handle sealed traits with recursive definitions" in {
@@ -82,7 +118,7 @@ class MacroTests extends AnyFlatSpec with Matchers with DefaultTSTypes {
     @nowarn("cat=unused") implicit val nilType: TSType[Nil.type] = TSType(TSNull)
     implicit val llType: TSType[Node]                            = TSType.alias("INode", TSNull | TSTypeReference("ILinkedList"))
 
-    TSType.fromSealed[LinkedList] shouldBe TSType.alias("LinkedList", TSNull | TSTypeReference("INode", Some(llType.get)))
+    TSType.fromSealed[LinkedList] shouldBe TSType.alias("LinkedList", TSNull | TSTypeReference("INode", Some(llType.get), Some("Node")))
   }
 
   it should "handle sealed traits without subclasses" in {

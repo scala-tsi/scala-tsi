@@ -6,8 +6,33 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
   import c.universe._
 
   /** Tree to use to get a TSType[T] */
-  private def getTSType(T: Type): Tree =
-    q"""_root_.com.scalatsi.TSType.getOrGenerate[$T]"""
+  private def getTSType(T: Type): Tree = {
+
+    if (T.typeArgs.isEmpty) {
+      q"""_root_.com.scalatsi.TSType.getOrGenerate[$T]"""
+    } else {
+      val allTypeArguments = findNestedTypeParameters(T)
+      val targImplicits =
+        allTypeArguments.toSeq.distinct.zipWithIndex
+          .map({ case (targ, i) =>
+            // Note: the implicit *must not* be annotated with TSType[$targ], otherwise the implicit lookup will be self-referential
+            q"""implicit val `${TermName(s"targ$i")}` = getOrGenerate[$targ]"""
+          })
+      q"""{
+          import _root_.com.scalatsi.TSType.getOrGenerate
+          ..$targImplicits
+          getOrGenerate[$T]
+        }"""
+    }
+  }
+
+  /** Generating TSTypes based on implicit conversion might fail if we still have to generate a nested type.
+    * For example `TSType[Seq[CaseClass]]` will fail if `TSType[CaseClass]` doesn't exist yet.
+    *
+    * To combat this, traverse all generic type parameters bottom-up, and get or generate them.
+    */
+  private def findNestedTypeParameters(T: Type): Iterator[Type] =
+    T.typeArgs.iterator.flatMap(findNestedTypeParameters) ++ Iterator(T)
 
   private def mapToNever[T: c.WeakTypeTag]: Tree =
     q"""{
@@ -34,8 +59,8 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
   private def circularRefError(T: c.Type, which: String): Unit = c.error(
     c.enclosingPosition,
     s"""
-       |Circular reference encountered while searching for $which[$T]
-       |Please break the cycle by locally defining an implicit TSType like so:
+       |Circular reference or very deep nesting encountered while searching for $which[$T]
+       |Please break the cycle or lower the nesting by locally defining an implicit TSType like so:
        |implicit val tsType...: $which[...] = {
        |  implicit val tsA: $which[$T] = TSType.external("I$T") // name of your "$T" typescript type here
        |  $which.getOrGenerate[...]
@@ -55,8 +80,8 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
   }
 
   def getImplicitInterfaceMappingOrGenerateDefault[T, TSType[_]](implicit
-    tt: c.WeakTypeTag[T],
-    tsTypeTag: c.WeakTypeTag[TSType[_]]
+      tt: c.WeakTypeTag[T],
+      tsTypeTag: c.WeakTypeTag[TSType[_]]
   ): Tree = {
     lookupOptionalImplicit(properType[T, TSType]) match {
       case Right(Some(value)) => value
@@ -187,7 +212,7 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
         }"""
       case children =>
         val operands = children map { symbol =>
-          q"TypescriptType.nameOrType(${getTSType(symbol.asType.toType)}.get)"
+          q"TypescriptType.nameOrType(${getTSType(symbol.asType.toType)}.get, discriminator = Some(${symbol.name.toString}))"
         }
 
         q"""{

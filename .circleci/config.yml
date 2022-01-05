@@ -14,13 +14,15 @@ jobs:
 
       - run:
           name: Compile and test for 2.13
-          command:
-            sbt -batch ++2.13.3 compile test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
+          command: |
+            scalav=$(sbt --no-colors --error "print scala213Version" | xargs)
+            sbt -batch ++"$scalav" compile test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
 
       - run:
           name: Compile and test for 2.12
-          command:
-            sbt -batch ++2.12.11 compile test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
+          command: |
+            scalav=$(sbt --no-colors --error "print scala212Version" | xargs)
+            sbt -batch ++"$scalav" compile test:compile sbt-scala-tsi/compile sbt-scala-tsi/test:compile exit
 
       - save_cache:
           key:  scala-tsi-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
@@ -29,7 +31,6 @@ jobs:
             - target/streams
             - project/target/resolution-cache
             - project/target/streams
-            - codestar
             - ~/.sbt
             - ~/.cache
 
@@ -63,16 +64,16 @@ jobs:
           command: |
             set -x
             if [ -z "$CIRCLE_PR_USERNAME" ]; then
-              # On forked PR, do an unsigned publish
               sbt -batch publishLocalSigned sbt-scala-tsi/publishLocalSigned
             else
+              # On forked PR, do an unsigned publish
               sbt -batch publishLocal sbt-scala-tsi/publishLocal
             fi
 
       - run:
           name: "test and generate example project"
           command: |
-            VERSION=$(cd ../ && sbt --error 'set showSuccess := false' "print version" exit)
+            VERSION=$(cd ../ && sbt --no-colors --error "print version" | xargs)
             sbt -batch -Dplugin.version="$VERSION" test generateTypescript scalafmtSbtCheck scalafmtCheckAll exit
           working_directory: example
 
@@ -93,13 +94,6 @@ jobs:
           command: |
             test -d ~/.ivy2/local/com.scalatsi/sbt-scala-tsi
             test -d ~/.ivy2/local/com.scalatsi/scala-tsi_2.13
-
-      - run:
-          name: "Publish under old name"
-          command: |
-            sbt -batch scala-tsi-codestar/publishLocal sbt-scala-tsi-codestar/publishLocal
-            test -d ~/.ivy2/local/nl.codestar/sbt-scala-tsi
-            test -d ~/.ivy2/local/nl.codestar/scala-tsi_2.13
 
   publish:
     working_directory: ~/scala-tsi
@@ -122,27 +116,6 @@ jobs:
           command:
             sbt -batch "sonatypeReleaseAll com.scalatsi"
 
-  publish_codestar:
-    working_directory: ~/scala-tsi
-    docker:
-      - image: circleci/openjdk:8
-    steps:
-      - checkout
-
-      - restore_cache:
-          keys:
-            - scala-tsi-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
-            - scala-tsi-6
-
-      - run:
-          command:
-            sbt -batch +scala-tsi-codestar/publishSigned +sbt-scala-tsi-codestar/publishSigned
-
-      # releases everything from nl.codestar, look into releasing only this project
-      - run:
-          command:
-            sbt -batch "sonatypeReleaseAll nl.codestar"
-
 workflows:
   version: 2
   build_and_publish:
@@ -152,14 +125,6 @@ workflows:
             tags:
               only: /.*/
       - publish:
-          requires:
-            - build
-          filters:
-            branches:
-              ignore: /.*/ # Only run for tagged builds
-            tags:
-              only: /[0-9].*/ # x.y.z version has that tag name
-      - publish_codestar:
           requires:
             - build
           filters:

@@ -30,8 +30,8 @@ object TypescriptType {
     }
 
   /** Get a reference to a named type, or the type itself if it is unnamed or built-in */
-  def nameOrType(tpe: TypescriptType): TypescriptType = tpe match {
-    case named: TypescriptNamedType => named.asReference
+  def nameOrType(tpe: TypescriptType, discriminator: Option[String] = None): TypescriptType = tpe match {
+    case named: TypescriptNamedType => named.asReference(discriminator)
     case anonymous                  => anonymous
   }
 
@@ -40,7 +40,7 @@ object TypescriptType {
     def name: String
     require(isValidTSName(name), s"Not a valid TypeScript identifier: $name")
 
-    def asReference: TSTypeReference = TSTypeReference(name, Some(this))
+    def asReference(discriminator: Option[String] = None): TSTypeReference = TSTypeReference(name, Some(this), discriminator)
 
     def withName(newName: String): TypescriptNamedType
   }
@@ -73,8 +73,8 @@ object TypescriptType {
   case class TSLiteralBoolean(value: Boolean)   extends TSLiteralType[Boolean]
 
   case class TSEnum(name: String, const: Boolean, entries: ListMap[String, Option[Int]])
-    extends TypescriptNamedType
-    with TypescriptAggregateType {
+      extends TypescriptNamedType
+      with TypescriptAggregateType {
     def nested: Set[TypescriptType]                = Set(TSNumber)
     override def withName(newName: String): TSEnum = copy(name = newName)
   }
@@ -83,21 +83,22 @@ object TypescriptType {
     * Not a real Typescript type
     * @note name takes from [Typescript specification](https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#3.8.2)
     * @param impl The implementation of the type if it is known, so that the nested types can be outputted even if not directly referenced
+    * @param discriminator the discrimininator value for the type if this type is part of a discriminated union
     */
-  case class TSTypeReference(name: String, impl: Option[TypescriptType] = None) extends TypescriptNamedType with TypescriptAggregateType {
-    override def asReference: TSTypeReference               = this
-    override def nested: Set[TypescriptType]                = impl.toSet
-    override def withName(newName: String): TSTypeReference = copy(name = newName)
+  case class TSTypeReference(name: String, impl: Option[TypescriptType] = None, discriminator: Option[String] = None)
+      extends TypescriptNamedType
+      with TypescriptAggregateType {
+    override def asReference(discriminator: Option[String] = None): TSTypeReference = this
+    override def nested: Set[TypescriptType]                                        = impl.toSet
+    override def withName(newName: String): TSTypeReference                         = copy(name = newName)
   }
-  @deprecated("0.2.0", "Renamed to TSTypeReference")
-  type TSExternalName = TSTypeReference
 
   /** Typescript anonymous indexed interfaces
     * { [indexName:indexType]: valueType }
     * @param indexType index type, TSNumber or TSString
     */
   case class TSIndexedInterface(indexName: String = "key", indexType: TypescriptType, valueType: TypescriptType)
-    extends TypescriptAggregateType {
+      extends TypescriptAggregateType {
     require(
       indexType == TSString || indexType == TSNumber,
       s"TypeScript indexed interface can only have index type string or number, not $indexType"
@@ -105,8 +106,8 @@ object TypescriptType {
     def nested: Set[TypescriptType] = Set(indexType, valueType)
   }
   case class TSInterfaceIndexed(name: String, indexName: String = "key", indexType: TypescriptType, valueType: TypescriptType)
-    extends TypescriptNamedType
-    with TypescriptAggregateType {
+      extends TypescriptNamedType
+      with TypescriptAggregateType {
     require(
       indexType == TSString || indexType == TSNumber,
       s"TypeScript indexed interface $name can only have index type string or number, not $indexType"
@@ -132,13 +133,15 @@ object TypescriptType {
   case object TSString extends TypescriptType
 
   /** Typescript tuple: `[0.type, 1.type, ... n.type]` */
-  // TODO: Why does this have a generic parameters? Remove?
-  case class TSTuple[E](of: Seq[TypescriptType]) extends TypescriptAggregateType { def nested: Set[TypescriptType] = of.toSet }
+  case class TSTuple(of: Seq[TypescriptType]) extends TypescriptAggregateType {
+    def nested: Set[TypescriptType] = of.toSet
+  }
   object TSTuple {
-    def of(of: TypescriptType*): TSTuple[Any] = TSTuple(of)
+    def of(of: TypescriptType*): TSTuple = TSTuple(of)
   }
 
   case object TSUndefined extends TypescriptType
+  // TODO: Flatten union on initialization
   case class TSUnion(of: Seq[TypescriptType]) extends TypescriptAggregateType {
     def nested: Set[TypescriptType] = of.toSet
   }

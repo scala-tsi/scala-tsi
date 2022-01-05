@@ -6,7 +6,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.verbs.StringVerbBlockRegistration
 import org.scalatest.wordspec.AnyWordSpec
 
-class LiteralTypeTests extends AnyWordSpec with Matchers with DefaultTSTypes {
+class LiteralTypeTests extends AnyWordSpec with Matchers {
 
   "Default TS Types should be defined" forWord {
     "literal booleans" in {
@@ -29,9 +29,9 @@ class LiteralTypeTests extends AnyWordSpec with Matchers with DefaultTSTypes {
   "Literal numbers" should {
     "work in other types" in {
       case class Literal(
-        a: "Hello!",
-        b: 42,
-        c: true
+          a: "Hello!",
+          b: 42,
+          c: true
       )
 
       implicit val tsType = TSType.fromCaseClass[Literal]

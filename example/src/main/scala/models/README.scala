@@ -1,7 +1,6 @@
 package models
 
 import com.scalatsi._
-import com.scalatsi.DefaultTSTypes._
 import com.scalatsi.dsl._
 
 /** ***********************************
@@ -10,12 +9,12 @@ import com.scalatsi.dsl._
   */
 
 case class Person(
-  name: String,
-  email: Email,
-  age: Option[Int],
-  // for privacy reasons, we do not put this social security number in the JSON
-  ssn: Option[Int],
-  job: Job
+    name: String,
+    email: Email,
+    age: Option[Int],
+    // for privacy reasons, we do not put this social security number in the JSON
+    ssn: Option[Int],
+    job: Job
 )
 // This type will get erased when serializing to JSON, only the string remains
 case class Email(address: String)

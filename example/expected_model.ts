@@ -1,3 +1,5 @@
+// DO NOT EDIT: generated file by scala-tsi
+
 export interface IBar {
   value: string
 }
@@ -34,10 +36,12 @@ export interface IPerson {
 
 export interface ISealedOption1 {
   foo: string
+  kind: "SealedOption1"
 }
 
 export interface ISealedOption2 {
   bar: number
+  kind: "SealedOption2"
 }
 
 export type JavaEnum = ("OPTION1" | "OPTION2" | "OPTION3" | "OPTION4")

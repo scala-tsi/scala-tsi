@@ -38,9 +38,6 @@ object TypescriptTypeSerializer {
   private def serializeArgumentList(argList: List[(String, TypescriptType)]): String =
     argList.map { case (n, t) => s"$n: ${serialize(t)}" }.mkString(", ")
 
-  @deprecated("0.2.0", "Use emit[T]()")
-  def emit[T](implicit tsType: TSNamedType[T]): String = emit[T]()(tsType)
-
   def emit[T](styleOptions: StyleOptions = StyleOptions())(implicit tsType: TSNamedType[T]): String =
     emits(styleOptions, types = Set(tsType.get))
 
@@ -49,14 +46,14 @@ object TypescriptTypeSerializer {
 
   def emits(styleOptions: StyleOptions = StyleOptions(), types: Set[TypescriptNamedType]): String =
     types
-      .flatMap(discoverNestedNames)
+      .flatMap(discoverNestedNames(styleOptions))
       .toSeq
       .sorted
       .flatMap(namedType => emitNamed(namedType)(styleOptions))
       .mkString("", "\n\n", "\n")
 
   private object TSInterfaceEntry {
-    def unapply(typescriptType: TypescriptType): Option[(TypescriptType, Boolean)] =
+    def unapply(typescriptType: TypescriptType): Some[(TypescriptType, Boolean)] =
       typescriptType match {
         case TSUnion(members) if members.contains(TSUndefined) =>
           Some((TSUnion(members.filter(_ != TSUndefined)), false))
@@ -102,14 +99,34 @@ object TypescriptTypeSerializer {
     }
   }
 
-  private def discoverNestedNames(tp: TypescriptType): Set[TypescriptNamedType] = {
+  private def discoverNestedNames(options: StyleOptions)(tp: TypescriptType): Set[TypescriptNamedType] = {
     val me: Set[TypescriptNamedType] = tp match {
       case named: TypescriptNamedType => Set(named)
       case _                          => Set()
     }
     tp match {
+      case union: TSUnion =>
+        union.nested
+          .map {
+            case TSTypeReference(ref, Some(TSInterface(name, members)), Some(discriminatorValue)) =>
+              TSTypeReference(
+                ref,
+                Some(
+                  TSInterface(
+                    name,
+                    options.taggedUnionDiscriminator match {
+                      case Some(discriminatorField) =>
+                        members.+((discriminatorField, TSLiteralString(discriminatorValue)))
+                      case None => members
+                    }
+                  )
+                )
+              )
+            case other => other
+          }
+          .flatMap(discoverNestedNames(options)) ++ me
       case TypescriptAggregateType(nested) =>
-        nested.flatMap(discoverNestedNames) ++ me
+        nested.flatMap(discoverNestedNames(options)) ++ me
       case _ => me
     }
   }

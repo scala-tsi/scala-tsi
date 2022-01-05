@@ -12,7 +12,10 @@ object ScalaTsiPlugin extends AutoPlugin {
       "Additional imports, i.e. your packages so you don't need to prefix your classes."
     ).withRank(KeyRanks.BSetting)
     val typescriptOutputFile      = settingKey[File]("File where all typescript interfaces will be written to").withRank(KeyRanks.BSetting)
-    val typescriptStyleSemicolons = settingKey[Boolean]("Whether to add booleans to the exported model").withRank(KeyRanks.BMinusSetting)
+    val typescriptStyleSemicolons = settingKey[Boolean]("Whether to add semicolons to the exported model").withRank(KeyRanks.BMinusSetting)
+    val typescriptHeader          = settingKey[Option[String]]("Optional header for the output file")
+    val typescriptTaggedUnionDiscriminator =
+      settingKey[Option[String]]("The discriminator field for tagged unions, or None to disable tagged unions").withRank(KeyRanks.BSetting)
 
     // tasks
     val generateTypescript = taskKey[Unit]("Generate typescript for this project").withRank(KeyRanks.ATask)
@@ -21,33 +24,28 @@ object ScalaTsiPlugin extends AutoPlugin {
     ).withRank(KeyRanks.CTask)
     val typescriptRunExporter    = taskKey[Unit]("Run the application created by typescriptCreateExporter").withRank(KeyRanks.CTask)
     val typescriptDeleteExporter = taskKey[Unit]("Remove the application created by typescriptCreateExporter").withRank(KeyRanks.CTask)
-
-    // deprecated
-    @deprecated("Use typescriptExports", "0.4.0")
-    val typescriptClassesToGenerateFor = settingKey[Seq[String]]("Types to export typescript version for").withRank(KeyRanks.DSetting)
   }
 
   import autoImport._
 
-  // TODO: On breaking release, change allRequirements into noTrigger to not automatically enable the plugin
-  //override def trigger = noTrigger
-  override def trigger = allRequirements
+  override def trigger = noTrigger
 
   private val scala_ts_compiler_version = BuildInfo.version
 
   lazy val baseScalaTsiSettings: Seq[Def.Setting[_]] = Seq(
     // User settings
     libraryDependencies += "com.scalatsi" %% "scala-tsi" % scala_ts_compiler_version,
-    typescriptGenerationImports := Seq(),
-    typescriptExports := Seq(),
-    typescriptClassesToGenerateFor := Seq(),
-    typescriptOutputFile := target.value / "scala-tsi.ts",
-    typescriptStyleSemicolons := false,
+    typescriptGenerationImports           := Seq(),
+    typescriptExports                     := Seq(),
+    typescriptOutputFile                  := target.value / "scala-tsi.ts",
+    typescriptHeader                      := Some("// DO NOT EDIT: generated file by scala-tsi"),
+    typescriptStyleSemicolons             := false,
+    typescriptTaggedUnionDiscriminator    := Some("type"),
     // Task settings
-    generateTypescript := Def.sequential(typescriptRunExporter, typescriptDeleteExporter).value,
+    generateTypescript                  := Def.sequential(typescriptRunExporter, typescriptDeleteExporter).value,
     typescriptCreateExporter in Compile := createTypescriptExporter.value,
-    typescriptRunExporter := runTypescriptExporter.value,
-    typescriptDeleteExporter := deleteTypescriptExporter.value,
+    typescriptRunExporter               := runTypescriptExporter.value,
+    typescriptDeleteExporter            := deleteTypescriptExporter.value,
     // Instruct SBT
     sourceGenerators in Compile += (typescriptCreateExporter in Compile),
     cleanFiles += typescriptOutputFile.value
@@ -55,19 +53,20 @@ object ScalaTsiPlugin extends AutoPlugin {
 
   override lazy val projectSettings: Seq[Def.Setting[_]] = baseScalaTsiSettings
 
-  private lazy val targetFile               = Def.setting { sourceManaged.value / "com" / "scalatsi" / "generator" / "ExportTypescript.scala" }
+  private lazy val targetFile = Def.setting { sourceManaged.value / "com" / "scalatsi" / "generator" / "ExportTypescript.scala" }
   private lazy val deleteTypescriptExporter = Def.task(IO.delete(targetFile.value))
 
   private lazy val createTypescriptExporter = Def.task {
-    val target          = targetFile.value
-    val typesToGenerate = typescriptExports.value ++ typescriptClassesToGenerateFor.value
+    val target = targetFile.value
 
     val toWrite: String = txt
       .ExportTypescriptTemplate(
-        typescriptGenerationImports.value,
-        typesToGenerate,
-        typescriptOutputFile.value.getAbsolutePath,
-        typescriptStyleSemicolons.value
+        imports = typescriptGenerationImports.value,
+        classes = typescriptExports.value,
+        targetFile = typescriptOutputFile.value.getAbsolutePath,
+        useSemicolons = typescriptStyleSemicolons.value,
+        header = typescriptHeader.value.getOrElse(""),
+        taggedUnionDiscriminator = typescriptTaggedUnionDiscriminator.value
       )
       .body
       .stripMargin

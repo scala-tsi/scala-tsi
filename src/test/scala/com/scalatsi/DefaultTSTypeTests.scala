@@ -4,7 +4,7 @@ import TypescriptType._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-class DefaultTSTypeTests extends AnyWordSpec with Matchers with DefaultTSTypes {
+class DefaultTSTypeTests extends AnyWordSpec with Matchers {
 
   "Default TS Types should be defined" forWord {
     "String" in { "implicitly[TSType[String]]" should compile }
@@ -67,6 +67,7 @@ class DefaultTSTypeTests extends AnyWordSpec with Matchers with DefaultTSTypes {
       "implicitly[TSType[IndexedSeq[Int]]]" should compile
       "implicitly[TSType[List[Int]]]" should compile
       "implicitly[TSType[Vector[Int]]]" should compile
+      "implicitly[TSType[Seq[Seq[Int]]]]" should compile
     }
 
     "Set[_]" in {
