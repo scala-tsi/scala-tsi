@@ -3,6 +3,8 @@ package com.scalatsi
 import com.scalatsi.output.StyleOptions
 import TypescriptType._
 
+import scala.collection.immutable.ListMap
+
 object TypescriptTypeSerializer {
 
   def serialize(tp: TypescriptType)(implicit styleOptions: StyleOptions = StyleOptions()): String = {
@@ -35,8 +37,8 @@ object TypescriptTypeSerializer {
     }
   }
 
-  private def serializeArgumentList(argList: List[(String, TypescriptType)]): String =
-    argList.map { case (n, t) => s"$n: ${serialize(t)}" }.mkString(", ")
+  private def serializeArgumentList(argList: ListMap[String, TypescriptType]): String =
+    argList.map({ case (n, t) => s"$n: ${serialize(t)}" }).mkString(", ")
 
   def emit[T](styleOptions: StyleOptions = StyleOptions())(implicit tsType: TSNamedType[T]): String =
     emits(styleOptions, types = Set(tsType.get))

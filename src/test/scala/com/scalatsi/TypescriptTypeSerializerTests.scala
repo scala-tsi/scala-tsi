@@ -280,7 +280,7 @@ class TypescriptTypeSerializerTests extends AnyFlatSpec with Matchers {
         (
           "fun1",
           TSFunction(
-            List(
+            ListMap(
               ("iarg", TSNumber),
               ("sarg", TSString)
             ),
@@ -290,11 +290,11 @@ class TypescriptTypeSerializerTests extends AnyFlatSpec with Matchers {
         (
           "fun2",
           TSFunction(
-            List(
+            ListMap(
               (
                 "farg",
                 TSFunction(
-                  List(
+                  ListMap(
                     ("iarg", TSNumber),
                     ("sarg", TSString)
                   ),

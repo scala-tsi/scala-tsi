@@ -79,18 +79,12 @@ object TypescriptType {
     override def withName(newName: String): TSEnum = copy(name = newName)
   }
 
-  /** This type is used as a marker that a type with this name exists and is either already defined or externally defined.
-    * Not a real Typescript type
-    * @note name takes from [Typescript specification](https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#3.8.2)
-    * @param impl The implementation of the type if it is known, so that the nested types can be outputted even if not directly referenced
-    * @param discriminator the discrimininator value for the type if this type is part of a discriminated union
-    */
-  case class TSTypeReference(name: String, impl: Option[TypescriptType] = None, discriminator: Option[String] = None)
-      extends TypescriptNamedType
+  // TODO: Add support for generics?
+  // TODO: Add support for type guards
+  case class TSFunction(arguments: ListMap[String, TypescriptType] = ListMap(), returnType: TypescriptType = TSVoid)
+      extends TypescriptType
       with TypescriptAggregateType {
-    override def asReference(discriminator: Option[String] = None): TSTypeReference = this
-    override def nested: Set[TypescriptType]                                        = impl.toSet
-    override def withName(newName: String): TSTypeReference                         = copy(name = newName)
+    def nested: Set[TypescriptType] = arguments.values.toSet + returnType
   }
 
   /** Typescript anonymous indexed interfaces
@@ -140,6 +134,20 @@ object TypescriptType {
     def of(of: TypescriptType*): TSTuple = TSTuple(of)
   }
 
+  /** This type is used as a marker that a type with this name exists and is either already defined or externally defined.
+    * Not a real Typescript type
+    * @note name takes from [Typescript specification](https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#3.8.2)
+    * @param impl The implementation of the type if it is known, so that the nested types can be outputted even if not directly referenced
+    * @param discriminator the discrimininator value for the type if this type is part of a discriminated union
+    */
+  case class TSTypeReference(name: String, impl: Option[TypescriptType] = None, discriminator: Option[String] = None)
+      extends TypescriptNamedType
+      with TypescriptAggregateType {
+    override def asReference(discriminator: Option[String] = None): TSTypeReference = this
+    override def nested: Set[TypescriptType]                                        = impl.toSet
+    override def withName(newName: String): TSTypeReference                         = copy(name = newName)
+  }
+
   case object TSUndefined extends TypescriptType
   // TODO: Flatten union on initialization
   case class TSUnion(of: Seq[TypescriptType]) extends TypescriptAggregateType {
@@ -149,8 +157,6 @@ object TypescriptType {
     def of(of: TypescriptType*): TSUnion = TSUnion(of)
   }
   case object TSVoid extends TypescriptType
-
-  case class TSFunction(arguments: List[(String, TypescriptType)], returnType: TypescriptType) extends TypescriptType
 
   private val tsIdentifierPattern = Pattern.compile("[_$\\p{L}\\p{Nl}][_$\\p{L}\\p{Nl}\\p{Nd}\\{Mn}\\{Mc}\\{Pc}]*")
   private[scalatsi] def isValidTSName(name: String): Boolean =
