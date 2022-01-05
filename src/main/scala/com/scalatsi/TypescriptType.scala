@@ -6,12 +6,8 @@ import scala.collection.immutable.ListMap
 import TypescriptType._
 
 sealed trait TypescriptType {
-  def |(tt: TypescriptType): TSUnion = this match {
-    case TSUnion(of) => TSUnion(of :+ tt)
-    case _           => TSUnion.of(this, tt)
-  }
-
-  def array: TSArray = TSArray(this)
+  def |(tt: TypescriptType): TSUnion = TSUnion.of(this, tt).flatten
+  def array: TSArray                 = TSArray(this)
 }
 
 object TypescriptType {
@@ -140,9 +136,17 @@ object TypescriptType {
     def of(of: TypescriptType*): TSTuple = TSTuple(of)
   }
 
-  case object TSUndefined extends TypescriptType
-  // TODO: Flatten union on initialization
+  case object TSUndefined                     extends TypescriptType
   case class TSUnion(of: Seq[TypescriptType]) extends TypescriptAggregateType {
+
+    /** Recursively flatten this union */
+    def flatten: TSUnion =
+      if (of.exists(_.isInstanceOf[TSUnion]))
+        TSUnion(of.flatMap({
+          case nested: TSUnion => nested.flatten.of
+          case other           => Seq(other)
+        }))
+      else this
     def nested: Set[TypescriptType] = of.toSet
   }
   object TSUnion {
