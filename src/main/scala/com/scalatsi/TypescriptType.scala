@@ -75,12 +75,24 @@ object TypescriptType {
     override def withName(newName: String): TSEnum = copy(name = newName)
   }
 
+  /** Anonymous Typescript function */
   // TODO: Add support for generics?
   // TODO: Add support for type guards
   case class TSFunction(arguments: ListMap[String, TypescriptType] = ListMap(), returnType: TypescriptType = TSVoid)
       extends TypescriptType
       with TypescriptAggregateType {
-    def nested: Set[TypescriptType] = arguments.values.toSet + returnType
+    override def nested: Set[TypescriptType] = arguments.values.toSet + returnType
+  }
+
+  /** A named Typescript function
+    * function name(arg1: type1, arg2: type2): returnType;
+    */
+  case class TSFunctionNamed(name: String, signature: TSFunction)
+      extends TypescriptType
+      with TypescriptAggregateType
+      with TypescriptNamedType {
+    override def nested: Set[TypescriptType]                = signature.nested
+    override def withName(newName: String): TSFunctionNamed = copy(name = newName)
   }
 
   /** Typescript anonymous indexed interfaces
