@@ -36,7 +36,10 @@ object TypescriptType {
     def name: String
     require(isValidTSName(name), s"Not a valid TypeScript identifier: $name")
 
-    def asReference(discriminator: Option[String] = None): TSTypeReference = TSTypeReference(name, Some(this), discriminator)
+    /** Whether this type should be referenced with a type query [`typeof name`](https://github.com/microsoft/TypeScript/blob/main/doc/spec-ARCHIVED.md#3.8.10) */
+    def useTypeQuery: Boolean = false
+
+    def asReference(discriminator: Option[String] = None): TSTypeReference = TSTypeReference(name, Some(this), discriminator, useTypeQuery)
 
     def withName(newName: String): TypescriptNamedType
   }
@@ -91,6 +94,7 @@ object TypescriptType {
       extends TypescriptType
       with TypescriptAggregateType
       with TypescriptNamedType {
+    override def useTypeQuery: Boolean                      = true
     override def nested: Set[TypescriptType]                = signature.nested
     override def withName(newName: String): TSFunctionNamed = copy(name = newName)
   }
@@ -144,16 +148,22 @@ object TypescriptType {
 
   /** This type is used as a marker that a type with this name exists and is either already defined or externally defined.
     * Not a real Typescript type
-    * @note name takes from [Typescript specification](https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#3.8.2)
+    * @note name takes from [Typescript specification](https://github.com/microsoft/TypeScript/blob/main/doc/spec-ARCHIVED.md#3.8.2)
     * @param impl The implementation of the type if it is known, so that the nested types can be outputted even if not directly referenced
-    * @param discriminator the discrimininator value for the type if this type is part of a discriminated union
+    * @param discriminator the discriminator value for the type if this type is part of a discriminated union
+    * @param useTypeQuery Whether this is a type query [`typeof name`](https://github.com/microsoft/TypeScript/blob/main/doc/spec-ARCHIVED.md#3.8.10)
     */
-  case class TSTypeReference(name: String, impl: Option[TypescriptType] = None, discriminator: Option[String] = None)
-      extends TypescriptNamedType
+  case class TSTypeReference(
+      name: String,
+      impl: Option[TypescriptType] = None,
+      discriminator: Option[String] = None,
+      override val useTypeQuery: Boolean = false
+  ) extends TypescriptNamedType
       with TypescriptAggregateType {
-    override def asReference(discriminator: Option[String] = None): TSTypeReference = this
-    override def nested: Set[TypescriptType]                                        = impl.toSet
-    override def withName(newName: String): TSTypeReference                         = copy(name = newName)
+    override def asReference(discriminator: Option[String] = None): TSTypeReference =
+      if (discriminator == this.discriminator) this else copy(discriminator = discriminator)
+    override def nested: Set[TypescriptType]                = impl.toSet
+    override def withName(newName: String): TSTypeReference = copy(name = newName)
   }
 
   case object TSUndefined                     extends TypescriptType

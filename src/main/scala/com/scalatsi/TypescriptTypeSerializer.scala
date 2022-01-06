@@ -10,7 +10,7 @@ object TypescriptTypeSerializer {
   def serialize(tp: TypescriptType)(implicit styleOptions: StyleOptions = StyleOptions()): String = {
     import styleOptions._
     tp match {
-      case t: TypescriptNamedType => t.name
+      case t: TypescriptNamedType => s"${if (t.useTypeQuery) "typeof " else ""}${t.name}"
       case TSAny                  => "any"
       case TSArray(elements)      => serialize(elements) + "[]"
       case TSBoolean              => "boolean"
@@ -114,7 +114,8 @@ object TypescriptTypeSerializer {
       case union: TSUnion =>
         union.nested
           .map {
-            case TSTypeReference(ref, Some(TSInterface(name, members)), Some(discriminatorValue)) =>
+            case query @ TSTypeReference(_, _, _, true) => query
+            case TSTypeReference(ref, Some(TSInterface(name, members)), Some(discriminatorValue), false) =>
               TSTypeReference(
                 ref,
                 Some(

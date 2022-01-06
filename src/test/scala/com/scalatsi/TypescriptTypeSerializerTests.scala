@@ -277,34 +277,10 @@ class TypescriptTypeSerializerTests extends AnyFlatSpec with Matchers {
     val interface =
       TSType.interface(
         "TestInterface",
-        (
-          "fun1",
-          TSFunction(
-            ListMap(
-              ("iarg", TSNumber),
-              ("sarg", TSString)
-            ),
-            TSVoid
-          )
-        ),
-        (
-          "fun2",
-          TSFunction(
-            ListMap(
-              (
-                "farg",
-                TSFunction(
-                  ListMap(
-                    ("iarg", TSNumber),
-                    ("sarg", TSString)
-                  ),
-                  TSVoid
-                )
-              )
-            ),
-            TSNumber
-          )
-        )
+        "fun1" ->
+          TSFunction(ListMap("iarg" -> TSNumber, "sarg" -> TSString), TSVoid),
+        "fun2" ->
+          TSFunction(ListMap("farg" -> TSFunction(ListMap("iarg" -> TSNumber, "sarg" -> TSString), TSVoid)), TSNumber)
       )
 
     val serialized = TypescriptTypeSerializer.emit()(interface).trim
@@ -317,4 +293,21 @@ class TypescriptTypeSerializerTests extends AnyFlatSpec with Matchers {
 
     serialized should equal(expected)
   }
+
+  it should "serialize named function references" in {
+    val function  = TSFunctionNamed("myfunc", TSFunction(ListMap(), TSVoid))
+    val interface = TSType.interface("TestInterface", "func" -> function)
+
+    val serialized = TypescriptTypeSerializer.emit()(interface).trim
+
+    val expected =
+      """|export interface TestInterface {
+         |  func: typeof myfunc
+         |}
+         |
+         |export function myfunc(): void""".stripMargin
+
+    serialized should equal(expected)
+  }
+
 }
