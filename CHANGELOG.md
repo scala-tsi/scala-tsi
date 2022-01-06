@@ -1,7 +1,7 @@
-## 0.6.0 - ...
+## 0.6.0 - 2022-01-05
 
 Improvements:
-* Adds `unknown`
+* Adds `unknown` type
 * Unions are now flattened more often
 
 Breaking changes:
