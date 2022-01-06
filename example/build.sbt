@@ -7,7 +7,7 @@ lazy val root = (project in file("."))
       scalaVersion := "2.13.7",
       organization := "com.scalatsi",
       scalacOptions ++= compilerOptions,
-      typescriptExports                  := Seq(
+      typescriptExports := Seq(
         "DeepThought",
         "Foo",
         "GreetFunction",
