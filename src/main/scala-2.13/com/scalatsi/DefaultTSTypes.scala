@@ -6,6 +6,7 @@ trait DefaultTSTypes
     extends PrimitiveTSTypes
     with ScalaTSTypes
     with CollectionTSTypes
+    with FunctionTSTypes
     with TupleTSTypes
     with JavaTSTypes
     with LiteralTSTypes

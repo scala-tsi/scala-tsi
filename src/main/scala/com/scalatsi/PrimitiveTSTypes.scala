@@ -1,6 +1,7 @@
 package com.scalatsi
 
 import TypescriptType._
+
 import scala.annotation.nowarn
 
 trait PrimitiveTSTypes {

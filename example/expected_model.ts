@@ -1,5 +1,7 @@
 // DO NOT EDIT: generated file by scala-tsi
 
+export function GreetFunction(arg0: string, arg1: number): string
+
 export interface IBar {
   value: string
 }
@@ -20,6 +22,12 @@ export interface IFoo {
   bool: boolean
   num?: number
   baz?: IBaz
+}
+
+export interface IGreeter {
+  anonymousFunction(arg0: string): number
+  namedFunction: typeof GreetFunction
+  voidFunction(): void
 }
 
 export interface IJob {

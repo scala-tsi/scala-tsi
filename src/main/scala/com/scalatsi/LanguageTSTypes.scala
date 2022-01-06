@@ -2,11 +2,13 @@ package com.scalatsi
 
 import TypescriptType._
 
+import scala.collection.immutable.ListMap
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe.TypeTag
 
 trait ScalaTSTypes {
-  implicit val anyTSType: TSType[Any] = TSType(TSAny)
+  implicit val anyTSType: TSType[Any]   = TSType(TSAny)
+  implicit val unitTsType: TSType[Unit] = TSType(TSVoid)
 }
 
 trait CollectionTSTypes extends LowPriorityCollectionTSType {
@@ -58,6 +60,7 @@ trait ScalaEnumTSTypes {
 
 trait JavaTSTypes {
   implicit val javaObjectTSType: TSType[Object] = TSType(TSObject)
+  implicit val javaVoidTSType: TSType[Void]     = TSType(TSVoid)
 
   import java.time.temporal.Temporal
   // Most JSON serializers write java.time times to a ISO8601-like string
@@ -124,4 +127,35 @@ trait TupleTSTypes {
   ): TSType[(T1, T2, T3, T4, T5, T6)] =
     TSType(TSTuple.of(t1.get, t2.get, t3.get, t4.get, t5.get, t6.get))
   // TODO: Tuple7-21
+}
+
+// TODO: Can we use reflection or macros to get the real argument names?
+trait FunctionTSTypes {
+  implicit def tsFunction0[R](implicit r: TSType[R]): TSType[() => R] =
+    TSType(TSFunction(ListMap(), r.get))
+
+  implicit def tsFunction1[P0, R](implicit t1: TSType[P0], r: TSType[R]): TSType[P0 => R] =
+    TSType(TSFunction(ListMap("arg0" -> t1.get), r.get))
+
+  implicit def tsFunction2[P0, P1, R](implicit t1: TSType[P0], t2: TSType[P1], r: TSType[R]): TSType[(P0, P1) => R] =
+    TSType(TSFunction(ListMap("arg0" -> t1.get, "arg1" -> t2.get), r.get))
+
+  implicit def tsFunction3[P0, P1, P2, R](implicit
+      t1: TSType[P0],
+      t2: TSType[P1],
+      t3: TSType[P2],
+      r: TSType[R]
+  ): TSType[(P0, P1, P2) => R] =
+    TSType(TSFunction(ListMap("arg0" -> t1.get, "arg1" -> t2.get, "arg2" -> t3.get), r.get))
+
+  implicit def tsFunction4[P0, P1, P2, P3, R](implicit
+      t1: TSType[P0],
+      t2: TSType[P1],
+      t3: TSType[P2],
+      t4: TSType[P3],
+      r: TSType[R]
+  ): TSType[(P0, P1, P2, P3) => R] =
+    TSType(TSFunction(ListMap("arg0" -> t1.get, "arg1" -> t2.get, "arg2" -> t3.get, "arg3" -> t4.get), r.get))
+
+  // TODO: Function5-22
 }

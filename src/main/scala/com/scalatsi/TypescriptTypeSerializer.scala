@@ -3,15 +3,18 @@ package com.scalatsi
 import com.scalatsi.output.StyleOptions
 import TypescriptType._
 
+import scala.collection.immutable.ListMap
+
 object TypescriptTypeSerializer {
 
   def serialize(tp: TypescriptType)(implicit styleOptions: StyleOptions = StyleOptions()): String = {
     import styleOptions._
     tp match {
-      case t: TypescriptNamedType => t.name
+      case t: TypescriptNamedType => s"${if (t.useTypeQuery) "typeof " else ""}${t.name}"
       case TSAny                  => "any"
       case TSArray(elements)      => serialize(elements) + "[]"
       case TSBoolean              => "boolean"
+      case TSFunction(args, rt)   => s"${serializeArgumentList(args)} => ${serialize(rt)}"
       case TSIndexedInterface(indexName, indexType, valueType) =>
         s"{ [ $indexName: ${serialize(indexType)} ]: ${serialize(valueType)}$sc }"
       case TSIntersection(Seq())  => serialize(TSNever)
@@ -34,6 +37,9 @@ object TypescriptTypeSerializer {
       case TSLiteralString(v)     => s""""${v.replace("\"", "\"\"")}""""
     }
   }
+
+  private def serializeArgumentList(argList: ListMap[String, TypescriptType]): String =
+    argList.map({ case (n, t) => s"$n: ${serialize(t)}" }).mkString("(", ", ", ")")
 
   def emit[T](styleOptions: StyleOptions = StyleOptions())(implicit tsType: TSNamedType[T]): String =
     emits(styleOptions, types = Set(tsType.get))
@@ -62,7 +68,7 @@ object TypescriptTypeSerializer {
     import styleOptions._
     named match {
       case TSAlias(name, underlying) =>
-        Some(s"export type $name = ${serialize(underlying)}")
+        Some(s"export type $name = ${serialize(underlying)}$sc")
 
       case TSEnum(name, const, entries) =>
         val mbs = entries.map({
@@ -73,7 +79,8 @@ object TypescriptTypeSerializer {
                 |${mbs.mkString(",\n")}
                 |}$sc""".stripMargin)
 
-      case _: TSTypeReference => None
+      case TSFunctionNamed(name, signature) =>
+        Some(s"export function $name${serializeArgumentList(signature.arguments)}: ${serialize(signature.returnType)}$sc")
 
       case TSInterfaceIndexed(name, indexName, indexType, valueType) =>
         Some(s"""export interface $name {
@@ -83,13 +90,18 @@ object TypescriptTypeSerializer {
       case TSInterface(name, members) =>
         def symbol(required: Boolean) = if (required) ":" else "?:"
 
-        val mbs = members.map({ case (memberName, TSInterfaceEntry(tp, required)) =>
-          s"  $memberName${symbol(required)} ${serialize(tp)}"
+        val mbs = members.map({
+          case (memberName, TSInterfaceEntry(TSFunction(arguments, returnType), _)) =>
+            s"  $memberName${serializeArgumentList(arguments)}: ${serialize(returnType)}"
+          case (memberName, TSInterfaceEntry(tp, required)) =>
+            s"  $memberName${symbol(required)} ${serialize(tp)}"
         })
 
         Some(s"""export interface $name {
                 |${mbs.mkString("", s"$sc\n", sc)}
                 |}""".stripMargin)
+
+      case _: TSTypeReference => None
     }
   }
 
@@ -102,7 +114,8 @@ object TypescriptTypeSerializer {
       case union: TSUnion =>
         union.nested
           .map {
-            case TSTypeReference(ref, Some(TSInterface(name, members)), Some(discriminatorValue)) =>
+            case query @ TSTypeReference(_, _, _, true) => query
+            case TSTypeReference(ref, Some(TSInterface(name, members)), Some(discriminatorValue), false) =>
               TSTypeReference(
                 ref,
                 Some(
