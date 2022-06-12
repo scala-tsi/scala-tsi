@@ -1,4 +1,4 @@
-## 0.6.1 - ...
+## 0.6.1 - 2022-06-12
 
 * Add initial support for function types ([#136](https://github.com/scala-tsi/scala-tsi/pull/136) by @vincentdehaan)
 
