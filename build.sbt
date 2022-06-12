@@ -9,7 +9,7 @@ Global / excludeLintKeys ++= Set(
   scala213Version
 )
 
-val scala213             = "2.13.7"
+val scala213             = "2.13.8"
 lazy val scala213Version = settingKey[String]("Scala 2.13 version")
 scala213Version := scala213
 val scala212             = "2.12.15"
