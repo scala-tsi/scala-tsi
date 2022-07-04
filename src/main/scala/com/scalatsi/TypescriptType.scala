@@ -78,6 +78,13 @@ object TypescriptType {
     override def withName(newName: String): TSEnum = copy(name = newName)
   }
 
+  case class TSStringEnum(name: String, const: Boolean, entries: ListMap[String, String])
+      extends TypescriptNamedType
+      with TypescriptAggregateType {
+    def nested: Set[TypescriptType]                             = Set(TSString)
+    override def withName(newName: String): TSStringEnum = copy(name = newName)
+  }
+
   /** Anonymous Typescript function */
   // TODO: Add support for generics?
   // TODO: Add support for type guards

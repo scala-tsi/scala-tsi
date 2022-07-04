@@ -1,7 +1,7 @@
 package com.scalatsi
 
+import com.scalatsi.TypescriptType._
 import com.scalatsi.output.StyleOptions
-import TypescriptType._
 
 import scala.collection.immutable.ListMap
 
@@ -76,6 +76,12 @@ object TypescriptTypeSerializer {
           case (entryName, None)    => s"  $entryName"
         })
         Some(s"""export ${if (const) "const " else ""}enum $name {
+                |${mbs.mkString(",\n")}
+                |}$sc""".stripMargin)
+
+      case TSStringEnum(name, const, entries) =>
+        val mbs = entries.map { case (entryName, value) => s"  $entryName = '$value'" }
+        Some(s"""export ${if (const) "const" else ""}enum $name {
                 |${mbs.mkString(",\n")}
                 |}$sc""".stripMargin)
 
