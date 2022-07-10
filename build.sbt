@@ -131,7 +131,7 @@ lazy val scalatsiSettings = Seq(
   libraryDependencies ++= Seq(
     // TODO: nowarn has been ported to scala 2.12 so can be removed
     // To support @nowarn in 2.12
-    "org.scala-lang.modules" %% "scala-collection-compat" % "2.7.0",
+    "org.scala-lang.modules" %% "scala-collection-compat" % "2.8.0",
     // testing framework
     "org.scalatest" %% "scalatest" % "3.2.12" % "test"
   )

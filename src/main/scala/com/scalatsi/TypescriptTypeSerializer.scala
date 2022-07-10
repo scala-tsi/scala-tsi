@@ -1,7 +1,7 @@
 package com.scalatsi
 
+import com.scalatsi.TypescriptType._
 import com.scalatsi.output.StyleOptions
-import TypescriptType._
 
 import scala.collection.immutable.ListMap
 
@@ -72,11 +72,11 @@ object TypescriptTypeSerializer {
 
       case TSEnum(name, const, entries) =>
         val mbs = entries.map({
-          case (entryName, Some(i)) => s"  $entryName = $i"
-          case (entryName, None)    => s"  $entryName"
+          case (entryName, Some(entryValue)) => s"  $entryName = ${serialize(entryValue)}"
+          case (entryName, None)             => s"  $entryName"
         })
         Some(s"""export ${if (const) "const " else ""}enum $name {
-                |${mbs.mkString(",\n")}
+                |${mbs.mkString("", ",\n", ",")}
                 |}$sc""".stripMargin)
 
       case TSFunctionNamed(name, signature) =>
