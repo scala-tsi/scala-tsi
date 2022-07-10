@@ -7,5 +7,3 @@ case class GenericCaseClass(
     emails: Seq[Email],
     mapping: Map[String, Person]
 )
-
-
