@@ -4,6 +4,7 @@ import scala.reflect.macros.blackbox
 
 /** Generic Macro utility not really related to specific scala-tsi logic */
 private[scalatsi] class MacroUtil[C <: blackbox.Context](val c: C) {
+  import c.universe.Type
 
   case object CircularReference
 
@@ -22,13 +23,20 @@ private[scalatsi] class MacroUtil[C <: blackbox.Context](val c: C) {
       }
     }
 
+  def implicitIsDefined(T: c.Type): Boolean =
+    lookupOptionalImplicit(T).exists(_.isDefined)
+
   /** Create a type representing F[T] from a T and a F[_] */
-  def properType[T: c.WeakTypeTag, F[_]](implicit tsTypeTag: c.WeakTypeTag[F[_]]) = {
+  def properType[F[_]](T: Type)(implicit tsTypeTag: c.WeakTypeTag[F[_]]): Type = {
     // Get the T => F[T] function
     val typeConstructor = c.weakTypeOf[F[_]].typeConstructor
     // Construct the F[T] type we need to look up
-    c.universe.appliedType(typeConstructor, c.weakTypeOf[T])
+    c.universe.appliedType(typeConstructor, T)
   }
+
+  /** Create a type representing F[T] from a T and a F[_] */
+  def properType[T: c.WeakTypeTag, F[_]](implicit tsTypeTag: c.WeakTypeTag[F[_]]): Type =
+    properType[F](c.weakTypeOf[T])
 
   /** HACK: Check if we are too deep in the stack to continue
     * Circular references cause an infinite loop while searching for implicits in combination with default values

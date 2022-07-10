@@ -2,26 +2,16 @@
 
 export function GreetFunction(arg0: string, arg1: number): string
 
-export interface IBar {
-  value: string
-}
-
-export interface IBaz {
-  boo: boolean
-  bar: number
-}
-
 export interface IDeepThought {
   query: "The Answer to Life, the Universe and Everything"
   answer: 42
   question: null
 }
 
-export interface IFoo {
-  bar: IBar
-  bool: boolean
-  num?: number
-  baz?: IBaz
+export interface IGenericCaseClass {
+  optional?: string
+  emails: string[]
+  mapping: { [ key: string ]: IPerson }
 }
 
 export interface IGreeter {
@@ -33,6 +23,11 @@ export interface IGreeter {
 export interface IJob {
   tasks: string[]
   boss: string
+}
+
+export interface IMyCaseClass {
+  nested: IPerson
+  bool: boolean
 }
 
 export interface IPerson {
