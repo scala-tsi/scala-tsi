@@ -1,3 +1,11 @@
+## 0.7.0 - ...
+
+* Add support for string enums in `TSEnum` (#236 by @b-eyselein) and several factory methods in the `TSType` companion object.
+* Fix a bug where custom definitions did not always work when used as a generic parameter (#242)
+
+Breaking changes:
+* `TSEnum` `entries` changed from `ListMap[String, Option[Int]]` to `ListMap[String, Option[TSLiteralType[_]]`
+
 ## 0.6.1 - 2022-06-12
 
 * Add initial support for function types ([#136](https://github.com/scala-tsi/scala-tsi/pull/136) by @vincentdehaan)
