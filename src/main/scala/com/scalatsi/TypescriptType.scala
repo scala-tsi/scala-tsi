@@ -79,11 +79,11 @@ object TypescriptType {
   }
   object TSEnum {
     def of(name: String, entries: String*): TSEnum =
-      TSEnum(name, const = false, entries.map(e => e -> None).to(ListMap))
+      TSEnum(name, const = false, ListMap(entries.map(e => e -> None): _*))
     def numeric(name: String, entries: (String, Int)*): TSEnum =
-      TSEnum(name, const = false, entries.map({ case (e, value) => e -> Some(TSLiteralNumber(value)) }).to(ListMap))
+      TSEnum(name, const = false, ListMap(entries.map({ case (e, value) => e -> Some(TSLiteralNumber(value)) }): _*))
     def string(name: String, entries: (String, String)*): TSEnum =
-      TSEnum(name, const = false, entries.map({ case (e, value) => e -> Some(TSLiteralString(value)) }).to(ListMap))
+      TSEnum(name, const = false, ListMap(entries.map({ case (e, value) => e -> Some(TSLiteralString(value)) }): _*))
   }
 
   /** Anonymous Typescript function */
