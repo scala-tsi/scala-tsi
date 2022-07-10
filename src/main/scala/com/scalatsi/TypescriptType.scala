@@ -71,11 +71,19 @@ object TypescriptType {
   case class TSLiteralNumber(value: BigDecimal) extends TSLiteralType[BigDecimal]
   case class TSLiteralBoolean(value: Boolean)   extends TSLiteralType[Boolean]
 
-  case class TSEnum(name: String, const: Boolean, entries: ListMap[String, Option[Int]])
+  case class TSEnum(name: String, const: Boolean, entries: ListMap[String, Option[TSLiteralType[_]]])
       extends TypescriptNamedType
       with TypescriptAggregateType {
-    def nested: Set[TypescriptType]                = Set(TSNumber)
+    def nested: Set[TypescriptType]                = entries.values.flatMap(_.toSeq).toSet
     override def withName(newName: String): TSEnum = copy(name = newName)
+  }
+  object TSEnum {
+    def of(name: String, entries: String*): TSEnum =
+      TSEnum(name, const = false, ListMap(entries.map(e => e -> None): _*))
+    def numeric(name: String, entries: (String, Int)*): TSEnum =
+      TSEnum(name, const = false, ListMap(entries.map({ case (e, value) => e -> Some(TSLiteralNumber(value)) }): _*))
+    def string(name: String, entries: (String, String)*): TSEnum =
+      TSEnum(name, const = false, ListMap(entries.map({ case (e, value) => e -> Some(TSLiteralString(value)) }): _*))
   }
 
   /** Anonymous Typescript function */

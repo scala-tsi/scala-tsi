@@ -310,4 +310,60 @@ class TypescriptTypeSerializerTests extends AnyFlatSpec with Matchers {
     serialized should equal(expected)
   }
 
+  it should "serialize enums" in {
+    val tsEnum     = TSEnum.of("MyEnum", "A", "B", "C")
+    val serialized = TypescriptTypeSerializer.emit()(tsEnum).trim
+
+    val expected =
+      """|export enum MyEnum {
+         |  A,
+         |  B,
+         |  C,
+         |}""".stripMargin
+
+    serialized should equal(expected)
+  }
+
+  it should "serialize const enums" in {
+    val tsEnum     = TSEnum.of("MyEnum", "A", "B", "C").copy(const = true)
+    val serialized = TypescriptTypeSerializer.emit()(tsEnum).trim
+
+    val expected =
+      """|export const enum MyEnum {
+         |  A,
+         |  B,
+         |  C,
+         |}""".stripMargin
+
+    serialized should equal(expected)
+  }
+
+  it should "serialize numeric enums" in {
+    val tsEnum     = TSEnum.numeric("MyEnum", "A" -> 2, "B" -> 3, "C" -> 5)
+    val serialized = TypescriptTypeSerializer.emit()(tsEnum).trim
+
+    val expected =
+      """|export enum MyEnum {
+         |  A = 2,
+         |  B = 3,
+         |  C = 5,
+         |}""".stripMargin
+
+    serialized should equal(expected)
+  }
+
+  it should "serialize string enums" in {
+    val tsEnum     = TSEnum.string("MyEnum", "A" -> "a", "B" -> "bValue", "C" -> "c")
+    val serialized = TypescriptTypeSerializer.emit()(tsEnum).trim
+
+    val expected =
+      """|export enum MyEnum {
+         |  A = "a",
+         |  B = "bValue",
+         |  C = "c",
+         |}""".stripMargin
+
+    serialized should equal(expected)
+  }
+
 }
