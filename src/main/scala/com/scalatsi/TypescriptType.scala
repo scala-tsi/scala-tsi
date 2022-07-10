@@ -71,18 +71,19 @@ object TypescriptType {
   case class TSLiteralNumber(value: BigDecimal) extends TSLiteralType[BigDecimal]
   case class TSLiteralBoolean(value: Boolean)   extends TSLiteralType[Boolean]
 
-  case class TSEnum(name: String, const: Boolean, entries: ListMap[String, Option[Int]])
+  case class TSEnum(name: String, const: Boolean, entries: ListMap[String, Option[TSLiteralType[_]]])
       extends TypescriptNamedType
       with TypescriptAggregateType {
-    def nested: Set[TypescriptType]                = Set(TSNumber)
+    def nested: Set[TypescriptType]                = entries.values.flatMap(_.toSeq).toSet
     override def withName(newName: String): TSEnum = copy(name = newName)
   }
-
-  case class TSStringEnum(name: String, const: Boolean, entries: ListMap[String, String])
-      extends TypescriptNamedType
-      with TypescriptAggregateType {
-    def nested: Set[TypescriptType]                      = Set(TSString)
-    override def withName(newName: String): TSStringEnum = copy(name = newName)
+  object TSEnum {
+    def of(name: String, entries: String*): TSEnum =
+      TSEnum(name, const = false, entries.map(e => e -> None).to(ListMap))
+    def numeric(name: String, entries: (String, Int)*): TSEnum =
+      TSEnum(name, const = false, entries.map({ case (e, value) => e -> Some(TSLiteralNumber(value)) }).to(ListMap))
+    def string(name: String, entries: (String, String)*): TSEnum =
+      TSEnum(name, const = false, entries.map({ case (e, value) => e -> Some(TSLiteralString(value)) }).to(ListMap))
   }
 
   /** Anonymous Typescript function */
