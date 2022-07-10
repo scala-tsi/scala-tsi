@@ -136,6 +136,15 @@ class MacroTests extends AnyFlatSpec with Matchers {
     TSType.fromSealed[Single] shouldBe TSType.alias("Single", TSTypeReference("IA", Some(a)))
   }
 
+  it should "handle case classes with polymorphic custom types inside" in {
+    class CustomTsType
+    case class ContainsGeneric(foos: Seq[CustomTsType])
+
+    @nowarn("cat=unused") implicit val tsFoo: TSType[CustomTsType] = TSType(TSString)
+
+    TSType.fromCaseClass[ContainsGeneric] shouldBe TSType.interface("IContainsGeneric", "foos" -> TSString.array)
+  }
+
   "TSType.getOrGenerate" should "use available implicit if in scope" in {
     case class A(foo: String)
 
@@ -197,6 +206,13 @@ class MacroTests extends AnyFlatSpec with Matchers {
     @nowarn("cat=unused") sealed class Something {}
 
     "TSType.getOrGenerate[Something]" shouldNot compile
+  }
+
+  it should "support custom polymorphic types in the same scope" in {
+    class CustomInPolymorphic
+
+    @nowarn("cat=unused") implicit val customTsType: TSType[CustomInPolymorphic] = TSType(TSString)
+    TSType.getOrGenerate[Seq[CustomInPolymorphic]] shouldBe TSType(TSString.array)
   }
 
   "TSIType.getOrGenerate" should "use available implicit if in scope" in {
