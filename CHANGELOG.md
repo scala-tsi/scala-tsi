@@ -1,4 +1,4 @@
-## 0.7.0 - ...
+## 0.7.0 - 2022-07-13
 
 * Add support for string enums in `TSEnum` (#236 by @b-eyselein) and several factory methods in the `TSType` companion object.
 * Fix a bug where custom definitions did not always work when used as a generic parameter (#242)
