@@ -1,6 +1,9 @@
 version: 2.1
 jobs:
   build:
+    parameters:
+      scala-version:
+        type: string
     working_directory: ~/scala-tsi
     docker:
       - image: circleci/openjdk:8
@@ -9,23 +12,21 @@ jobs:
 
       - restore_cache:
           keys:
-            - scala-tsi-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
-            - scala-tsi-7
+            - scala-tsi-<< parameters.scala-version >>-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
+            - scala-tsi-<< parameters.scala-version >>-1
 
       - run:
-          name: Compile and test for 2.13
+          name: Compile
           command: |
-            scalav=$(sbt --no-colors --error "print scala213Version" | xargs)
-            sbt -batch ++"$scalav" compile Test/compile sbt-scala-tsi/compile sbt-scala-tsi/Test/compile exit
-
-      - run:
-          name: Compile and test for 2.12
-          command: |
-            scalav=$(sbt --no-colors --error "print scala212Version" | xargs)
-            sbt -batch ++"$scalav" compile Test/compile sbt-scala-tsi/compile sbt-scala-tsi/Test/compile exit
+            sbt -batch ++"<< parameters.scala-version >>.x" \
+            compile \
+            Test/compile \
+            sbt-scala-tsi/compile \
+            sbt-scala-tsi/Test/compile \
+            exit
 
       - save_cache:
-          key:  scala-tsi-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
+          key:  scala-tsi-<< parameters.scala-version >>-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
           paths:
             - target/resolution-cache
             - target/streams
@@ -35,8 +36,8 @@ jobs:
             - ~/.cache
 
       - save_cache:
-        # Changing this key/incrementing the number at the end is the only way to remove old dependencies and/or generate a more up-to-date cache
-          key: scala-tsi-6
+          # Change the number to switch to a cache with up-to-date dependencies
+          key: scala-tsi-<< parameters.scala-version >>-1
           paths:
             - ~/.sbt
             - ~/.cache
@@ -44,17 +45,17 @@ jobs:
       - run:
           name: Check formatting
           command:
-            sbt scalafmtSbtCheck scalafmtCheckAll exit
+            sbt -batch scalafmtSbtCheck scalafmtCheckAll exit
 
       - run:
-          name: "Run scala-tsi tests"
+          name: Test
           command:
-            sbt test scala-tsi-macros/test exit
+            sbt -batch ++"<< parameters.scala-version >>.x" test scala-tsi-macros/test exit
 
       - run:
-          name: "Run sbt-scala-tsi scripted tests"
+          name: Run sbt-scala-tsi scripted tests
           command:
-            sbt sbt-scala-tsi/scripted
+            sbt -batch sbt-scala-tsi/scripted
 
       - store_test_results:
           path: target/test-reports
@@ -64,22 +65,27 @@ jobs:
           command: |
             set -x
             if [ -z "$CIRCLE_PR_USERNAME" ]; then
-              sbt -batch publishLocalSigned sbt-scala-tsi/publishLocalSigned
+              sbt -batch ++"<< parameters.scala-version >>.x" publishLocalSigned sbt-scala-tsi/publishLocalSigned
             else
               # On forked PR, do an unsigned publish
-              sbt -batch publishLocal sbt-scala-tsi/publishLocal
+              sbt -batch ++"<< parameters.scala-version >>.x" publishLocal sbt-scala-tsi/publishLocal
             fi
 
       - run:
-          name: "test and generate example project"
+          name: Check, test and generate example project
           command: |
             VERSION=$(cd ../ && sbt --no-colors --error "print version" | xargs)
-            sbt -batch -Dplugin.version="$VERSION" test generateTypescript scalafmtSbtCheck scalafmtCheckAll exit
+            sbt -batch ++"<< parameters.scala-version >>.x" -Dplugin.version="$VERSION" \
+            test \
+            generateTypescript \
+            scalafmtSbtCheck \
+            scalafmtCheckAll \
+            exit
           working_directory: example
 
       - run:
-          # This is also done with sbt-scala-tsi/scripted, but that it a little easier to accidentally disable than this
-          name: "Check example project output"
+          # This is also done with sbt-scala-tsi/scripted, but that is a little easier to accidentally disable than this
+          name: Check example project output
           command: diff model.ts expected_model.ts
           working_directory: example
           
@@ -88,12 +94,6 @@ jobs:
 
       - store_artifacts:
           path: example/model.ts
-
-      - run:
-          name: "Publish under new name"
-          command: |
-            test -d ~/.ivy2/local/com.scalatsi/sbt-scala-tsi
-            test -d ~/.ivy2/local/com.scalatsi/scala-tsi_2.13
 
   publish:
     working_directory: ~/scala-tsi
@@ -121,6 +121,11 @@ workflows:
   build_and_publish:
     jobs:
       - build:
+          matrix:
+            parameters:
+              scala-version:
+                - "2.13"
+                - "2.12"
           filters:  # required since `deploy` has tag filters AND requires `build`
             tags:
               only: /.*/

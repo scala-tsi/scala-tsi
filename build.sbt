@@ -3,18 +3,8 @@ import sbt.ScriptedPlugin.autoImport.scriptedBufferLog
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-Global / excludeLintKeys ++= Set(
-  // Used by CI to share the scala version during builds
-  scala212Version,
-  scala213Version
-)
-
-val scala213             = "2.13.8"
-lazy val scala213Version = settingKey[String]("Scala 2.13 version")
-scala213Version := scala213
-val scala212             = "2.12.16"
-lazy val scala212Version = settingKey[String]("Scala 2.12 version")
-scala212Version := scala212
+val scala213 = "2.13.8"
+val scala212 = "2.12.16"
 
 lazy val commonSettings = Seq(
   organization       := "com.scalatsi",
