@@ -19,11 +19,11 @@ jobs:
           name: Compile
           command: |
             sbt -batch ++"<< parameters.scala-version >>.x" \
-            compile \
-            Test/compile \
-            sbt-scala-tsi/compile \
-            sbt-scala-tsi/Test/compile \
-            exit
+              compile \
+              Test/compile \
+              sbt-scala-tsi/compile \
+              sbt-scala-tsi/Test/compile \
+              exit
 
       - save_cache:
           key:  scala-tsi-<< parameters.scala-version >>-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
@@ -74,13 +74,17 @@ jobs:
       - run:
           name: Check, test and generate example project
           command: |
+            # Example project requires 2.13
+            if [ "<< parameters.scala-version >>" = "2.12" ]; then
+              circleci-agent step halt
+            fi
             VERSION=$(cd ../ && sbt --no-colors --error "print version" | xargs)
-            sbt -batch ++"<< parameters.scala-version >>.x" -Dplugin.version="$VERSION" \
-            test \
-            generateTypescript \
-            scalafmtSbtCheck \
-            scalafmtCheckAll \
-            exit
+            sbt -batch -Dplugin.version="$VERSION" \
+              test \
+              generateTypescript \
+              scalafmtSbtCheck \
+              scalafmtCheckAll \
+              exit
           working_directory: example
 
       - run:
@@ -104,8 +108,7 @@ jobs:
 
       - restore_cache:
           keys:
-            - scala-tsi-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
-            - scala-tsi-6
+            - scala-tsi-2.13-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
 
       - run:
           command:
