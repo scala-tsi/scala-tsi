@@ -1,12 +1,26 @@
 pull_request_rules:
+  - name: automatically update PRs
+    conditions:
+      - or:
+        - author=scalatsi
+        - author=scala-steward
+        - author=dhoepelman
+    actions:
+      update:
   - name: automatically merge scala-steward PRs
     conditions:
       - or:
         - author=scalatsi
         - author=scala-steward
-      - "status-success=ci/circleci: build"
+      - "status-success=ci/circleci: build-2.12"
+      - "status-success=ci/circleci: build-2.13"
       - -title~=.*pgp.*
       - body~=labels:.*semver-((minor)|(patch)).*
     actions:
       merge:
         method: squash
+  - name: delete head branch after merge
+    conditions:
+      - merged
+    actions:
+      delete_head_branch:
