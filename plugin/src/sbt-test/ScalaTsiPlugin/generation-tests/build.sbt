@@ -4,7 +4,7 @@ lazy val root = (project in file("."))
   .enablePlugins(ScalaTsiPlugin)
   .settings(
     Seq(
-      scalaVersion                := "2.13.9",
+      scalaVersion                := "2.13.8",
       organization                := "com.scalatsi",
       typescriptExports           := Seq("DeepNestingTopLevel", "NestedGenerated"),
       typescriptGenerationImports := Seq("models._"),
