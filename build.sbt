@@ -123,7 +123,7 @@ lazy val scalatsiSettings = Seq(
     // To support @nowarn in 2.12
     "org.scala-lang.modules" %% "scala-collection-compat" % "2.9.0",
     // testing framework
-    "org.scalatest" %% "scalatest" % "3.2.14" % "test"
+    "org.scalatest" %% "scalatest" % "3.2.15" % "test"
   )
 )
 
