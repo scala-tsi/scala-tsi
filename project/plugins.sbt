@@ -6,7 +6,7 @@ addSbtPlugin("com.typesafe.play" % "sbt-twirl" % "1.5.2")
 
 // To enable publishing to maven central
 addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.15")
-addSbtPlugin("com.jsuereth"   % "sbt-pgp"      % "1.1.2-1")
+addSbtPlugin("com.github.sbt" % "sbt-pgp"      % "2.2.1")
 
 // Enable version infromation in the build
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.11.0")

@@ -64,6 +64,7 @@ jobs:
           command: |
             set -x
             if [ -z "$CIRCLE_PR_USERNAME" ]; then
+              gpg --batch --yes --import .circleci/circleci.key.asc
               sbt -batch ++"<< parameters.scala-version >>.x" publishLocalSigned sbt-scala-tsi/publishLocalSigned
             else
               # On forked PR, do an unsigned publish
@@ -107,6 +108,7 @@ jobs:
 
       - run:
           command:
+            gpg --batch --yes --import .circleci/circleci.key.asc
             sbt -batch +publishSigned +sbt-scala-tsi/publishSigned
 
       # releases everything from com.scala-tsi, look into releasing only this project

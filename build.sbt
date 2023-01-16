@@ -19,6 +19,7 @@ lazy val commonSettings = Seq(
 
 /* Settings to publish to maven central */
 lazy val publishSettings = Seq(
+  versionScheme     := Some("early-semver"),
   publishMavenStyle := true,
   publishTo         := sonatypePublishTo.value,
   credentials ++= sys.env
