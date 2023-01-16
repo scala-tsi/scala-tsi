@@ -6,7 +6,7 @@ jobs:
         type: string
     working_directory: ~/scala-tsi
     docker:
-      - image: cimg/openjdk:11.0
+      - image: cimg/openjdk:8.0
     steps:
       - checkout
 
