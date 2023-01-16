@@ -42,12 +42,12 @@ object ScalaTsiPlugin extends AutoPlugin {
     typescriptStyleSemicolons             := false,
     typescriptTaggedUnionDiscriminator    := Some("type"),
     // Task settings
-    generateTypescript                  := Def.sequential(typescriptRunExporter, typescriptDeleteExporter).value,
-    typescriptCreateExporter in Compile := createTypescriptExporter.value,
-    typescriptRunExporter               := runTypescriptExporter.value,
-    typescriptDeleteExporter            := deleteTypescriptExporter.value,
+    generateTypescript                 := Def.sequential(typescriptRunExporter, typescriptDeleteExporter).value,
+    Compile / typescriptCreateExporter := createTypescriptExporter.value,
+    typescriptRunExporter              := runTypescriptExporter.value,
+    typescriptDeleteExporter           := deleteTypescriptExporter.value,
     // Instruct SBT
-    sourceGenerators in Compile += (typescriptCreateExporter in Compile),
+    Compile / sourceGenerators += (Compile / typescriptCreateExporter),
     cleanFiles += typescriptOutputFile.value
   )
 
@@ -75,7 +75,7 @@ object ScalaTsiPlugin extends AutoPlugin {
     Seq(target)
   }
 
-  private lazy val runTypescriptExporter = (runMain in Compile)
+  private lazy val runTypescriptExporter = (Compile / runMain)
     .toTask(" com.scalatsi.generator.ExportTypescript")
     .dependsOn(createTypescriptExporter)
 }

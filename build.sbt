@@ -139,6 +139,10 @@ lazy val `sbt-scala-tsi` = (project in file("plugin"))
     publishLocal := publishLocal.dependsOn(scalaTsiPublishLocal).value
   )
   .settings(
+    // Twirl template gives an incorrect unused import warning
+    scalacOptions := scalacOptions.value diff Seq("-Xlint", "-Ywarn-unused:imports")
+  )
+  .settings(
     scriptedLaunchOpts := {
       scriptedLaunchOpts.value ++
         Seq("-Xmx1024M", "-XX:MaxPermSize=256M", "-Dplugin.version=" + version.value)

@@ -24,7 +24,6 @@ jobs:
               sbt-scala-tsi/compile \
               sbt-scala-tsi/Test/compile \
               exit
-
       - save_cache:
           key:  scala-tsi-<< parameters.scala-version >>-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
           paths:
