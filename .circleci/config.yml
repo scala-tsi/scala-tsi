@@ -13,7 +13,7 @@ jobs:
       - restore_cache:
           keys:
             - scala-tsi-<< parameters.scala-version >>-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
-            - scala-tsi-<< parameters.scala-version >>-1
+            - scala-tsi-<< parameters.scala-version >>-2
 
       - run:
           name: Compile
@@ -37,7 +37,7 @@ jobs:
 
       - save_cache:
           # Change the number to switch to a cache with up-to-date dependencies
-          key: scala-tsi-<< parameters.scala-version >>-1
+          key: scala-tsi-<< parameters.scala-version >>-2
           paths:
             - ~/.sbt
             - ~/.cache
@@ -74,10 +74,6 @@ jobs:
       - run:
           name: Check, test and generate example project
           command: |
-            # Example project requires 2.13
-            if [ "<< parameters.scala-version >>" = "2.12" ]; then
-              circleci-agent step halt
-            fi
             VERSION=$(cd ../ && sbt --no-colors --error "print version" | xargs)
             sbt -batch -Dplugin.version="$VERSION" \
               test \
@@ -128,7 +124,7 @@ workflows:
             parameters:
               scala-version:
                 - "2.13"
-                - "2.12"
+                - "3"
           filters:  # required since `deploy` has tag filters AND requires `build`
             tags:
               only: /.*/
