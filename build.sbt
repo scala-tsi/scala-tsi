@@ -153,7 +153,15 @@ lazy val `sbt-scala-tsi` = (project in file("plugin"))
   )
   .settings(
     scriptedLaunchOpts := {
-      scriptedLaunchOpts.value ++ Seq("-Xmx1024M", "-Dplugin.version=" + version.value)
+      scriptedLaunchOpts.value ++ Seq(
+        "-Xmx1024M",
+        "-Dplugin.version=" + version.value,
+        "-Dscala.version=" + (sys.props.get("scala.version") match {
+          case Some("3")    => scala3
+          case Some("2.13") => scala213
+          case _            => scala213
+        })
+      )
     },
     scriptedBufferLog := false,
     // Make sure to publish the library locally first

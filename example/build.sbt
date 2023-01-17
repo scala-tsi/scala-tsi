@@ -1,16 +1,14 @@
 import sbt.Keys._
 
-val scala3   = "3.2.1"
-val scala213 = "2.13.10"
+val scalaVersion = "2.13.10"
 
 lazy val root = (project in file("."))
   .enablePlugins(ScalaTsiPlugin)
   .settings(
     Seq(
-      scalaVersion := scala3,
+      scalaVersion := sys.props.get("scala.version").getOrElse(scalaVersion),
       organization := "com.scalatsi",
       scalacOptions ++= compilerOptions,
-      crossScalaVersions := Seq(scala213, scala3),
       typescriptExports := Seq(
         "DeepThought",
         "GenericCaseClass",
@@ -26,8 +24,6 @@ lazy val root = (project in file("."))
       typescriptOutputFile               := baseDirectory.value / "model.ts",
       typescriptTaggedUnionDiscriminator := Some("kind"),
       scalafmtConfig                     := file("../.scalafmt.conf")
-      // Enable to debug macros
-      // scalacOptions += "-Ymacro-debug-lite"
     )
   )
 
