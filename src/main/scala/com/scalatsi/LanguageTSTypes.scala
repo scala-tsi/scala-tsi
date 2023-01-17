@@ -1,7 +1,8 @@
 package com.scalatsi
 
-import TypescriptType._
+import TypescriptType.*
 
+import scala.annotation.unused
 import scala.collection.immutable.ListMap
 import scala.reflect.ClassTag
 
@@ -29,7 +30,7 @@ trait CollectionTSTypes extends LowPriorityCollectionTSType {
 trait LowPriorityCollectionTSType {
 
   /** Provides a TSType for any scala collection of E to a typescript array of E */
-  implicit def tsTraversable[E, F[_]](implicit e: TSType[E], ev: F[E] <:< Iterable[E]): TSType[F[E]] = TSType(e.get.array)
+  implicit def tsTraversable[E, F[_]](implicit e: TSType[E], @unused ev: F[E] <:< Iterable[E]): TSType[F[E]] = TSType(e.get.array)
 }
 
 trait ScalaEnumTSTypes {
@@ -62,7 +63,7 @@ trait JavaTSTypes {
   // All java collection types implement Collection and are almost always translated to javascript arrays
   implicit def tsJavaCollection[E, F[_]](implicit
       e: TSType[E],
-      ev: F[E] <:< java.util.Collection[E]
+      @unused ev: F[E] <:< java.util.Collection[E]
   ): TSType[F[E]] = TSType(e.get.array)
 
   implicit val javaUriTSType: TSType[java.net.URI]    = TSType(TSString)

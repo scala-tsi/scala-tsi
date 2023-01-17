@@ -107,7 +107,6 @@ class Macros(using Quotes) {
   }
 
   private def notFound[T: Type]: String = {
-    report.info(s"nowFound[${Type.show[T]}]")
     val t = TypeRepr.of[T]
     val isDefault = t =:= TypeRepr.of[String] ||
       t <:< TypeRepr.of[Numeric[_]] ||
@@ -116,10 +115,9 @@ class Macros(using Quotes) {
       t <:< TypeRepr.of[Enumeration] ||
       t <:< TypeRepr.of[Enum[_]]
     if (isDefault)
-      s"Missing implicit for TSType[${t}]. This should be provided out-of-the-box, please file a bug report at https://github.com/scala-tsi/scala-tsi/issues."
+      s"Missing implicit for TSType[${Type.show[T]}]. This should be provided out-of-the-box, please file a bug report at https://github.com/scala-tsi/scala-tsi/issues."
     else
-      new RuntimeException().printStackTrace()
-      s"Missing implicit for TSType[${t}] in scope and could not generate one. Did you create and import it?"
+      s"Missing implicit for TSType[${Type.show[T]}] in scope and could not generate one. Did you create and import it?"
   }
 }
 
