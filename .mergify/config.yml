@@ -12,9 +12,6 @@ pull_request_rules:
       - or:
         - author=scalatsi
         - author=scala-steward
-      - "status-success=ci/circleci: build-2.12"
-      - "status-success=ci/circleci: build-2.13"
-      - -title~=.*pgp.*
       - body~=labels:.*semver-((minor)|(patch)).*
     actions:
       merge:
