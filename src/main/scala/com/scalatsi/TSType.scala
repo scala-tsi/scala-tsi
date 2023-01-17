@@ -13,7 +13,7 @@ import scala.collection.immutable.ListMap
 trait TSType[T] { self =>
   def get: TypescriptType
   override def equals(obj: scala.Any): Boolean = obj match {
-    case o: TSType[_] => get == o.get
+    case o: TSType[?] => get == o.get
     case _            => false
   }
   override def hashCode(): Int  = get.hashCode()
@@ -21,7 +21,7 @@ trait TSType[T] { self =>
 
   // Forwarders to the underlying TypescriptType
   def |(other: TypescriptType): TSUnion = get | other
-  def |(other: TSType[_]): TSUnion      = this | other.get
+  def |(other: TSType[?]): TSUnion      = this | other.get
 }
 
 object TSType extends DefaultTSTypes {

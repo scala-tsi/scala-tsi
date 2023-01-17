@@ -1,17 +1,17 @@
 package com.scalatsi
 
-import TypescriptType._
+import TypescriptType.*
 
-import scala.annotation.nowarn
+import scala.annotation.unused
 
 package object dsl {
   import scala.language.implicitConversions
 
   // Implicit conversions to allow a more natural DSL
   // disable unused because the cls parameter if for the conversion, but isn't actually used
-  @nowarn("cat=unused-params") implicit def classToType[T](cls: Class[T])(implicit tsType: TSType[T]): TypescriptType =
+  implicit def classToType[T](@unused cls: Class[T])(implicit tsType: TSType[T]): TypescriptType =
     tsType.get
-  @nowarn("cat=unused-params") implicit def classToNamedType[T](cls: Class[T])(implicit tsType: TSNamedType[T]): TypescriptNamedType =
+  implicit def classToNamedType[T](@unused cls: Class[T])(implicit tsType: TSNamedType[T]): TypescriptNamedType =
     tsType.get
   implicit def tupleToTSInterfaceEntry[T](entry: (String, Class[T]))(implicit tsType: TSType[T]): (String, TypescriptType) =
     (entry._1, tsType.get)

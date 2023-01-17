@@ -4,7 +4,7 @@ lazy val root = (project in file("."))
   .enablePlugins(ScalaTsiPlugin)
   .settings(
     Seq(
-      scalaVersion         := "2.13.10",
+      scalaVersion         := sys.props.get("scala.version").get,
       typescriptOutputFile := baseDirectory.value / "model.ts"
     )
   )

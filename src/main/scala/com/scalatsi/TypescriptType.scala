@@ -71,7 +71,7 @@ object TypescriptType {
   case class TSLiteralNumber(value: BigDecimal) extends TSLiteralType[BigDecimal]
   case class TSLiteralBoolean(value: Boolean)   extends TSLiteralType[Boolean]
 
-  case class TSEnum(name: String, const: Boolean, entries: ListMap[String, Option[TSLiteralType[_]]])
+  case class TSEnum(name: String, const: Boolean, entries: ListMap[String, Option[TSLiteralType[?]]])
       extends TypescriptNamedType
       with TypescriptAggregateType {
     def nested: Set[TypescriptType]                = entries.values.flatMap(_.toSeq).toSet

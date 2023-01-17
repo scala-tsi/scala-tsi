@@ -44,7 +44,7 @@ jobs:
       - run:
           name: Check formatting
           command:
-            sbt -batch scalafmtSbtCheck scalafmtCheckAll exit
+            sbt -batch ++"<< parameters.scala-version >>.x" scalafmtSbtCheck scalafmtCheckAll exit
 
       - run:
           name: Test
@@ -54,7 +54,7 @@ jobs:
       - run:
           name: Run sbt-scala-tsi scripted tests
           command:
-            sbt -batch sbt-scala-tsi/scripted
+            sbt -batch -Dscala.version="<< parameters.scala-version >>.x" ++"<< parameters.scala-version >>.x" sbt-scala-tsi/scripted
 
       - store_test_results:
           path: target/test-reports
@@ -76,6 +76,7 @@ jobs:
           command: |
             VERSION=$(cd ../ && sbt --no-colors --error "print version" | xargs)
             sbt -batch -Dplugin.version="$VERSION" \
+              -Dscala.version="<< parameters.scala-version >>.x" ++"<< parameters.scala-version >>.x" \
               test \
               generateTypescript \
               scalafmtSbtCheck \
