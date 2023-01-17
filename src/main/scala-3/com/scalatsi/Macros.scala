@@ -88,14 +88,14 @@ class Macros(using Quotes) {
     val name = Expr(symbol.name)
 
     symbol.children.map(_.typeRef.asType) match
-      case Nil =>
+      case Seq() =>
         val symbolType =
           if (symbol.flags is Flags.Trait) "trait"
           else if (symbol.flags is Flags.Abstract) "abstract class"
           else "type"
         report.warning(s"Sealed $symbolType ${Type.show[T]} has now known subclasses, could not generate union")
         '{ TSNamedType(TSAlias(${ Expr(tsName[T]) }, TSNever)) }
-      case List('[t]) => '{ TSNamedType(TSAlias(${ name }, TypescriptType.nameOrType(${ getTSType[t] }.get))) }
+      case Seq('[t]) => '{ TSNamedType(TSAlias(${ name }, TypescriptType.nameOrType(${ getTSType[t] }.get))) }
       case children =>
         val operands = children.map { tpe =>
           tpe match {
