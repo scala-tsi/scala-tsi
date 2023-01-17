@@ -6,14 +6,13 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 class EnumTests extends AnyWordSpec with Matchers {
+  object SomeEnum extends Enumeration {
+    type SomeEnum = Value
+    val O1, O2 = Value
+  }
 
   "Scala enumerations" should {
     "have typescript representation" in {
-      object SomeEnum extends Enumeration {
-        type SomeEnum = Value
-        val O1, O2 = Value
-      }
-
       val generated = implicitly[TSType[SomeEnum.type]]
       val manual    = TSType.alias[SomeEnum.type]("SomeEnum", TSLiteralString("O1") | TSLiteralString("O2"))
       generated should ===(manual)
