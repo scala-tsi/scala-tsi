@@ -1,6 +1,6 @@
 package com.scalatsi
 
-import com.scalatsi.TypescriptType.{TSLiteralBoolean, TSLiteralNumber, TSLiteralString}
+import TypescriptType.{TSLiteralBoolean, TSLiteralNumber, TSLiteralString}
 import org.scalactic.source
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.verbs.StringVerbBlockRegistration
