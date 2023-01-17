@@ -33,13 +33,16 @@ class Macros(using Quotes) {
     }
   }
 
-  def getImplicitMappingOrGenerateDefaultImpl[T: Type, TSTypeSubclass[_]]: Expr[TSTypeSubclass[T]] =
-    Expr.summon[TSTypeSubclass[T]].getOrElse(generateDefaultMapping[T])
+  def getImplicitMappingOrGenerateDefaultImpl[T: Type]: Expr[TSType[T]] =
+    Expr.summon[TSType[T]].getOrElse(generateDefaultMapping[T])
+
+  def getImplicitNamedMappingOrGenerateDefaultImpl[T: Type]: Expr[TSNamedType[T]] =
+    Expr.summon[TSNamedType[T]].getOrElse(generateDefaultMapping[T])
 
   def getImplicitInterfaceMappingOrGenerateDefaultImpl[T: Type]: Expr[TSIType[T]] =
     Expr.summon[TSIType[T]].getOrElse(generateInterfaceFromCaseClassImpl[T])
 
-  private def generateDefaultMapping[T: Type]: Expr[TSType[T]] = {
+  private def generateDefaultMapping[T: Type]: Expr[TSNamedType[T]] = {
     val symbol = TypeRepr.of[T].typeSymbol
     if (!(symbol.isClassDef)) report.errorAndAbort(notFound[T])
     else if (symbol.flags is Flags.Case) generateInterfaceFromCaseClassImpl[T]
@@ -127,6 +130,10 @@ object Macros {
 
   private def getImplicitMappingOrGenerateDefaultImpl[T: Type](using Quotes) = Macros().getImplicitMappingOrGenerateDefaultImpl[T]
   inline def getImplicitMappingOrGenerateDefault[T]                          = ${ getImplicitMappingOrGenerateDefaultImpl[T] }
+
+  private def getImplicitNamedMappingOrGenerateDefaultImpl[T: Type](using Quotes) = Macros().getImplicitNamedMappingOrGenerateDefaultImpl[T]
+
+  inline def getImplicitNamedMappingOrGenerateDefault[T] = ${ getImplicitNamedMappingOrGenerateDefaultImpl[T] }
 
   private def getImplicitInterfaceMappingOrGenerateDefaultImpl[T: Type](using Quotes): Expr[TSIType[T]] =
     Macros().getImplicitInterfaceMappingOrGenerateDefaultImpl[T]
