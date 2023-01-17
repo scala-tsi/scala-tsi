@@ -1,12 +1,12 @@
 import sbt.Keys._
 
-val scalaVersion = "2.13.10"
+val defaultScalaVersion = "2.13.10"
 
 lazy val root = (project in file("."))
   .enablePlugins(ScalaTsiPlugin)
   .settings(
     Seq(
-      scalaVersion := sys.props.get("scala.version").getOrElse(scalaVersion),
+      scalaVersion := sys.props.get("scala.version").getOrElse(defaultScalaVersion),
       organization := "com.scalatsi",
       scalacOptions ++= compilerOptions,
       typescriptExports := Seq(
