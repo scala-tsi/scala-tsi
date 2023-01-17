@@ -54,7 +54,7 @@ jobs:
       - run:
           name: Run sbt-scala-tsi scripted tests
           command:
-            sbt -batch sbt-scala-tsi/scripted
+            sbt -batch ++"<< parameters.scala-version >>.x" sbt-scala-tsi/scripted
 
       - store_test_results:
           path: target/test-reports

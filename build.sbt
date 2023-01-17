@@ -153,8 +153,7 @@ lazy val `sbt-scala-tsi` = (project in file("plugin"))
   )
   .settings(
     scriptedLaunchOpts := {
-      scriptedLaunchOpts.value ++
-        Seq("-Xmx1024M", "-XX:MaxPermSize=256M", "-Dplugin.version=" + version.value)
+      scriptedLaunchOpts.value ++ Seq("-Xmx1024M", "-Dplugin.version=" + version.value)
     },
     scriptedBufferLog := false,
     // Make sure to publish the library locally first
