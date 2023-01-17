@@ -9,9 +9,12 @@ pull_request_rules:
       update:
   - name: automatically merge scala-steward PRs
     conditions:
-      - author=scala-steward
+      - or:
+        - author=scalatsi
+        - author=scala-steward
+      - "status-success=ci/circleci: build-2.12"
       - "status-success=ci/circleci: build-2.13"
-      - "status-success=ci/circleci: build-3"
+      - -title~=.*pgp.*
       - body~=labels:.*semver-((minor)|(patch)).*
     actions:
       merge:
