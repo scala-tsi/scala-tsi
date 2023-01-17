@@ -1,12 +1,16 @@
 import sbt.Keys._
 
+val scala3   = "3.2.1"
+val scala213 = "2.13.10"
+
 lazy val root = (project in file("."))
   .enablePlugins(ScalaTsiPlugin)
   .settings(
     Seq(
-      scalaVersion := "2.13.10",
+      scalaVersion := scala3,
       organization := "com.scalatsi",
       scalacOptions ++= compilerOptions,
+      crossScalaVersions := Seq(scala213, scala3),
       typescriptExports := Seq(
         "DeepThought",
         "GenericCaseClass",

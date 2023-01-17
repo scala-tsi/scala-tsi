@@ -61,7 +61,7 @@ class DefaultTSTypeTests extends AnyWordSpec with Matchers {
       "implicitly[TSType[Map[Int, Int]]]" should compile
     }
 
-    "Seq[_]" in {
+    "Seq[?]" in {
       "implicitly[TSType[scala.collection.mutable.Seq[Int]]]" should compile
       "implicitly[TSType[scala.collection.immutable.Seq[Int]]]" should compile
       "implicitly[TSType[IndexedSeq[Int]]]" should compile
@@ -70,7 +70,7 @@ class DefaultTSTypeTests extends AnyWordSpec with Matchers {
       "implicitly[TSType[Seq[Seq[Int]]]]" should compile
     }
 
-    "Set[_]" in {
+    "Set[?]" in {
       "implicitly[TSType[Set[Int]]]" should compile
       "implicitly[TSType[scala.collection.immutable.HashSet[Int]]]" should compile
     }

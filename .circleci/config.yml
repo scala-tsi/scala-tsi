@@ -76,6 +76,7 @@ jobs:
           command: |
             VERSION=$(cd ../ && sbt --no-colors --error "print version" | xargs)
             sbt -batch -Dplugin.version="$VERSION" \
+              ++"<< parameters.scala-version >>.x" \
               test \
               generateTypescript \
               scalafmtSbtCheck \

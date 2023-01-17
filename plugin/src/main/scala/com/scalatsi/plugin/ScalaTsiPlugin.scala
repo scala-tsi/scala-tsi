@@ -32,7 +32,7 @@ object ScalaTsiPlugin extends AutoPlugin {
 
   private val scala_ts_compiler_version = BuildInfo.version
 
-  lazy val baseScalaTsiSettings: Seq[Def.Setting[_]] = Seq(
+  lazy val baseScalaTsiSettings: Seq[Def.Setting[?]] = Seq(
     // User settings
     libraryDependencies += "com.scalatsi" %% "scala-tsi" % scala_ts_compiler_version,
     typescriptGenerationImports           := Seq(),
@@ -51,7 +51,7 @@ object ScalaTsiPlugin extends AutoPlugin {
     cleanFiles += typescriptOutputFile.value
   )
 
-  override lazy val projectSettings: Seq[Def.Setting[_]] = baseScalaTsiSettings
+  override lazy val projectSettings: Seq[Def.Setting[?]] = baseScalaTsiSettings
 
   private lazy val targetFile = Def.setting { sourceManaged.value / "com" / "scalatsi" / "generator" / "ExportTypescript.scala" }
   private lazy val deleteTypescriptExporter = Def.task(IO.delete(targetFile.value))

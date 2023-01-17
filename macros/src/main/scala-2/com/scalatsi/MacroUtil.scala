@@ -26,16 +26,16 @@ private[scalatsi] class MacroUtil[C <: blackbox.Context](val c: C) {
   def implicitIsDefined(T: c.Type): Boolean =
     lookupOptionalImplicit(T).exists(_.isDefined)
 
-  /** Create a type representing F[T] from a T and a F[_] */
-  def properType[F[_]](T: Type)(implicit tsTypeTag: c.WeakTypeTag[F[_]]): Type = {
+  /** Create a type representing F[T] from a T and a F[?] */
+  def properType[F[_]](T: Type)(implicit tsTypeTag: c.WeakTypeTag[F[?]]): Type = {
     // Get the T => F[T] function
-    val typeConstructor = c.weakTypeOf[F[_]].typeConstructor
+    val typeConstructor = c.weakTypeOf[F[?]].typeConstructor
     // Construct the F[T] type we need to look up
     c.universe.appliedType(typeConstructor, T)
   }
 
-  /** Create a type representing F[T] from a T and a F[_] */
-  def properType[T: c.WeakTypeTag, F[_]](implicit tsTypeTag: c.WeakTypeTag[F[_]]): Type =
+  /** Create a type representing F[T] from a T and a F[?] */
+  def properType[T: c.WeakTypeTag, F[_]](implicit tsTypeTag: c.WeakTypeTag[F[?]]): Type =
     properType[F](c.weakTypeOf[T])
 
   /** HACK: Check if we are too deep in the stack to continue
