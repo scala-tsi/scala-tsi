@@ -14,30 +14,29 @@ class Macros(using Quotes) {
     if (TypeRepr.of[T].typeArgs.isEmpty) {
       '{ TSType.getOrGenerate[T] }
     } else {
-      def allTypeArgs(typeRepr: TypeRepr, typeReprs: Set[TypeRepr] = Set.empty): Set[TypeRepr] =
-        typeRepr.typeArgs
-          .flatMap(typeArgRepr => if typeReprs.contains(typeArgRepr) then Set.empty else allTypeArgs(typeArgRepr, typeReprs + typeArgRepr))
-          .toSet
+      val allTypeArguments: Iterator[Type[_]] = findNestedTypeParameters(TypeRepr.of[T]).map(_.asType)
 
-      val typeArgImplicits = allTypeArgs(TypeRepr.of[T])
-        .tapEach(typeRepr => report.warning(s"found type arg implicit ${typeRepr}"))
-        .map(_.asType)
-        .filterNot({ case '[t] => Expr.summon[TSType[t]].isDefined })
-        .map { case '[t] => '{ given TSType[t] = TSType.getOrGenerate[t] } }
-        .reduceOption((expr1, expr2) => '{ ${ expr1 }; ${ expr2 } })
-        .getOrElse('{})
-      '{
-        ${ typeArgImplicits }
-        TSType.getOrGenerate[T]
-      }
+      val typeArgImplicits =
+        allTypeArguments
+          .distinct
+          .filterNot({ case '[t] => Expr.summon[TSType[t]].isDefined })
+          .map { case '[t] => '{ given TSType[t] = TSType.getOrGenerate[t] } }
+          .toList
+      val x = Expr.block(typeArgImplicits, '{TSType.getOrGenerate[T]})
+      println(x.show)
+      x
     }
   }
+
+  private def findNestedTypeParameters(typeRepr: TypeRepr, first: Boolean = true): Iterator[TypeRepr] =
+    typeRepr.typeArgs.iterator.flatMap(t => findNestedTypeParameters(t, first = false)) ++ (if (first) Iterator() else Iterator(typeRepr))
+
 
   def getImplicitMappingOrGenerateDefaultImpl[T: Type]: Expr[TSType[T]] =
     Expr.summon[TSType[T]].getOrElse(generateDefaultMapping[T])
 
   def getImplicitNamedMappingOrGenerateDefaultImpl[T: Type]: Expr[TSNamedType[T]] =
-    Expr.summon[TSNamedType[T]].getOrElse(generateDefaultMapping[T])
+    Expr.summon[TSNamedType[T]].getOrElse(generateDefaultMapping[T].asInstanceOf[Expr[TSNamedType[T]]])
 
   def getImplicitInterfaceMappingOrGenerateDefaultImpl[T: Type]: Expr[TSIType[T]] =
     Expr.summon[TSIType[T]].getOrElse(generateInterfaceFromCaseClassImpl[T])
@@ -62,7 +61,7 @@ class Macros(using Quotes) {
       case lists    => report.error(s"Only one parameter list classes are supported. Found: ${Type.show[T]}")
     }
 
-    val members: List[Expr[(String, TypescriptType)]] =
+    val members: Seq[Expr[(String, TypescriptType)]] =
       symbol.caseFields
         .map(member => (member.name, typeRepr.memberType(member).asType))
         .map {
@@ -73,6 +72,7 @@ class Macros(using Quotes) {
 
     '{ TSIType[T](TSInterface("I", ListMap(${ Varargs(members) }*))) }
   }
+
 
   private def tsName[T: Type]: String =
     val symbol = TypeRepr.of[T].typeSymbol
@@ -107,9 +107,9 @@ class Macros(using Quotes) {
   }
 
   private def notFound[T: Type]: Expr[TSType[T]] = {
-    val msg = s"Could not find TSType[${Type.show[T]}] in scope and could not generate it."
-    report.error(s"$msg. Dit you create and import it?")
-    '{ TSType(TSLiteralString(msg)) }
+    val msg = s"Could not find TSType[${Type.show[T]}] in scope and could not generate it"
+    report.warning(s"$msg. Did you create and import it?")
+    '{ TSType(TSLiteralString(${Expr(msg)})) }
   }
 }
 

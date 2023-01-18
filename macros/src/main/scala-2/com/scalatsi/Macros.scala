@@ -99,8 +99,8 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
 
   /** Generate an implicit not found message */
   private def notFound[T: c.WeakTypeTag]: Tree = {
-    val msg = s"Could not find TSType[${c.weakTypeOf[T]}] in scope and could not generate it."
-    c.warning(c.enclosingPosition, msg)
+    val msg = s"Could not find TSType[${c.weakTypeOf[T]}] in scope and could not generate it"
+    c.warning(c.enclosingPosition, s"$msg. Did you create and import it?")
     q"""com.scalatsi.TSType(com.scalatsi.TypescriptType.TSLiteralString($msg))"""
   }
 

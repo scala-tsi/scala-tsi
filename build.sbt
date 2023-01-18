@@ -56,9 +56,10 @@ lazy val compilerOptions = scalacOptions := Seq(
   "-release",
   "8",
   "-language:experimental.macros",
-  "-Xfatal-warnings"
 ) ++ (if (isScala2.value)
         Seq(
+          // TODO: Move to general options
+          "-Xfatal-warnings",
           "-Xsource:3",
           // These are not yet implemented in Scala 3 compiler
           "-Xlint",
@@ -74,8 +75,9 @@ lazy val compilerOptions = scalacOptions := Seq(
         )
       else
         Seq(
-          "-rewrite",
           "-explain",
+          // Only enable during development of macros, this will lead to extra runtime overhead
+          // "-Xcheck-macros",
         ))
 
 /** ***************
