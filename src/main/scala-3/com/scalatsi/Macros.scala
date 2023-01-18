@@ -16,14 +16,14 @@ class Macros(using Quotes) {
     } else {
       val allTypeArguments: Iterator[Type[_]] = findNestedTypeParameters(TypeRepr.of[T]).map(_.asType)
 
-      val typeArgImplicits =
+      val typeArgImplicits: List[Expr[Unit]] =
         allTypeArguments
           .distinct
           .filterNot({ case '[t] => Expr.summon[TSType[t]].isDefined })
-          .map { case '[t] => '{ given TSType[t] = TSType.getOrGenerate[t] } }
+          .map { case '[t] => '{ given TSType[t]  = TSType.getOrGenerate[t] } }
           .toList
       val x = Expr.block(typeArgImplicits, '{TSType.getOrGenerate[T]})
-      println(x.show)
+      println(s"${Type.show[T]} was ${x.show}")
       x
     }
   }

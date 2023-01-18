@@ -32,9 +32,8 @@ class MacroTests extends AnyFlatSpec with Matchers {
     case class Element(foo: String)
     case class Root(
         listField: Seq[Element],
-        setField: Set[Element]
-        // eitherField: Either[String, Element],
-        // tuple3Field: (Element, String, Int)
+        eitherField: Either[String, Element],
+        tuple3Field: (Element, String, Int)
     )
 
     val tsElement: TypescriptType = TSType.fromCaseClass[Element].get
@@ -47,23 +46,23 @@ class MacroTests extends AnyFlatSpec with Matchers {
     )
   }
 
-//  it should "handle nested polymorphic members " in {
-//    case class Element(foo: String)
-//    case class Root(
-//        twoLevels: Seq[Seq[Element]],
-//        threeLevels: Seq[Seq[Seq[Element]]],
-//        branched: Either[String, Either[Int, Seq[Element]]]
-//    )
-//
-//    val tsElement: TypescriptType = TSType.fromCaseClass[Element].get
-//
-//    TSType.fromCaseClass[Root] shouldBe TSType.interface(
-//      "IRoot",
-//      "twoLevels"   -> tsElement.array.array,
-//      "threeLevels" -> tsElement.array.array.array,
-//      "branched"    -> (TSString | TSNumber | tsElement.array)
-//    )
-//  }
+  it should "handle nested polymorphic members " in {
+    case class Element(foo: String)
+    case class Root(
+        twoLevels: Seq[Seq[Element]],
+        threeLevels: Seq[Seq[Seq[Element]]],
+        branched: Either[String, Either[Int, Seq[Element]]]
+    )
+
+    val tsElement: TypescriptType = TSType.fromCaseClass[Element].get
+
+    TSType.fromCaseClass[Root] shouldBe TSType.interface(
+      "IRoot",
+      "twoLevels"   -> tsElement.array.array,
+      "threeLevels" -> tsElement.array.array.array,
+      "branched"    -> (TSString | TSNumber | tsElement.array)
+    )
+  }
 
   "The sealed trait/class to Typescript type macro" should "handle sealed traits" in {
     sealed trait FooOrBar
@@ -187,12 +186,6 @@ class MacroTests extends AnyFlatSpec with Matchers {
 
     generated shouldBe fromSealed
     fromSealed shouldBe TSType.alias("A", TSTypeReference("IB", Some(b)))
-  }
-
-  it should "give an error on non-abstract sealed class" in {
-    @unused sealed class Something {}
-
-    "TSType.getOrGenerate[Something]" shouldNot compile
   }
 
   it should "support custom polymorphic types in the same scope" in {

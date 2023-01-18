@@ -15,17 +15,16 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
     } else {
       val allTypeArguments = findNestedTypeParameters(T)
       val targImplicits =
-        allTypeArguments
+        allTypeArguments.distinct
           // Prevent generating an `implicit val` again if it is already in scope before macro expansion, otherwise
           // we might get ambiguous implicit values
           .filter(targ => !implicitIsDefined(properType[TSType](targ)))
-          .toIndexedSeq
-          .distinct
           .zipWithIndex
           .map({ case (targ, i) =>
             // Note: the implicit *must not* be annotated with TSType[$targ], otherwise the implicit lookup will be self-referential
             q"""implicit val `${TermName(s"targ$i")}` = getOrGenerate[$targ]"""
           })
+          .toList
       q"""{
           import _root_.com.scalatsi.TSType.getOrGenerate
           ..$targImplicits
