@@ -62,7 +62,7 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
   }
 
   private def circularRefError(T: c.Type, which: String): Tree = {
-    c.error(
+    c.warning(
       c.enclosingPosition,
       s"""
          |Circular reference or very deep nesting encountered while searching for $which[$T]
@@ -100,7 +100,7 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
   /** Generate an implicit not found message */
   private def notFound[T: c.WeakTypeTag]: Tree = {
     val msg = s"Could not find TSType[${c.weakTypeOf[T]}] in scope and could not generate it."
-    c.error(c.enclosingPosition, msg)
+    c.warning(c.enclosingPosition, msg)
     q"""com.scalatsi.TSType(com.scalatsi.TypescriptType.TSLiteralString($msg))"""
   }
 

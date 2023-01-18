@@ -1,7 +1,7 @@
 ## 0.8.0 - ...
 
 * Scala 3 support by @...
-* Failures are now reported as compiled errors and as error messages in the generated Typescript code instead of aborting compilation. 
+* Failures in finding the mapping of a type are now reported as compile warnings and as messages in the generated Typescript code instead of aborting compilation. 
 
 ## 0.7.0 - 2022-07-13
 

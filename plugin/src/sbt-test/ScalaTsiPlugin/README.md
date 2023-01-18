@@ -13,6 +13,6 @@ sbt +scala-tsi/publishLocal sbt-scala-tsi/publishLocal
 Then generate the typescript from the test:
 ```sh
 cd plugin/src/sbt-test/ScalaTsiPlugin/xxxxxx
-sbt -Dplugin.version=0.X.X-SNAPSHOT generateTypescript
+sbt -Dplugin.version=0.X.X-SNAPSHOT -Dscala.version=X.X generateTypescript
 diff model.ts expected_model.ts
 ```
