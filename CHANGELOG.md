@@ -1,3 +1,8 @@
+## 0.8.0 - ...
+
+* Scala 3 support by @...
+* Failures are now reported as compiled errors and as error messages in the generated Typescript code instead of aborting compilation. 
+
 ## 0.7.0 - 2022-07-13
 
 * Add support for string enums in `TSEnum` (#236 by @b-eyselein) and several factory methods in the `TSType` companion object.
