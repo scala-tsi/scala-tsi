@@ -75,7 +75,7 @@ class DefaultTSTypeTests extends AnyWordSpec with Matchers {
       "implicitly[TSType[scala.collection.immutable.HashSet[Int]]]" should compile
     }
 
-    "Collection<?>" in {
+    "Collection[?]" in {
       "implicitly[TSType[java.util.Collection[Int]]]" should compile
       "implicitly[TSType[java.util.List[Int]]]" should compile
       "implicitly[TSType[java.util.ArrayList[Int]]]" should compile

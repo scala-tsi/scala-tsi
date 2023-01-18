@@ -20,7 +20,7 @@ class Macros(using Quotes) {
           .toSet
 
       val typeArgImplicits = allTypeArgs(TypeRepr.of[T])
-        .tapEach(typeRepr => report.info(s"found type arg implicit ${typeRepr}"))
+        .tapEach(typeRepr => report.warning(s"found type arg implicit ${typeRepr}"))
         .map(_.asType)
         .filterNot({ case '[t] => Expr.summon[TSType[t]].isDefined })
         .map { case '[t] => '{ given TSType[t] = TSType.getOrGenerate[t] } }
@@ -42,12 +42,12 @@ class Macros(using Quotes) {
   def getImplicitInterfaceMappingOrGenerateDefaultImpl[T: Type]: Expr[TSIType[T]] =
     Expr.summon[TSIType[T]].getOrElse(generateInterfaceFromCaseClassImpl[T])
 
-  private def generateDefaultMapping[T: Type]: Expr[TSNamedType[T]] = {
+  private def generateDefaultMapping[T: Type]: Expr[TSType[T]] = {
     val symbol = TypeRepr.of[T].typeSymbol
-    if (!(symbol.isClassDef)) report.errorAndAbort(notFound[T])
+    if (!(symbol.isClassDef)) notFound[T]
     else if (symbol.flags is Flags.Case) generateInterfaceFromCaseClassImpl[T]
     else if (symbol.flags is Flags.Sealed) generateUnionFromSealedTraitImpl[T]
-    else report.errorAndAbort(notFound[T])
+    else notFound[T]
   }
 
   def generateInterfaceFromCaseClassImpl[T](using Type[T], Quotes): Expr[TSIType[T]] = {
@@ -106,7 +106,7 @@ class Macros(using Quotes) {
         '{ TSNamedType(TSAlias(${ name }, TSUnion(Vector(${ Varargs(operands) }*)))) }
   }
 
-  private def notFound[T: Type]: String = {
+  private def notFound[T: Type]: Expr[TSType[T]] = {
     val t = TypeRepr.of[T]
     val isDefault = t =:= TypeRepr.of[String] ||
       t <:< TypeRepr.of[Numeric[_]] ||
@@ -114,10 +114,13 @@ class Macros(using Quotes) {
       t <:< TypeRepr.of[Either[_, _]] ||
       t <:< TypeRepr.of[Enumeration] ||
       t <:< TypeRepr.of[Enum[_]]
-    if (isDefault)
-      s"Missing implicit for TSType[${Type.show[T]}]. This should be provided out-of-the-box, please file a bug report at https://github.com/scala-tsi/scala-tsi/issues."
-    else
-      s"Missing implicit for TSType[${Type.show[T]}] in scope and could not generate one. Did you create and import it?"
+    val msg =
+      if (isDefault)
+        s"Missing implicit for TSType[${Type.show[T]}]. This should be provided out-of-the-box, please file a bug report at https://github.com/scala-tsi/scala-tsi/issues."
+      else
+        s"Missing implicit for TSType[${Type.show[T]}] in scope and could not generate one. Did you create and import it?"
+    report.error(msg)
+    return '{ TSType(TSNever) }
   }
 }
 
