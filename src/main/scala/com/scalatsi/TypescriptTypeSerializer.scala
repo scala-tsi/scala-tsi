@@ -51,6 +51,7 @@ object TypescriptTypeSerializer {
     types
       .flatMap(discoverNestedNames(styleOptions))
       .toSeq
+      .distinctBy(_.name)
       .sorted
       .flatMap(namedType => emitNamed(namedType)(styleOptions))
       .mkString("", "\n\n", "\n")

@@ -70,7 +70,7 @@ class Macros(using Quotes) {
           case (name, '[t])         => '{ (${ Expr(name) }, ${ getTSType[t] }.get) }
         }
 
-    '{ TSIType[T](TSInterface("I", ListMap(${ Varargs(members) }*))) }
+    '{ TSIType[T](TSInterface(${Expr(tsName[T])}, ListMap(${ Varargs(members) }*))) }
   }
 
 

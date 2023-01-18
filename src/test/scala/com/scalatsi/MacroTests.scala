@@ -189,20 +189,6 @@ class MacroTests extends AnyFlatSpec with Matchers {
     fromSealed shouldBe TSType.alias("A", TSTypeReference("IB", Some(b)))
   }
 
-  it should "give a compile error for unsupported types if no implicit is available" in {
-    @unused class A
-
-    "TSType.getOrGenerate[A]" shouldNot compile
-  }
-
-  it should "not crash on recursive definitions" in {
-    case class RecursiveA(b: RecursiveB)
-    case class RecursiveB(a: RecursiveA)
-
-    // Check that this generates the expected compile error, but not crashes the compilation
-    "TSType.getOrGenerate[RecursiveA]" shouldNot compile
-  }
-
   it should "give an error on non-abstract sealed class" in {
     @unused sealed class Something {}
 

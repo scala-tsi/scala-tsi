@@ -169,7 +169,7 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
      import _root_.com.scalatsi.TypescriptType.{TSUndefined, TSInterface}
      import _root_.com.scalatsi.{TSNamedType, TSIType}
      import _root_.scala.collection.immutable.ListMap
-     TSIType(TSInterface("I" + ${symbol.name.toString}, ListMap(
+     TSIType(TSInterface(${tsName[T]}, ListMap(
        ..$members
      )))
     }"""

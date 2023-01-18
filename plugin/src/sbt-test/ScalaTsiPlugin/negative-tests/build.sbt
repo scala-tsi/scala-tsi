@@ -6,7 +6,7 @@ lazy val root = (project in file("."))
     Seq(
       scalaVersion                := sys.props.get("scala.version").get,
       organization                := "com.scalatsi",
-      typescriptExports           := Seq("ClassWithUndefinedMember"),
+      typescriptExports           := Seq("ClassWithUndefinedMember", "RecursiveA"),
       typescriptGenerationImports := Seq("models._"),
       typescriptOutputFile        := baseDirectory.value / "model.ts",
       scalafmtConfig              := file("../../../../.scalafmt.conf")
