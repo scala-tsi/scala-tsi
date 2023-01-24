@@ -93,7 +93,7 @@ lazy val `scala-tsi-macros` = (project in file("macros"))
     libraryDependencies ++= (if (isScala2.value) Seq("org.scala-lang" % "scala-reflect" % scalaVersion.value)
                              else Seq.empty),
     scalaVersion       := scala213,
-    crossScalaVersions := Seq(scala213),
+    crossScalaVersions := Seq(scala213, scala3),
     // Disable publishing
     publish        := {},
     publishLocal   := {},
@@ -104,7 +104,7 @@ lazy val `scala-tsi` = (project in file("."))
   .settings(commonSettings)
   .settings(publishSettings)
   .settings(scalatsiSettings)
-  // Scala 2 needs a separate compilation step and thus separate project. Scala 3 doensn't need any of this at all.
+  // Scala 2 needs a separate compilation step and thus separate project. Scala 3 doesn't need any of this at all.
   .dependsOn(`scala-tsi-macros` % "compile-internal, test-internal")
   .settings(
     // Add dependencies from the macro project

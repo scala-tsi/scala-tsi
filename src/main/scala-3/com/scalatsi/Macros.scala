@@ -20,7 +20,13 @@ class Macros(using Quotes) {
         allTypeArguments
           .distinct
           .filterNot({ case '[t] => Expr.summon[TSType[t]].isDefined })
-          .map { case '[t] => '{ given TSType[t]  = TSType.getOrGenerate[t] } }
+          .zipWithIndex
+          .flatMap {
+            case ('[t], i) =>
+              ValDef.let(symbol.asQuotes, s"targ$iVal", '{ TSType.getOrGenerate[t] }) { targVal =>
+                '{ given TSType[t] = targVal }
+            }
+          }
           .toList
       val x = Expr.block(typeArgImplicits, '{TSType.getOrGenerate[T]})
       println(s"${Type.show[T]} was ${x.show}")

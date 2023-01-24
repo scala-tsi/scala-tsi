@@ -1,6 +1,6 @@
 package com.scalatsi
 
-import TypescriptType._
+import TypescriptType.*
 
 import scala.annotation.implicitNotFound
 import scala.collection.immutable.ListMap

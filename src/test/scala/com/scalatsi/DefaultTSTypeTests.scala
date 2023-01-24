@@ -1,6 +1,6 @@
 package com.scalatsi
 
-import TypescriptType._
+import TypescriptType.*
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 

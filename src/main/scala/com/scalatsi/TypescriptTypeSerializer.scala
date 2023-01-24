@@ -1,6 +1,6 @@
 package com.scalatsi
 
-import com.scalatsi.TypescriptType._
+import com.scalatsi.TypescriptType.*
 import com.scalatsi.output.StyleOptions
 
 import scala.collection.immutable.ListMap
@@ -8,7 +8,7 @@ import scala.collection.immutable.ListMap
 object TypescriptTypeSerializer {
 
   def serialize(tp: TypescriptType)(implicit styleOptions: StyleOptions = StyleOptions()): String = {
-    import styleOptions._
+    import styleOptions.*
     tp match {
       case t: TypescriptNamedType => s"${if (t.useTypeQuery) "typeof " else ""}${t.name}"
       case TSAny                  => "any"
@@ -66,7 +66,7 @@ object TypescriptTypeSerializer {
   }
 
   private def emitNamed(named: TypescriptNamedType)(implicit styleOptions: StyleOptions): Option[String] = {
-    import styleOptions._
+    import styleOptions.*
     named match {
       case TSAlias(name, underlying) =>
         Some(s"export type $name = ${serialize(underlying)}$sc")

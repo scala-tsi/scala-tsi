@@ -20,15 +20,18 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
           // we might get ambiguous implicit values
           .filter(targ => !implicitIsDefined(properType[TSType](targ)))
           .zipWithIndex
-          .map({ case (targ, i) =>
-            // Note: the implicit *must not* be annotated with TSType[$targ], otherwise the implicit lookup will be self-referential
-            q"""implicit val `${TermName(s"targ$i")}` = getOrGenerate[$targ]"""
+          .flatMap({ case (targ, i) =>
+            val valueTerm = TermName(s"targ${i}Val")
+            Seq(
+              q"""val $valueTerm: TSType[$targ] = TSType.getOrGenerate[$targ]""",
+              q"""implicit val ${TermName(s"targ$i")}: TSType[$targ] = $valueTerm"""
+            )
           })
           .toList
       q"""{
-          import _root_.com.scalatsi.TSType.getOrGenerate
+          import _root_.com.scalatsi.TSType
           ..$targImplicits
-          getOrGenerate[$T]
+          TSType.getOrGenerate[$T]
         }"""
     }
   }

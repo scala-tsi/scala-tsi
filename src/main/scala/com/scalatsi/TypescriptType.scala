@@ -3,7 +3,7 @@ package com.scalatsi
 import java.util.regex.Pattern
 
 import scala.collection.immutable.ListMap
-import TypescriptType._
+import TypescriptType.*
 
 sealed trait TypescriptType {
   def |(tt: TypescriptType): TSUnion = TSUnion.of(this, tt).flatten

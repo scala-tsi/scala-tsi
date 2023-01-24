@@ -1,12 +1,15 @@
 package com.scalatsi
 
 trait ScalaVersionSpecificTypes {
-  given seqTsType[T](using TSType[T]): TSType[Seq[T]] with
+
+//  given seqTsType[T: TSType]: TSType[Seq[T]] with
+//    def get: TypescriptType = summon[TSType[T]].get.array
+
+  implicit def tsTraversable[E, F[_]](implicit e: TSType[E], ev: F[E] <:< Iterable[E]): TSType[F[E]] = TSType(e.get.array)
+
+  given setTsType[T: TSType]: TSType[Set[T]] with
     def get: TypescriptType = summon[TSType[T]].get.array
 
-  given setTsType[T](using TSType[T]): TSType[Set[T]] with
-    def get: TypescriptType = summon[TSType[T]].get.array
-
-  given javaCollectionTsType[T](using TSType[T]): TSType[java.util.Collection[T]] with
+  given javaCollectionTsType[T: TSType]: TSType[java.util.Collection[T]] with
     def get: TypescriptType = summon[TSType[T]].get.array
 }
