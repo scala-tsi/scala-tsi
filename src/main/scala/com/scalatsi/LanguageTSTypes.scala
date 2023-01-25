@@ -7,7 +7,7 @@ import scala.collection.immutable.ListMap
 import scala.reflect.ClassTag
 
 trait ScalaTSTypes {
-  implicit val anyTSType: TSType[Any]                              = TSType(TSAny)
+  implicit val anyRefTSType: TSType[AnyRef]                        = TSType(TSAny)
   implicit val unitTsType: TSType[Unit]                            = TSType(TSVoid)
   implicit val booleanTsType: TSType[Boolean]                      = TSType(TSBoolean)
   implicit val stringTsType: TSType[String]                        = TSType(TSString)
@@ -50,8 +50,7 @@ trait ScalaEnumTSTypes {
 }
 
 trait JavaTSTypes {
-  implicit val javaObjectTSType: TSType[Object] = TSType(TSObject)
-  implicit val javaVoidTSType: TSType[Void]     = TSType(TSVoid)
+  implicit val javaVoidTSType: TSType[Void] = TSType(TSVoid)
 
   import java.time.temporal.Temporal
   // Most JSON serializers write java.time times to a ISO8601-like string

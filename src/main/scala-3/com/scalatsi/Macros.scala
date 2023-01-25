@@ -10,6 +10,7 @@ class Macros(using q: Quotes) {
   import q.reflect.*
 
   private def getTSType[T: Type]: Expr[TSType[T]] = {
+    println(s"getTSType: ${Type.show[T]}")
     val existing = Expr.summon[TSType[T]]
     if (existing.isDefined) {
       return existing.get
@@ -21,12 +22,12 @@ class Macros(using q: Quotes) {
 
       val typeArgImplicits: List[Expr[Unit]] =
         allTypeArguments.distinct
-          .filterNot({ case '[t] => Expr.summon[TSType[t]].isDefined })
+          //.filterNot({ case '[t] => Expr.summon[TSType[t]].isDefined })
           .zipWithIndex
           .map {
             case ('[t], i) =>
               ValDef
-                .let(Symbol.spliceOwner, s"targ${i}Val", '{ TSType.getOrGenerate[t] }.asTerm) { targVal =>
+                .let(Symbol.spliceOwner, s"targ${i}Val", getTSType[t] .asTerm) { targVal =>
                   ('{ given TSType[t] = ${ targVal.asExprOf[TSType[t]] } }).asTerm
                 }
                 .asExprOf[Unit]
@@ -54,6 +55,15 @@ class Macros(using q: Quotes) {
     Expr.summon[TSIType[T]].getOrElse(generateInterfaceFromCaseClassImpl[T])
 
   private def generateDefaultMapping[T: Type]: Expr[TSType[T]] = {
+    val x = Type.of[T] match {
+      case '[Iterable[t]] => {
+        Some('{ TSType.iterableTsType[t, Iterable[t]](TSType.getOrGenerate[t]).asInstanceOf[TSType[T]] })
+      }
+      case _ => None
+    }
+    if(x.isDefined) {
+      return x.get.asExprOf[TSType[T]]
+    }
     val symbol = TypeRepr.of[T].typeSymbol
     if (!(symbol.isClassDef)) notFound[T]
     else if (symbol.flags is Flags.Case) generateInterfaceFromCaseClassImpl[T]
@@ -61,7 +71,7 @@ class Macros(using q: Quotes) {
     else notFound[T]
   }
 
-  def generateInterfaceFromCaseClassImpl[T](using Type[T]): Expr[TSIType[T]] = {
+  def generateInterfaceFromCaseClassImpl[T: Type]: Expr[TSIType[T]] = {
     val typeRepr = TypeRepr.of[T]
     val symbol   = typeRepr.typeSymbol
 
@@ -79,7 +89,7 @@ class Macros(using q: Quotes) {
 
     val x = '{ TSIType[T](TSInterface(${ Expr(tsName[T]) }, ListMap(${ Varargs(members) }*))) }
     println(s"generateInterfaceFromCaseClassImpl ${Type.show[T]} was ${x.show}")
-    return x
+    x
   }
 
   private def tsName[T: Type]: String =
