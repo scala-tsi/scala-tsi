@@ -77,7 +77,7 @@ lazy val compilerOptions = scalacOptions := Seq(
         Seq(
           "-explain",
           // Only enable during development of macros, this will lead to extra runtime overhead
-          // "-Xcheck-macros",
+          //"-Xcheck-macros",
         ))
 
 /** ***************

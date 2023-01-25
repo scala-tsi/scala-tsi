@@ -13,5 +13,9 @@ object Outer {
 //  given TSType[Seq[Inner]] = b
 //  val x                    = TSType.getOrGenerate[Outer]
 
-  given TSType[Outer] = TSType.getOrGenerate[Outer]
+  // private val inner = TSType.getOrGenerate[Inner]
+  // given TSType[Inner] = inner
+  // private val seq = TSType.getOrGenerate[Seq[Inner]]
+  // given TSType[Seq[Inner]] = seq
+  private val outer = TSType.getOrGenerate[Outer]
 }

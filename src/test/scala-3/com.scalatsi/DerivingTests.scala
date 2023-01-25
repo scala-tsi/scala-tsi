@@ -11,6 +11,6 @@ class DerivingTests extends AnyFlatSpec with Matchers {
   "a case class" should "be able to derive a TSIType" in {
     summon[TSIType[TestDerivingTSIType]] shouldBe TSType.interface("ITestDerivingTSIType", "foo" -> TSString)
   }
-*/
+   */
 
 }

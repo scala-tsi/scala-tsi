@@ -5,30 +5,35 @@ import com.scalatsi.TypescriptTypeToExpr.given
 
 import scala.collection.immutable.ListMap
 import scala.quoted.*
-import scala.Symbol
 
-class Macros(using Quotes) {
-  import quotes.reflect.*
+class Macros(using q: Quotes) {
+  import q.reflect.*
 
   private def getTSType[T: Type]: Expr[TSType[T]] = {
+    val existing = Expr.summon[TSType[T]]
+    if (existing.isDefined) {
+      return existing.get
+    }
     if (TypeRepr.of[T].typeArgs.isEmpty) {
       '{ TSType.getOrGenerate[T] }
     } else {
       val allTypeArguments: Iterator[Type[_]] = findNestedTypeParameters(TypeRepr.of[T]).map(_.asType)
 
       val typeArgImplicits: List[Expr[Unit]] =
-        allTypeArguments
-          .distinct
+        allTypeArguments.distinct
           .filterNot({ case '[t] => Expr.summon[TSType[t]].isDefined })
           .zipWithIndex
-          .flatMap {
+          .map {
             case ('[t], i) =>
-              ValDef.let(symbol.asQuotes, s"targ$iVal", '{ TSType.getOrGenerate[t] }) { targVal =>
-                '{ given TSType[t] = targVal }
-            }
+              ValDef
+                .let(Symbol.spliceOwner, s"targ${i}Val", '{ TSType.getOrGenerate[t] }.asTerm) { targVal =>
+                  ('{ given TSType[t] = ${ targVal.asExprOf[TSType[t]] } }).asTerm
+                }
+                .asExprOf[Unit]
           }
           .toList
-      val x = Expr.block(typeArgImplicits, '{TSType.getOrGenerate[T]})
+      typeArgImplicits.zipWithIndex.foreach((y, i) => println(s"$i: ${y.show}"))
+      val x = Expr.block(typeArgImplicits, '{ TSType.getOrGenerate[T] })
       println(s"${Type.show[T]} was ${x.show}")
       x
     }
@@ -37,9 +42,10 @@ class Macros(using Quotes) {
   private def findNestedTypeParameters(typeRepr: TypeRepr, first: Boolean = true): Iterator[TypeRepr] =
     typeRepr.typeArgs.iterator.flatMap(t => findNestedTypeParameters(t, first = false)) ++ (if (first) Iterator() else Iterator(typeRepr))
 
-
-  def getImplicitMappingOrGenerateDefaultImpl[T: Type]: Expr[TSType[T]] =
+  def getImplicitMappingOrGenerateDefaultImpl[T: Type]: Expr[TSType[T]] = {
+    println(s"Seeking ${Type.show[T]}");
     Expr.summon[TSType[T]].getOrElse(generateDefaultMapping[T])
+  }
 
   def getImplicitNamedMappingOrGenerateDefaultImpl[T: Type]: Expr[TSNamedType[T]] =
     Expr.summon[TSNamedType[T]].getOrElse(generateDefaultMapping[T].asInstanceOf[Expr[TSNamedType[T]]])
@@ -55,17 +61,12 @@ class Macros(using Quotes) {
     else notFound[T]
   }
 
-  def generateInterfaceFromCaseClassImpl[T](using Type[T], Quotes): Expr[TSIType[T]] = {
+  def generateInterfaceFromCaseClassImpl[T](using Type[T]): Expr[TSIType[T]] = {
     val typeRepr = TypeRepr.of[T]
     val symbol   = typeRepr.typeSymbol
 
     if (!(symbol.isClassDef && (symbol.flags is Flags.Case)))
       report.errorAndAbort(s"Expected case class, but found: ${Type.show[T]}")
-
-    symbol.primaryConstructor.paramSymss match {
-      case _ :: Nil =>
-      case lists    => report.error(s"Only one parameter list classes are supported. Found: ${Type.show[T]}")
-    }
 
     val members: Seq[Expr[(String, TypescriptType)]] =
       symbol.caseFields
@@ -76,9 +77,10 @@ class Macros(using Quotes) {
           case (name, '[t])         => '{ (${ Expr(name) }, ${ getTSType[t] }.get) }
         }
 
-    '{ TSIType[T](TSInterface(${Expr(tsName[T])}, ListMap(${ Varargs(members) }*))) }
+    val x = '{ TSIType[T](TSInterface(${ Expr(tsName[T]) }, ListMap(${ Varargs(members) }*))) }
+    println(s"generateInterfaceFromCaseClassImpl ${Type.show[T]} was ${x.show}")
+    return x
   }
-
 
   private def tsName[T: Type]: String =
     val symbol = TypeRepr.of[T].typeSymbol
@@ -115,7 +117,7 @@ class Macros(using Quotes) {
   private def notFound[T: Type]: Expr[TSType[T]] = {
     val msg = s"Could not find TSType[${Type.show[T]}] in scope and could not generate it"
     report.warning(s"$msg. Did you create and import it?")
-    '{ TSType(TSLiteralString(${Expr(msg)})) }
+    '{ TSType(TSLiteralString(${ Expr(msg) })) }
   }
 }
 
