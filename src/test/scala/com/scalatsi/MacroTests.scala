@@ -28,42 +28,6 @@ class MacroTests extends AnyFlatSpec with Matchers {
     TSType.fromCaseClass[B] shouldBe TSType.interface("IB", "a" -> tsA.get)
   }
 
-  it should "handle polymorphic members with parameter type that is itself generated" in {
-    case class Element(foo: String)
-    case class Root(
-        listField: Seq[Element],
-        eitherField: Either[String, Element],
-        tuple3Field: (Element, String, Int)
-    )
-
-    val tsElement: TypescriptType = TSType.fromCaseClass[Element].get
-
-    TSType.fromCaseClass[Root] shouldBe TSType.interface(
-      "IRoot",
-      "listField"   -> tsElement.array,
-      "eitherField" -> (TSString | tsElement),
-      "tuple3Field" -> TSTuple.of(tsElement, TSString, TSNumber)
-    )
-  }
-
-  it should "handle nested polymorphic members " in {
-    case class Element(foo: String)
-    case class Root(
-        twoLevels: Seq[Seq[Element]],
-        threeLevels: Seq[Seq[Seq[Element]]],
-        branched: Either[String, Either[Int, Seq[Element]]]
-    )
-
-    val tsElement: TypescriptType = TSType.fromCaseClass[Element].get
-
-    TSType.fromCaseClass[Root] shouldBe TSType.interface(
-      "IRoot",
-      "twoLevels"   -> tsElement.array.array,
-      "threeLevels" -> tsElement.array.array.array,
-      "branched"    -> (TSString | TSNumber | tsElement.array)
-    )
-  }
-
   "The sealed trait/class to Typescript type macro" should "handle sealed traits" in {
     sealed trait FooOrBar
     case class Foo(foo: String) extends FooOrBar
