@@ -10,7 +10,6 @@ class Macros(using q: Quotes) {
   import q.reflect.*
 
   private def getTSType[T: Type]: Expr[TSType[T]] = {
-    println(s"getTSType: ${Type.show[T]}")
     val existing = Expr.summon[TSType[T]]
     if (existing.isDefined) {
       return existing.get
@@ -33,20 +32,15 @@ class Macros(using q: Quotes) {
                 .asExprOf[Unit]
           }
           .toList
-      typeArgImplicits.zipWithIndex.foreach((y, i) => println(s"$i: ${y.show}"))
-      val x = Expr.block(typeArgImplicits, '{ TSType.getOrGenerate[T] })
-      println(s"${Type.show[T]} was ${x.show}")
-      x
+      Expr.block(typeArgImplicits, '{ TSType.getOrGenerate[T] })
     }
   }
 
   private def findNestedTypeParameters(typeRepr: TypeRepr, first: Boolean = true): Iterator[TypeRepr] =
     typeRepr.typeArgs.iterator.flatMap(t => findNestedTypeParameters(t, first = false)) ++ (if (first) Iterator() else Iterator(typeRepr))
 
-  def getImplicitMappingOrGenerateDefaultImpl[T: Type]: Expr[TSType[T]] = {
-    println(s"Seeking ${Type.show[T]}");
+  def getImplicitMappingOrGenerateDefaultImpl[T: Type]: Expr[TSType[T]] =
     Expr.summon[TSType[T]].getOrElse(generateDefaultMapping[T])
-  }
 
   def getImplicitNamedMappingOrGenerateDefaultImpl[T: Type]: Expr[TSNamedType[T]] =
     Expr.summon[TSNamedType[T]].getOrElse(generateDefaultMapping[T].asInstanceOf[Expr[TSNamedType[T]]])
@@ -74,13 +68,11 @@ class Macros(using q: Quotes) {
         .map(member => (member.name, typeRepr.memberType(member).asType))
         .map {
           case (name, '[None.type]) => '{ (${ Expr(name) }, TSNull) }
-          case (name, '[Option[t]]) => '{ (${ Expr(name) }, ${ getTSType[t] } | TSNull) }
+          case (name, '[Option[t]]) => '{ (${ Expr(name) }, ${ getTSType[t] } | TSUndefined) }
           case (name, '[t])         => '{ (${ Expr(name) }, ${ getTSType[t] }.get) }
         }
 
-    val x = '{ TSIType[T](TSInterface(${ Expr(tsName[T]) }, ListMap(${ Varargs(members) }*))) }
-    println(s"generateInterfaceFromCaseClassImpl ${Type.show[T]} was ${x.show}")
-    x
+    '{ TSIType[T](TSInterface(${ Expr(tsName[T]) }, ListMap(${ Varargs(members) }*))) }
   }
 
   private def tsName[T: Type]: String =
