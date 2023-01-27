@@ -85,24 +85,16 @@ class TypescriptTypeSerializerTests extends AnyFlatSpec with Matchers {
     }
 
     val tsAGenerated: TSIType[A] = TSType.fromCaseClass
-    TypescriptTypeSerializer.emit()(tsAGenerated) should equal("""|export interface IA {
-                                                                  |  b: IB
-                                                                  |}
-                                                                  |
-                                                                  |export interface IB {
-                                                                  |  a: IA
-                                                                  |}
-                                                                  |""".stripMargin)
+    val output                   = TypescriptTypeSerializer.emit()(tsAGenerated)
+    output should equal("""|export interface IA {
+                           |  b: IB
+                           |}
+                           |
+                           |export interface IB {
+                           |  a: IA
+                           |}
+                           |""".stripMargin)
   }
-
-  // Due to the circular nature of this test, it slows down compilation/testing by *a lot*. Disabled by default
-  //  it should "not crash on circular references" in {
-  //    case class A(b: B)
-  //    case class B(a: A)
-  //
-  //    // shouldn't compile but don't crash, but also shouldn't crash the compiler
-  //    """TSType.fromCaseClass[A]""" shouldNot compile
-  //  }
 
   it should "be able to handle all primitive types" in {
     case class PrimitiveTypes(

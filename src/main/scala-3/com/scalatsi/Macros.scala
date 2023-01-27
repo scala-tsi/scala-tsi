@@ -22,7 +22,7 @@ class Macros(using q: Quotes) {
 
       val typeArgImplicits: List[Expr[Unit]] =
         allTypeArguments.distinct
-          //.filterNot({ case '[t] => Expr.summon[TSType[t]].isDefined })
+          .filterNot({ case '[t] => Expr.summon[TSType[t]].isDefined })
           .zipWithIndex
           .map {
             case ('[t], i) =>
@@ -55,15 +55,6 @@ class Macros(using q: Quotes) {
     Expr.summon[TSIType[T]].getOrElse(generateInterfaceFromCaseClassImpl[T])
 
   private def generateDefaultMapping[T: Type]: Expr[TSType[T]] = {
-    val x = Type.of[T] match {
-      case '[Iterable[t]] => {
-        Some('{ TSType.iterableTsType[t, Iterable[t]](TSType.getOrGenerate[t]).asInstanceOf[TSType[T]] })
-      }
-      case _ => None
-    }
-    if(x.isDefined) {
-      return x.get.asExprOf[TSType[T]]
-    }
     val symbol = TypeRepr.of[T].typeSymbol
     if (!(symbol.isClassDef)) notFound[T]
     else if (symbol.flags is Flags.Case) generateInterfaceFromCaseClassImpl[T]

@@ -50,6 +50,12 @@ object TypescriptTypeSerializer {
   def emits(styleOptions: StyleOptions = StyleOptions(), types: Set[TypescriptNamedType]): String =
     types
       .flatMap(discoverNestedNames(styleOptions))
+      // Ignore references to other types, unless they are named and carry an implementation around
+      // If so just emit the implementation
+      .collect {
+        case TSTypeReference(_, Some(impl: TypescriptNamedType), _, _) => impl
+        case o if !o.isInstanceOf[TSTypeReference]                     => o
+      }
       .toSeq
       .distinctBy(_.name)
       .sorted

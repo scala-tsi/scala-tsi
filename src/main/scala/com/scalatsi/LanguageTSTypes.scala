@@ -7,11 +7,11 @@ import scala.collection.immutable.ListMap
 import scala.reflect.ClassTag
 
 trait ScalaTSTypes {
-  implicit val anyTSType: TSType[Any]                              = TSType(TSAny)
-  implicit val unitTsType: TSType[Unit]                            = TSType(TSVoid)
-  implicit val booleanTsType: TSType[Boolean]                      = TSType(TSBoolean)
-  implicit val stringTsType: TSType[String]                        = TSType(TSString)
-  def numericTsType[T](implicit @unused ev: Numeric[T]): TSType[T] = TSType(TSNumber)
+  implicit val anyTSType: TSType[Any]                                       = TSType(TSAny)
+  implicit val unitTsType: TSType[Unit]                                     = TSType(TSVoid)
+  implicit val booleanTsType: TSType[Boolean]                               = TSType(TSBoolean)
+  implicit val stringTsType: TSType[String]                                 = TSType(TSString)
+  implicit def numericTsType[T](implicit @unused ev: Numeric[T]): TSType[T] = TSType(TSNumber)
 }
 
 trait CollectionTSTypes extends LowPriorityCollectionTSType {
