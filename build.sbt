@@ -55,11 +55,10 @@ lazy val compilerOptions = scalacOptions := Seq(
   "UTF8",
   "-release",
   "8",
-  "-language:experimental.macros",
+  "-Xfatal-warnings",
 ) ++ (if (isScala2.value)
         Seq(
-          // TODO: Move to general options
-          "-Xfatal-warnings",
+          "-language:experimental.macros",
           "-Xsource:3",
           // These are not yet implemented in Scala 3 compiler
           "-Xlint",
