@@ -6,10 +6,15 @@ import com.scalatsi.TypescriptTypeToExpr.given
 import scala.collection.immutable.ListMap
 import scala.quoted.*
 
-class Macros(using q: Quotes) {
-  import q.reflect.*
+object Macros {
+  inline def generateInterfaceFromCaseClass[T]: TSIType[T]               = ${ generateInterfaceFromCaseClassImpl[T] }
+  inline def getImplicitMappingOrGenerateDefault[T]                      = ${ getImplicitMappingOrGenerateDefaultImpl[T] }
+  inline def getImplicitNamedMappingOrGenerateDefault[T]                 = ${ getImplicitNamedMappingOrGenerateDefaultImpl[T] }
+  inline def getImplicitInterfaceMappingOrGenerateDefault[T]: TSIType[T] = ${ getImplicitInterfaceMappingOrGenerateDefaultImpl[T] }
+  inline def generateUnionFromSealedTrait[T]: TSNamedType[T]             = ${ generateUnionFromSealedTraitImpl[T] }
 
-  private def getTSType[T: Type]: Expr[TSType[T]] = {
+  private def getTSType[T: Type](using q: Quotes): Expr[TSType[T]] = {
+    import q.reflect.*
     val existing = Expr.summon[TSType[T]]
     if (existing.isDefined) {
       return existing.get
@@ -35,19 +40,20 @@ class Macros(using q: Quotes) {
     }
   }
 
-  private def findNestedTypeParameters(typeRepr: TypeRepr, first: Boolean = true): Iterator[TypeRepr] =
+  private def findNestedTypeParameters(using q: Quotes)(typeRepr: q.reflect.TypeRepr, first: Boolean = true): Iterator[q.reflect.TypeRepr] =
     typeRepr.typeArgs.iterator.flatMap(t => findNestedTypeParameters(t, first = false)) ++ (if (first) Iterator() else Iterator(typeRepr))
 
-  def getImplicitMappingOrGenerateDefaultImpl[T: Type]: Expr[TSType[T]] =
+  def getImplicitMappingOrGenerateDefaultImpl[T: Type](using Quotes): Expr[TSType[T]] =
     Expr.summon[TSType[T]].getOrElse(generateDefaultMapping[T])
 
-  def getImplicitNamedMappingOrGenerateDefaultImpl[T: Type]: Expr[TSNamedType[T]] =
+  def getImplicitNamedMappingOrGenerateDefaultImpl[T: Type](using Quotes): Expr[TSNamedType[T]] =
     Expr.summon[TSNamedType[T]].getOrElse(generateDefaultMapping[T].asInstanceOf[Expr[TSNamedType[T]]])
 
-  def getImplicitInterfaceMappingOrGenerateDefaultImpl[T: Type]: Expr[TSIType[T]] =
+  def getImplicitInterfaceMappingOrGenerateDefaultImpl[T: Type](using Quotes): Expr[TSIType[T]] =
     Expr.summon[TSIType[T]].getOrElse(generateInterfaceFromCaseClassImpl[T])
 
-  private def generateDefaultMapping[T: Type]: Expr[TSType[T]] = {
+  private def generateDefaultMapping[T: Type](using q: Quotes): Expr[TSType[T]] = {
+    import q.reflect.*
     val symbol = TypeRepr.of[T].typeSymbol
     if (!(symbol.isClassDef)) notFound[T]
     else if (symbol.flags is Flags.Case) generateInterfaceFromCaseClassImpl[T]
@@ -55,7 +61,8 @@ class Macros(using q: Quotes) {
     else notFound[T]
   }
 
-  def generateInterfaceFromCaseClassImpl[T: Type]: Expr[TSIType[T]] = {
+  def generateInterfaceFromCaseClassImpl[T: Type](using q: Quotes): Expr[TSIType[T]] = {
+    import q.reflect.*
     val typeRepr = TypeRepr.of[T]
     val symbol   = typeRepr.typeSymbol
 
@@ -74,11 +81,13 @@ class Macros(using q: Quotes) {
     '{ TSIType[T](TSInterface(${ Expr(tsName[T]) }, ListMap(${ Varargs(members) }*))) }
   }
 
-  private def tsName[T: Type]: String =
+  private def tsName[T: Type](using q: Quotes): String =
+    import q.reflect.*
     val symbol = TypeRepr.of[T].typeSymbol
     if (symbol.isClassDef) s"I${symbol.name}" else symbol.name
 
-  def generateUnionFromSealedTraitImpl[T: Type]: Expr[TSNamedType[T]] = {
+  def generateUnionFromSealedTraitImpl[T: Type](using q: Quotes): Expr[TSNamedType[T]] = {
+    import q.reflect.*
     val typeRepr = TypeRepr.of[T]
     val symbol   = typeRepr.typeSymbol
 
@@ -106,29 +115,10 @@ class Macros(using q: Quotes) {
         '{ TSNamedType(TSAlias(${ name }, TSUnion(Vector(${ Varargs(operands) }*)))) }
   }
 
-  private def notFound[T: Type]: Expr[TSType[T]] = {
+  private def notFound[T: Type](using q: Quotes): Expr[TSType[T]] = {
+    import q.reflect.*
     val msg = s"Could not find TSType[${Type.show[T]}] in scope and could not generate it"
     report.warning(s"$msg. Did you create and import it?")
     '{ TSType(TSLiteralString(${ Expr(msg) })) }
   }
-}
-
-object Macros {
-  private def generateInterfaceFromCaseClassImpl[T](using Quotes, Type[T]): Expr[TSIType[T]] =
-    Macros().generateInterfaceFromCaseClassImpl[T]
-  inline def generateInterfaceFromCaseClass[T]: TSIType[T] = ${ generateInterfaceFromCaseClassImpl[T] }
-
-  private def getImplicitMappingOrGenerateDefaultImpl[T: Type](using Quotes) = Macros().getImplicitMappingOrGenerateDefaultImpl[T]
-  inline def getImplicitMappingOrGenerateDefault[T]                          = ${ getImplicitMappingOrGenerateDefaultImpl[T] }
-
-  private def getImplicitNamedMappingOrGenerateDefaultImpl[T: Type](using Quotes) = Macros().getImplicitNamedMappingOrGenerateDefaultImpl[T]
-
-  inline def getImplicitNamedMappingOrGenerateDefault[T] = ${ getImplicitNamedMappingOrGenerateDefaultImpl[T] }
-
-  private def getImplicitInterfaceMappingOrGenerateDefaultImpl[T: Type](using Quotes): Expr[TSIType[T]] =
-    Macros().getImplicitInterfaceMappingOrGenerateDefaultImpl[T]
-  inline def getImplicitInterfaceMappingOrGenerateDefault[T]: TSIType[T] = ${ getImplicitInterfaceMappingOrGenerateDefaultImpl[T] }
-
-  private def generateUnionFromSealedTraitImpl[T: Type](using Quotes): Expr[TSNamedType[T]] = Macros().generateUnionFromSealedTraitImpl[T]
-  inline def generateUnionFromSealedTrait[T]: TSNamedType[T]                                = ${ generateUnionFromSealedTraitImpl[T] }
 }
