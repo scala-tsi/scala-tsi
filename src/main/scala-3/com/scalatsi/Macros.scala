@@ -23,13 +23,12 @@ class Macros(using q: Quotes) {
         allTypeArguments.distinct
           .filterNot({ case '[t] => Expr.summon[TSType[t]].isDefined })
           .zipWithIndex
-          .map {
-            case ('[t], i) =>
-              ValDef
-                .let(Symbol.spliceOwner, s"targ${i}Val", getTSType[t] .asTerm) { targVal =>
-                  ('{ given TSType[t] = ${ targVal.asExprOf[TSType[t]] } }).asTerm
-                }
-                .asExprOf[Unit]
+          .map { case ('[t], i) =>
+            ValDef
+              .let(Symbol.spliceOwner, s"targ${i}Val", getTSType[t].asTerm) { targVal =>
+                ('{ given TSType[t] = ${ targVal.asExprOf[TSType[t]] } }).asTerm
+              }
+              .asExprOf[Unit]
           }
           .toList
       Expr.block(typeArgImplicits, '{ TSType.getOrGenerate[T] })

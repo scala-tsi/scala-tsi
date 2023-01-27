@@ -1,7 +1,7 @@
-## 0.8.0 - ...
+## 0.8.0 - 2023-...
 
-* Scala 3 support by @...
-* Failures in finding the mapping of a type are now reported as compile warnings and as messages in the generated Typescript code instead of aborting compilation. 
+* Scala 3 is now supported, thanks @jdsalchow for the initial contribution!
+* Failures in finding the `TSType` of a type are now reported as compile warnings and as messages in the generated Typescript code instead of aborting compilation. 
 
 ## 0.7.0 - 2022-07-13
 
