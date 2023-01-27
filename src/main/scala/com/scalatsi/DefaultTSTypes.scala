@@ -9,6 +9,5 @@ trait DefaultTSTypes
     with TupleTSTypes
     with JavaTSTypes
     with LiteralTSTypes
-    with ScalaEnumTSTypes
-    with ScalaVersionSpecificTypes {}
+    with ScalaEnumTSTypes {}
 object DefaultTSTypes extends DefaultTSTypes

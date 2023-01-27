@@ -20,12 +20,8 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
           // we might get ambiguous implicit values
           .filter(targ => !implicitIsDefined(properType[TSType](targ)))
           .zipWithIndex
-          .flatMap({ case (targ, i) =>
-            val valueTerm = TermName(s"targ${i}Val")
-            Seq(
-              q"""val $valueTerm: TSType[$targ] = TSType.getOrGenerate[$targ]""",
-              q"""implicit val ${TermName(s"targ$i")}: TSType[$targ] = $valueTerm"""
-            )
+          .map({ case (targ, i) =>
+            q"""implicit val ${TermName(s"targ$i")} = TSType.getOrGenerate[$targ]"""
           })
           .toList
       q"""{
@@ -63,7 +59,7 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
     prefix.getOrElse("") + symbol.name.toString
   }
 
-  private def circularRefError(T: c.Type, which: String): Tree = {
+  private def circularRefWarning(T: c.Type, which: String): Tree = {
     c.warning(
       c.enclosingPosition,
       s"""
@@ -83,7 +79,7 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
     lookupOptionalImplicit(properType[T, TSType]) match {
       case Right(Some(value))      => value
       case Right(None)             => generateDefaultMapping[T, TSType]
-      case Left(CircularReference) => circularRefError(c.weakTypeOf[T], "TSType")
+      case Left(CircularReference) => circularRefWarning(c.weakTypeOf[T], "TSType")
     }
   }
 
@@ -95,7 +91,7 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
     lookupOptionalImplicit(properType[T, TSIType]) match {
       case Right(Some(value))      => value
       case Right(None)             => generateInterfaceFromCaseClass[T, TSType]
-      case Left(CircularReference) => circularRefError(c.weakTypeOf[T], "TSIType")
+      case Left(CircularReference) => circularRefWarning(c.weakTypeOf[T], "TSIType")
     }
   }
 

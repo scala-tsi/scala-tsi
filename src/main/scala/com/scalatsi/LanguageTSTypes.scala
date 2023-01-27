@@ -7,23 +7,14 @@ import scala.collection.immutable.ListMap
 import scala.reflect.ClassTag
 
 trait ScalaTSTypes {
-  implicit val anyRefTSType: TSType[AnyRef]                        = TSType(TSAny)
+  implicit val anyTSType: TSType[Any]                              = TSType(TSAny)
   implicit val unitTsType: TSType[Unit]                            = TSType(TSVoid)
   implicit val booleanTsType: TSType[Boolean]                      = TSType(TSBoolean)
   implicit val stringTsType: TSType[String]                        = TSType(TSString)
   def numericTsType[T](implicit @unused ev: Numeric[T]): TSType[T] = TSType(TSNumber)
-  implicit val bigDecimalTsType: TSType[BigDecimal]                = numericTsType
-  implicit val bigIntTsType: TSType[BigInt]                        = numericTsType
-  implicit val byteTsType: TSType[Byte]                            = numericTsType
-  implicit val charTsType: TSType[Char]                            = numericTsType
-  implicit val doubleTsType: TSType[Double]                        = numericTsType
-  implicit val floatTsType: TSType[Float]                          = numericTsType
-  implicit val intTsType: TSType[Int]                              = numericTsType
-  implicit val longTsType: TSType[Long]                            = numericTsType
-  implicit val shortTstType: TSType[Short]                         = numericTsType
 }
 
-trait CollectionTSTypes {
+trait CollectionTSTypes extends LowPriorityCollectionTSType {
 
   /** Represent an Option[E] with a Typescript (E | undefined) */
   implicit def tsOption[E](implicit e: TSType[E]): TSType[Option[E]] = TSType(e | TSUndefined)
@@ -39,6 +30,12 @@ trait CollectionTSTypes {
     TSType(TSIndexedInterface(indexType = TSNumber, valueType = e.get))
 }
 
+trait LowPriorityCollectionTSType {
+
+  /** Provides a TSType for any scala collection of E to a typescript array of E */
+  implicit def tsTraversable[E, F[_]](implicit e: TSType[E], @unused ev: F[E] <:< Iterable[E]): TSType[F[E]] = TSType(e.get.array)
+}
+
 trait ScalaEnumTSTypes {
   implicit def scalaEnumTSType[E <: Enumeration: ValueOf]: TSNamedType[E] = {
     val e                   = valueOf[E]
@@ -50,7 +47,8 @@ trait ScalaEnumTSTypes {
 }
 
 trait JavaTSTypes {
-  implicit val javaVoidTSType: TSType[Void] = TSType(TSVoid)
+  implicit val javaObjectTSType: TSType[Object] = TSType(TSObject)
+  implicit val javaVoidTSType: TSType[Void]     = TSType(TSVoid)
 
   import java.time.temporal.Temporal
   // Most JSON serializers write java.time times to a ISO8601-like string
@@ -64,6 +62,12 @@ trait JavaTSTypes {
   implicit def java8DateTSTypeConversion[T <: Temporal]: TSType[T] = java8TimeTSType.asInstanceOf[TSType[T]]
 
   implicit def javaNumber[T <: java.lang.Number]: TSType[T] = TSType(TSNumber)
+
+  // All java collection types implement Collection and are almost always translated to javascript arrays
+  implicit def tsJavaCollection[E, F[_]](implicit
+      e: TSType[E],
+      ev: F[E] <:< java.util.Collection[E]
+  ): TSType[F[E]] = TSType(e.get.array)
 
   implicit val javaUriTSType: TSType[java.net.URI]    = TSType(TSString)
   implicit val javaUrlTSType: TSType[java.net.URL]    = TSType(TSString)
