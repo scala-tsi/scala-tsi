@@ -54,7 +54,7 @@ jobs:
       - run:
           name: Run sbt-scala-tsi scripted tests
           command:
-            sbt -batch -Dscala.version="<< parameters.scala-version >>.x" ++"<< parameters.scala-version >>.x" sbt-scala-tsi/scripted
+            sbt -batch -Dscala.version="<< parameters.scala-version-patch >>" ++"<< parameters.scala-version >>.x" sbt-scala-tsi/scripted
 
       - store_test_results:
           path: target/test-reports
@@ -76,7 +76,7 @@ jobs:
           command: |
             VERSION=$(cd ../ && sbt --no-colors --error "print version" | xargs)
             sbt -batch -Dplugin.version="$VERSION" \
-              -Dscala.version="<< parameters.scala-version >>.x" ++"<< parameters.scala-version >>.x" \
+              -Dscala.version="<< parameters.scala-version-patch >>" ++"<< parameters.scala-version >>.x" \
               test \
               generateTypescript \
               scalafmtSbtCheck \
@@ -127,6 +127,10 @@ workflows:
               scala-version:
                 - "2.13"
                 - "3"
+              # This is only used for SBT scripted tests, prefer to rely only on the major version as it doesn't change
+              scala-version-patch:
+                - "2.13.10"
+                - "3.2.1""
           filters:  # required since `deploy` has tag filters AND requires `build`
             tags:
               only: /.*/

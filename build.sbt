@@ -157,11 +157,7 @@ lazy val `sbt-scala-tsi` = (project in file("plugin"))
       scriptedLaunchOpts.value ++ Seq(
         "-Xmx1024M",
         "-Dplugin.version=" + version.value,
-        "-Dscala.version=" + (sys.props.get("scala.version") match {
-          case Some("3")    => scala3
-          case Some("2.13") => scala213
-          case _            => scala213
-        })
+        "-Dscala.version=" + sys.props.get("scala.version").getOrElse("\"Pass -Dscala.version=....\"")
       )
     },
     scriptedBufferLog := false,
