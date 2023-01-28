@@ -53,7 +53,7 @@ jobs:
 
       - run:
           name: Run sbt-scala-tsi scripted tests
-          command:
+          command: |
             # These tests can be enabled on Scala 3 once all features are supported there
             if [ "<< parameters.scala-version >>" = "3"]; then
               exit 0
