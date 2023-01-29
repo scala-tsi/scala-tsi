@@ -43,7 +43,10 @@ lazy val publishSettings = Seq(
         usePgpKeyHex("6044257F427C2854A6F9A0C211A02377A6DD0E59"),
         pgpSecretRing := file(".circleci/circleci.key.asc"),
         pgpPublicRing := file(".circleci/circleci.pub.asc"),
-        pgpPassphrase := sys.env.get("GPG_passphrase").map(_.toCharArray)
+        pgpPassphrase := sys.env.get("GPG_passphrase").map(_.toCharArray),
+        // For some reason without these the dependencies can't be found on CI when testing locally
+        (publishLocal / publishMavenStyle).withRank(KeyRanks.Invisible)       := false,
+        (publishLocalSigned / publishMavenStyle).withRank(KeyRanks.Invisible) := false
       )
     })
     .getOrElse(Seq())
@@ -151,10 +154,7 @@ lazy val `sbt-scala-tsi` = (project in file("plugin"))
     crossScalaVersions := Seq(scala212),
     // Twirl template gives an incorrect unused import warning
     scalacOptions := scalacOptions.value diff Seq("-Xlint", "-Ywarn-unused:imports"),
-    publishLocal  := publishLocal.dependsOn(scalaTsiPublishLocal).value,
-    // Locally we need ivy publishing
-    (publishLocal / publishMavenStyle).withRank(KeyRanks.Invisible)       := false,
-    (publishLocalSigned / publishMavenStyle).withRank(KeyRanks.Invisible) := false
+    publishLocal  := publishLocal.dependsOn(scalaTsiPublishLocal).value
   )
   .settings(
     scriptedLaunchOpts := {
