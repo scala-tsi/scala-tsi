@@ -1,6 +1,7 @@
 import sbt.Keys.scalacOptions
 import sbt.ScriptedPlugin.autoImport.scriptedBufferLog
 import xerial.sbt.Sonatype._
+import com.jsuereth.sbtpgp.PgpKeys.publishLocalSigned
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
@@ -152,7 +153,8 @@ lazy val `sbt-scala-tsi` = (project in file("plugin"))
     scalacOptions := scalacOptions.value diff Seq("-Xlint", "-Ywarn-unused:imports"),
     publishLocal  := publishLocal.dependsOn(scalaTsiPublishLocal).value,
     // Locally we need ivy publishing
-    publishLocal / publishMavenStyle := false
+    (publishLocal / publishMavenStyle).withRank(KeyRanks.Invisible)       := false,
+    (publishLocalSigned / publishMavenStyle).withRank(KeyRanks.Invisible) := false
   )
   .settings(
     scriptedLaunchOpts := {

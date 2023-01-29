@@ -3,8 +3,9 @@
 [![CircleCI](https://img.shields.io/circleci/project/github/scala-tsi/scala-tsi/master.svg)](https://circleci.com/gh/scala-tsi/scala-tsi/)
 
 
-[![2.12](https://img.shields.io/maven-central/v/com.scalatsi/scala-tsi_2.12.svg?label=2.12)](https://mvnrepository.com/artifact/com.scalatsi/scala-tsi)
+[![2.12](https://img.shields.io/maven-central/v/com.scalatsi/scala-tsi_3.svg?label=3.x)](https://mvnrepository.com/artifact/com.scalatsi/scala-tsi)
 [![2.13](https://img.shields.io/maven-central/v/com.scalatsi/scala-tsi_2.13.svg?label=2.13)](https://mvnrepository.com/artifact/com.scalatsi/scala-tsi)
+[![2.12](https://img.shields.io/maven-central/v/com.scalatsi/scala-tsi_2.12.svg?label=2.12)](https://mvnrepository.com/artifact/com.scalatsi/scala-tsi)
 
 Scala TSI can automatically generate Typescript Interfaces from your Scala classes.
 
