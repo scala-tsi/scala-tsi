@@ -10,7 +10,7 @@ lazy val root = (project in file("."))
       scalaVersion       := sys.props.get("scala.version").getOrElse(scala213),
       crossScalaVersions := Seq(scala213, scala3),
       organization       := "com.scalatsi",
-      scalacOptions ++= compilerOptions,
+      compilerOptions,
       typescriptExports := Seq(
         "DeepThought",
         "GenericCaseClass",
@@ -29,11 +29,20 @@ lazy val root = (project in file("."))
     )
   )
 
-lazy val compilerOptions = Seq(
+lazy val compilerOptions = scalacOptions := Seq(
   "-unchecked",
   "-feature",
   "-deprecation",
-  "-Xlint",
   "-encoding",
   "UTF8"
-)
+) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
+  case Some((2, _)) =>
+    Seq(
+      "-Xsource:3",
+      "-Xlint"
+    )
+  case _ =>
+    Seq(
+      "-explain",
+    )
+})

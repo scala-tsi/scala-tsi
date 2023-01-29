@@ -22,6 +22,6 @@ case class Email(address: String)
 case class Job(tasks: Seq[String], boss: String)
 
 object ReadmeTSTypes {
-  implicit val tsEmail  = TSType.sameAs[Email, String]
-  implicit val tsPerson = TSType.fromCaseClass[Person] - "ssn"
+  implicit val tsEmail: TSType[Email]   = TSType.sameAs[Email, String]
+  implicit val tsPerson: TSType[Person] = TSType.fromCaseClass[Person] - "ssn"
 }

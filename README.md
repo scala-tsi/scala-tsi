@@ -110,8 +110,8 @@ First we define the mapping as follows
 ```scala
 package myproject
 
-import com.scalatsi._
-import com.scalatsi.dsl._
+import com.scalatsi.*
+import com.scalatsi.dsl.*
 
 // A TSType[T] is what tells scala-tsi how to convert your type T into typescript
 // MyModelTSTypes contains all TSType[?]'s for your model
@@ -120,11 +120,11 @@ object MyModelTSTypes {
  
   // Tell scala-tsi to use the typescript type of string whenever we have an Email type
   // Alternatively, TSType.alias[Email, String] will create a `type Email = string` entry in the typescript file
-  implicit val tsEmail = TSType.sameAs[Email, String]
+  implicit val tsEmail: TSType[Email] = TSType.sameAs[Email, String]
   
   // TSType.fromCaseClass will convert your case class to a typescript definition
   // `- ssn` indicated the ssn field should be removed
-  implicit val tsPerson = TSType.fromCaseClass[Person] - "ssn"
+  implicit val tsPerson: TSType[Person] = TSType.fromCaseClass[Person] - "ssn"
 }
 ```
 
