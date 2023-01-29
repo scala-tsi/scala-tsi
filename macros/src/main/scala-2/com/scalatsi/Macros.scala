@@ -15,21 +15,19 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
     } else {
       val allTypeArguments = findNestedTypeParameters(T)
       val targImplicits =
-        allTypeArguments
+        allTypeArguments.distinct
           // Prevent generating an `implicit val` again if it is already in scope before macro expansion, otherwise
           // we might get ambiguous implicit values
           .filter(targ => !implicitIsDefined(properType[TSType](targ)))
-          .toIndexedSeq
-          .distinct
           .zipWithIndex
           .map({ case (targ, i) =>
-            // Note: the implicit *must not* be annotated with TSType[$targ], otherwise the implicit lookup will be self-referential
-            q"""implicit val `${TermName(s"targ$i")}` = getOrGenerate[$targ]"""
+            q"""implicit val ${TermName(s"targ$i")} = TSType.getOrGenerate[$targ]"""
           })
+          .toList
       q"""{
-          import _root_.com.scalatsi.TSType.getOrGenerate
+          import _root_.com.scalatsi.TSType
           ..$targImplicits
-          getOrGenerate[$T]
+          TSType.getOrGenerate[$T]
         }"""
     }
   }
@@ -61,26 +59,27 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
     prefix.getOrElse("") + symbol.name.toString
   }
 
-  private def circularRefError(T: c.Type, which: String): Unit = c.error(
-    c.enclosingPosition,
-    s"""
-       |Circular reference or very deep nesting encountered while searching for $which[$T]
-       |Please break the cycle or lower the nesting by locally defining an implicit TSType like so:
-       |implicit val tsType...: $which[...] = {
-       |  implicit val tsA: $which[$T] = TSType.external("I$T") // name of your "$T" typescript type here
-       |  $which.getOrGenerate[...]
-       |}
-       |for more help see https://github.com/scala-tsi/scala-tsi#circular-references
-       |""".stripMargin
-  )
+  private def circularRefWarning(T: c.Type, which: String): Tree = {
+    c.warning(
+      c.enclosingPosition,
+      s"""
+         |Circular reference or very deep nesting encountered while searching for $which[$T]
+         |Please break the cycle or lower the nesting by locally defining an implicit TSType like so:
+         |implicit val tsType...: $which[...] = {
+         |  implicit val tsA: $which[$T] = TSType.external("I$T") // name of your "$T" typescript type here
+         |  $which.getOrGenerate[...]
+         |}
+         |for more help see https://github.com/scala-tsi/scala-tsi#circular-references
+         |""".stripMargin
+    )
+    q"""com.scalatsi.TSType(com.scalatsi.TypescriptType.TSLiteralString("circular reference error"))"""
+  }
 
   def getImplicitMappingOrGenerateDefault[T: c.WeakTypeTag, TSType[_]](implicit tsTypeTag: c.WeakTypeTag[TSType[?]]): Tree = {
     lookupOptionalImplicit(properType[T, TSType]) match {
-      case Right(Some(value)) => value
-      case Right(None)        => generateDefaultMapping[T, TSType]
-      case Left(CircularReference) =>
-        circularRefError(c.weakTypeOf[T], "TSType")
-        q"""com.scalatsi.TypescriptType.TSNever"""
+      case Right(Some(value))      => value
+      case Right(None)             => generateDefaultMapping[T, TSType]
+      case Left(CircularReference) => circularRefWarning(c.weakTypeOf[T], "TSType")
     }
   }
 
@@ -90,45 +89,32 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
       tsiTypeTag: c.WeakTypeTag[TSIType[?]]
   ): Tree = {
     lookupOptionalImplicit(properType[T, TSIType]) match {
-      case Right(Some(value)) => value
-      case Right(None)        => generateInterfaceFromCaseClass[T, TSType]
-      case Left(CircularReference) =>
-        circularRefError(c.weakTypeOf[T], "TSIType")
-        q"""com.scalatsi.TypescriptType.TSNever"""
+      case Right(Some(value))      => value
+      case Right(None)             => generateInterfaceFromCaseClass[T, TSType]
+      case Left(CircularReference) => circularRefWarning(c.weakTypeOf[T], "TSIType")
     }
   }
 
   /** Generate an implicit not found message */
-  private def notFound[T: c.WeakTypeTag]: String = {
-    val T = c.weakTypeOf[T]
-    // Help the user a little more with some basic types
-    val isDefault = T =:= c.weakTypeOf[String] ||
-      T <:< c.weakTypeOf[Numeric[?]] ||
-      (T <:< c.weakTypeOf[Iterable[?]] && !(T <:< c.weakTypeOf[Map[?, ?]])) ||
-      T <:< c.weakTypeOf[Either[?, ?]] ||
-      T <:< c.weakTypeOf[Enumeration] ||
-      T <:< c.weakTypeOf[Enum[?]]
-    if (isDefault)
-      s"Missing implicit for TSType[$T]. This should be provided out-of-the-box, please file a bug report at https://github.com/scala-tsi/scala-tsi/issues."
-    else
-      s"Missing implicit for TSType[$T] in scope and could not generate one. Did you create and import it?"
+  private def notFound[T: c.WeakTypeTag]: Tree = {
+    val msg = s"Could not find TSType[${c.weakTypeOf[T]}] in scope and could not generate it"
+    c.warning(c.enclosingPosition, s"$msg. Did you create and import it?")
+    q"""com.scalatsi.TSType(com.scalatsi.TypescriptType.TSLiteralString($msg))"""
   }
 
   private def generateDefaultMapping[T: c.WeakTypeTag, TSType[_]](implicit tsTypeTag: c.WeakTypeTag[TSType[?]]): Tree = {
     val T      = c.weakTypeOf[T]
     val symbol = T.typeSymbol
 
-    def notSupported() = c.abort(c.enclosingPosition, notFound[T])
-
     if (!symbol.isClass) {
-      notSupported()
+      notFound[T]
     } else {
       val classSymbol = symbol.asClass
       if (classSymbol.isCaseClass)
         generateInterfaceFromCaseClass[T, TSType]
       else if (isSealedTraitOrAbstractClass(classSymbol))
         generateUnionFromSealedTrait[T, TSType]
-      else notSupported()
+      else notFound[T]
     }
   }
 
@@ -181,7 +167,7 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
      import _root_.com.scalatsi.TypescriptType.{TSUndefined, TSInterface}
      import _root_.com.scalatsi.{TSNamedType, TSIType}
      import _root_.scala.collection.immutable.ListMap
-     TSIType(TSInterface("I" + ${symbol.name.toString}, ListMap(
+     TSIType(TSInterface(${tsName[T]}, ListMap(
        ..$members
      )))
     }"""

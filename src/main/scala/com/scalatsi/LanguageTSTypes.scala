@@ -1,13 +1,17 @@
 package com.scalatsi
 
-import TypescriptType._
+import TypescriptType.*
 
+import scala.annotation.unused
 import scala.collection.immutable.ListMap
 import scala.reflect.ClassTag
 
 trait ScalaTSTypes {
-  implicit val anyTSType: TSType[Any]   = TSType(TSAny)
-  implicit val unitTsType: TSType[Unit] = TSType(TSVoid)
+  implicit val anyTSType: TSType[Any]                                       = TSType(TSAny)
+  implicit val unitTsType: TSType[Unit]                                     = TSType(TSVoid)
+  implicit val booleanTsType: TSType[Boolean]                               = TSType(TSBoolean)
+  implicit val stringTsType: TSType[String]                                 = TSType(TSString)
+  implicit def numericTsType[T](implicit @unused ev: Numeric[T]): TSType[T] = TSType(TSNumber)
 }
 
 trait CollectionTSTypes extends LowPriorityCollectionTSType {
@@ -29,7 +33,7 @@ trait CollectionTSTypes extends LowPriorityCollectionTSType {
 trait LowPriorityCollectionTSType {
 
   /** Provides a TSType for any scala collection of E to a typescript array of E */
-  implicit def tsTraversable[E, F[_]](implicit e: TSType[E], ev: F[E] <:< Iterable[E]): TSType[F[E]] = TSType(e.get.array)
+  implicit def tsTraversable[E, F[_]](implicit e: TSType[E], @unused ev: F[E] <:< Iterable[E]): TSType[F[E]] = TSType(e.get.array)
 }
 
 trait ScalaEnumTSTypes {

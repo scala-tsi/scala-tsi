@@ -3,8 +3,9 @@
 [![CircleCI](https://img.shields.io/circleci/project/github/scala-tsi/scala-tsi/master.svg)](https://circleci.com/gh/scala-tsi/scala-tsi/)
 
 
-[![2.12](https://img.shields.io/maven-central/v/com.scalatsi/scala-tsi_2.12.svg?label=2.12)](https://mvnrepository.com/artifact/com.scalatsi/scala-tsi)
+[![2.12](https://img.shields.io/maven-central/v/com.scalatsi/scala-tsi_3.svg?label=3.x)](https://mvnrepository.com/artifact/com.scalatsi/scala-tsi)
 [![2.13](https://img.shields.io/maven-central/v/com.scalatsi/scala-tsi_2.13.svg?label=2.13)](https://mvnrepository.com/artifact/com.scalatsi/scala-tsi)
+[![2.12](https://img.shields.io/maven-central/v/com.scalatsi/scala-tsi_2.12.svg?label=2.12)](https://mvnrepository.com/artifact/com.scalatsi/scala-tsi)
 
 Scala TSI can automatically generate Typescript Interfaces from your Scala classes.
 
@@ -110,8 +111,8 @@ First we define the mapping as follows
 ```scala
 package myproject
 
-import com.scalatsi._
-import com.scalatsi.dsl._
+import com.scalatsi.*
+import com.scalatsi.dsl.*
 
 // A TSType[T] is what tells scala-tsi how to convert your type T into typescript
 // MyModelTSTypes contains all TSType[?]'s for your model
@@ -120,11 +121,11 @@ object MyModelTSTypes {
  
   // Tell scala-tsi to use the typescript type of string whenever we have an Email type
   // Alternatively, TSType.alias[Email, String] will create a `type Email = string` entry in the typescript file
-  implicit val tsEmail = TSType.sameAs[Email, String]
+  implicit val tsEmail: TSType[Email] = TSType.sameAs[Email, String]
   
   // TSType.fromCaseClass will convert your case class to a typescript definition
   // `- ssn` indicated the ssn field should be removed
-  implicit val tsPerson = TSType.fromCaseClass[Person] - "ssn"
+  implicit val tsPerson: TSType[Person] = TSType.fromCaseClass[Person] - "ssn"
 }
 ```
 
@@ -159,7 +160,7 @@ export interface IJob {
 
 #### Circular references
 
-Currently, scala-tsi cannot handle circular references.
+Currently, scala-tsi cannot always handle circular references.
 You will get an error along the following lines:
 ```text
 [error] Circular reference encountered while searching for TSType[B]
@@ -179,15 +180,26 @@ case class A(b: B)
 case class B(a: A)
 ```
 
-you have to define a local implicit for one of the types, so the loop gets broken
+You will get a warning on Scala 2, and an error on Scala 3. The Scala 2 output might also not always be as desired.
+To fix this, you can explicitly define the right values.
+
+##### Scala 2
+
 ```scala
 object B {
   // This explicit definition is to help scala-tsi with the recursive definition of A and B
-  implicit val bTSI: TSIType[B] = {
-    implicit val aReference: TSType[A] = TSType.external[A]("IA")
-    TSType.fromCaseClass[B]
-  }
+  private implicit val aReference: TSType[A] = TSType.external[A]("IA")
+  implicit val bTS: TSType[B] = TSType.fromCaseClass[B]
 }
 ```
 
-There are rare cases where this error might be false. If you are sure of this, [please file a bug report](https://github.com/scala-tsi/scala-tsi/issues).
+##### Scala 3
+
+```scala
+object B {
+// This explicit definition is to help scala-tsi with the recursive definition of A and B
+  private given TSType[A] = TSType.external[A]("IA") 
+  prviate val generatedTSType = TSType.getOrGenerate[B] 
+  given TSType[B] = generatedTSType
+}
+```

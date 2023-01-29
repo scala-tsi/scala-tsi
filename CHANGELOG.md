@@ -1,3 +1,10 @@
+## 0.8.0 - 2023-...
+
+* Scala 3 is now mostly supported, thanks @jdsalchow for the initial contribution!
+  * Automatic recursive definitions are still unsupported: [#278](https://github.com/scala-tsi/scala-tsi/issues/278)
+  * Auto-generated definitions inside generics types (`Seq[YourClass]`) will not always work: [#278](https://github.com/scala-tsi/scala-tsi/issues/278)
+* Failures in finding the `TSType` of a type are now reported as compile warnings and as messages in the generated Typescript code instead of aborting compilation. 
+
 ## 0.7.0 - 2022-07-13
 
 * Add support for string enums in `TSEnum` (#236 by @b-eyselein) and several factory methods in the `TSType` companion object.

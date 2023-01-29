@@ -1,6 +1,6 @@
 package com.scalatsi
 
-import TypescriptType._
+import TypescriptType.*
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -62,11 +62,11 @@ class DefaultTSTypeTests extends AnyWordSpec with Matchers {
     }
 
     "Seq[?]" in {
-      "implicitly[TSType[scala.collection.mutable.Seq[Int]]]" should compile
-      "implicitly[TSType[scala.collection.immutable.Seq[Int]]]" should compile
+      "implicitly[TSType[scala.collection.mutable.Seq[String]]]" should compile
+      "implicitly[TSType[scala.collection.immutable.Seq[String]]]" should compile
       "implicitly[TSType[IndexedSeq[Int]]]" should compile
-      "implicitly[TSType[List[Int]]]" should compile
-      "implicitly[TSType[Vector[Int]]]" should compile
+      "implicitly[TSType[List[Boolean]]]" should compile
+      "implicitly[TSType[Vector[Boolean]]]" should compile
       "implicitly[TSType[Seq[Seq[Int]]]]" should compile
     }
 
@@ -75,7 +75,7 @@ class DefaultTSTypeTests extends AnyWordSpec with Matchers {
       "implicitly[TSType[scala.collection.immutable.HashSet[Int]]]" should compile
     }
 
-    "Collection<?>" in {
+    "Collection[?]" in {
       "implicitly[TSType[java.util.Collection[Int]]]" should compile
       "implicitly[TSType[java.util.List[Int]]]" should compile
       "implicitly[TSType[java.util.ArrayList[Int]]]" should compile

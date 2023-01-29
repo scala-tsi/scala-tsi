@@ -1,3 +1,5 @@
+addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.0")
+
 val pluginVersionParam = sys.props
   .get("plugin.version")
   .getOrElse(sys.error("""|The system property 'plugin.version' is not defined.

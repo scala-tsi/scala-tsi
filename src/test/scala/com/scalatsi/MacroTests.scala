@@ -1,8 +1,8 @@
 package com.scalatsi
 
-import TypescriptType._
+import TypescriptType.*
 
-import scala.annotation.nowarn
+import scala.annotation.{nowarn, unused}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -28,42 +28,6 @@ class MacroTests extends AnyFlatSpec with Matchers {
     TSType.fromCaseClass[B] shouldBe TSType.interface("IB", "a" -> tsA.get)
   }
 
-  it should "handle polymorphic members with parameter type that is itself generated" in {
-    case class Element(foo: String)
-    case class Root(
-        listField: Seq[Element],
-        eitherField: Either[String, Element],
-        tuple3Field: (Element, String, Int)
-    )
-
-    val tsElement: TypescriptType = TSType.fromCaseClass[Element].get
-
-    TSType.fromCaseClass[Root] shouldBe TSType.interface(
-      "IRoot",
-      "listField"   -> tsElement.array,
-      "eitherField" -> (TSString | tsElement),
-      "tuple3Field" -> TSTuple.of(tsElement, TSString, TSNumber)
-    )
-  }
-
-  it should "handle nested polymorphic members " in {
-    case class Element(foo: String)
-    case class Root(
-        twoLevels: Seq[Seq[Element]],
-        threeLevels: Seq[Seq[Seq[Element]]],
-        branched: Either[String, Either[Int, Seq[Element]]]
-    )
-
-    val tsElement: TypescriptType = TSType.fromCaseClass[Element].get
-
-    TSType.fromCaseClass[Root] shouldBe TSType.interface(
-      "IRoot",
-      "twoLevels"   -> tsElement.array.array,
-      "threeLevels" -> tsElement.array.array.array,
-      "branched"    -> (TSString | TSNumber | tsElement.array)
-    )
-  }
-
   "The sealed trait/class to Typescript type macro" should "handle sealed traits" in {
     sealed trait FooOrBar
     case class Foo(foo: String) extends FooOrBar
@@ -79,13 +43,13 @@ class MacroTests extends AnyFlatSpec with Matchers {
   }
 
   it should "handle sealed abstract classes" in {
-    @nowarn("cat=unused-params") sealed abstract class FooOrBar(tpe: String)
+    sealed abstract class FooOrBar(@unused tpe: String)
     case class Foo(foo: String) extends FooOrBar("Foo")
     case class Bar(bar: Int)    extends FooOrBar("Bar")
 
-    import dsl._
-    implicit val tsFoo = TSType.fromCaseClass[Foo] + ("type" -> "Foo")
-    implicit val tsBar = TSType.fromCaseClass[Bar] + ("type" -> "Bar")
+    import dsl.*
+    implicit val tsFoo: TSIType[Foo] = TSType.fromCaseClass[Foo] + ("type" -> "Foo")
+    implicit val tsBar: TSIType[Bar] = TSType.fromCaseClass[Bar] + ("type" -> "Bar")
 
     tsFoo shouldBe TSType.interface("IFoo", "foo" -> TSString, "type" -> TSLiteralString("Foo"))
     tsBar shouldBe TSType.interface("IBar", "bar" -> TSNumber, "type" -> TSLiteralString("Bar"))
@@ -101,8 +65,8 @@ class MacroTests extends AnyFlatSpec with Matchers {
     case class Foo(foo: String) extends FooOrBar
     case class Bar(bar: Int)    extends FooOrBar
 
-    implicit val tsFoo = TSType.fromCaseClass[Foo]
-    implicit val tsBar = TSType.sameAs[Bar, Int]
+    implicit val tsFoo: TSIType[Foo] = TSType.fromCaseClass[Foo]
+    implicit val tsBar: TSType[Bar]  = TSType.sameAs[Bar, Int]
 
     tsFoo shouldBe TSType.interface("IFoo", "foo" -> TSString)
     tsBar.get shouldBe TSNumber
@@ -115,8 +79,8 @@ class MacroTests extends AnyFlatSpec with Matchers {
     case object Nil                                     extends LinkedList
     case class Node(value: Int, next: LinkedList = Nil) extends LinkedList
 
-    @nowarn("cat=unused") implicit val nilType: TSType[Nil.type] = TSType(TSNull)
-    implicit val llType: TSType[Node]                            = TSType.alias("INode", TSNull | TSTypeReference("ILinkedList"))
+    @unused implicit val nilType: TSType[Nil.type] = TSType(TSNull)
+    implicit val llType: TSType[Node]              = TSType.alias("INode", TSNull | TSTypeReference("ILinkedList"))
 
     TSType.fromSealed[LinkedList] shouldBe TSType.alias("LinkedList", TSNull | TSTypeReference("INode", Some(llType.get), Some("Node")))
   }
@@ -140,7 +104,7 @@ class MacroTests extends AnyFlatSpec with Matchers {
     class CustomTsType
     case class ContainsGeneric(foos: Seq[CustomTsType])
 
-    @nowarn("cat=unused") implicit val tsFoo: TSType[CustomTsType] = TSType(TSString)
+    @unused implicit val tsFoo: TSType[CustomTsType] = TSType(TSString)
 
     TSType.fromCaseClass[ContainsGeneric] shouldBe TSType.interface("IContainsGeneric", "foos" -> TSString.array)
   }
@@ -148,7 +112,7 @@ class MacroTests extends AnyFlatSpec with Matchers {
   "TSType.getOrGenerate" should "use available implicit if in scope" in {
     case class A(foo: String)
 
-    implicit val tsA = TSType[A](TSNumber)
+    implicit val tsA: TSType[A] = TSType[A](TSNumber)
 
     TSType.getOrGenerate[A] shouldBe theSameInstanceAs(tsA)
   }
@@ -156,8 +120,8 @@ class MacroTests extends AnyFlatSpec with Matchers {
   it should "use available implicit TSNamedType if in scope" in {
     case class A(foo: String)
 
-    import dsl._
-    @nowarn("cat=unused") implicit val tsA: TSNamedType[A] = TSType.fromCaseClass[A] + ("type" -> "A")
+    import dsl.*
+    @unused implicit val tsA: TSNamedType[A] = TSType.fromCaseClass[A] + ("type" -> "A")
 
     TSNamedType.getOrGenerate[A] shouldBe TSType.interface(
       "IA",
@@ -188,30 +152,10 @@ class MacroTests extends AnyFlatSpec with Matchers {
     fromSealed shouldBe TSType.alias("A", TSTypeReference("IB", Some(b)))
   }
 
-  it should "give a compile error for unsupported types if no implicit is available" in {
-    @nowarn("cat=unused") class A
-
-    "TSType.getOrGenerate[A]" shouldNot compile
-  }
-
-  it should "not crash on recursive definitions" in {
-    case class RecursiveA(b: RecursiveB)
-    case class RecursiveB(a: RecursiveA)
-
-    // Check that this generates the expected compile error, but not crashes the compilation
-    "TSType.getOrGenerate[RecursiveA]" shouldNot compile
-  }
-
-  it should "give an error on non-abstract sealed class" in {
-    @nowarn("cat=unused") sealed class Something {}
-
-    "TSType.getOrGenerate[Something]" shouldNot compile
-  }
-
   it should "support custom polymorphic types in the same scope" in {
     class CustomInPolymorphic
 
-    @nowarn("cat=unused") implicit val customTsType: TSType[CustomInPolymorphic] = TSType(TSString)
+    @unused implicit val customTsType: TSType[CustomInPolymorphic] = TSType(TSString)
     TSType.getOrGenerate[Seq[CustomInPolymorphic]] shouldBe TSType(TSString.array)
   }
 
@@ -234,7 +178,7 @@ class MacroTests extends AnyFlatSpec with Matchers {
   }
 
   it should "give a compile error for unsupported types if no implicit is available" in {
-    @nowarn("cat=unused") sealed trait A
+    @unused sealed trait A
 
     "TSIType.getOrGenerate[A]" shouldNot compile
   }

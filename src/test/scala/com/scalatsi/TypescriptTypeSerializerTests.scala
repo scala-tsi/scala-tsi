@@ -1,10 +1,10 @@
 package com.scalatsi
 
 import com.scalatsi.output.StyleOptions
-import TypescriptType._
-import dsl._
+import TypescriptType.*
+import dsl.*
 
-import scala.annotation.nowarn
+import scala.annotation.unused
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -44,8 +44,8 @@ class TypescriptTypeSerializerTests extends AnyFlatSpec with Matchers {
     case class ComplexCaseClass(nested: NestedCaseClass)
     case class NestedCaseClass(name: String)
 
-    @nowarn("cat=unused") implicit val nestedCaseClassTSType: TSIType[NestedCaseClass] = TSType.fromCaseClass[NestedCaseClass]
-    implicit val complexCaseClassTSType: TSIType[ComplexCaseClass]                     = TSType.fromCaseClass[ComplexCaseClass]
+    @unused implicit val nestedCaseClassTSType: TSIType[NestedCaseClass] = TSType.fromCaseClass[NestedCaseClass]
+    implicit val complexCaseClassTSType: TSIType[ComplexCaseClass]       = TSType.fromCaseClass[ComplexCaseClass]
 
     val typescript = TypescriptTypeSerializer.emit[ComplexCaseClass]()
 
@@ -79,30 +79,22 @@ class TypescriptTypeSerializerTests extends AnyFlatSpec with Matchers {
 
     // Test work-around for circular references
     // see [[Macros.circularRefError]] and https://github.com/scala-tsi/scala-tsi#circular-references
-    @nowarn("cat=unused") implicit val tsB: TSIType[B] = {
-      implicit val tsA: TSType[A] = TSType.external("IA")
+    @unused implicit val tsB: TSIType[B] = {
+      @unused implicit val tsA: TSType[A] = TSType.external("IA")
       TSType.fromCaseClass[B]
     }
 
     val tsAGenerated: TSIType[A] = TSType.fromCaseClass
-    TypescriptTypeSerializer.emit()(tsAGenerated) should equal("""|export interface IA {
-                                                                  |  b: IB
-                                                                  |}
-                                                                  |
-                                                                  |export interface IB {
-                                                                  |  a: IA
-                                                                  |}
-                                                                  |""".stripMargin)
+    val output                   = TypescriptTypeSerializer.emit()(tsAGenerated)
+    output should equal("""|export interface IA {
+                           |  b: IB
+                           |}
+                           |
+                           |export interface IB {
+                           |  a: IA
+                           |}
+                           |""".stripMargin)
   }
-
-  // Due to the circular nature of this test, it slows down compilation/testing by *a lot*. Disabled by default
-  //  it should "not crash on circular references" in {
-  //    case class A(b: B)
-  //    case class B(a: A)
-  //
-  //    // shouldn't compile but don't crash, but also shouldn't crash the compiler
-  //    """TSType.fromCaseClass[A]""" shouldNot compile
-  //  }
 
   it should "be able to handle all primitive types" in {
     case class PrimitiveTypes(

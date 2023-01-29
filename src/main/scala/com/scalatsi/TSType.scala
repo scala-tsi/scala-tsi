@@ -1,6 +1,6 @@
 package com.scalatsi
 
-import TypescriptType._
+import TypescriptType.*
 
 import scala.annotation.implicitNotFound
 import scala.collection.immutable.ListMap
@@ -24,7 +24,7 @@ trait TSType[T] { self =>
   def |(other: TSType[?]): TSUnion      = this | other.get
 }
 
-object TSType extends DefaultTSTypes {
+object TSType extends DefaultTSTypes with TSTypeMacros {
   private class TSTypeImpl[T](override val get: TypescriptType) extends TSType[T]
   def apply[T](tt: TypescriptType): TSType[T] = new TSTypeImpl(tt)
 
@@ -32,35 +32,6 @@ object TSType extends DefaultTSTypes {
 
   /** Get an implicit `TSType[T]` */
   def get[T](implicit tsType: TSType[T]): TSType[T] = tsType
-
-  /** Get an implicit `TSType[T]` or generate a default one
-    *
-    * By default
-    * Case class will use [[fromCaseClass]]
-    * Sealed traits/classes will use [[fromSealed]]
-    */
-  def getOrGenerate[T]: TSType[T] = macro Macros.getImplicitMappingOrGenerateDefault[T, TSType]
-
-  /** Generate a typescript interface for a case class */
-  def fromCaseClass[T]: TSIType[T] = macro Macros.generateInterfaceFromCaseClass[T, TSType]
-
-  /** Generate a Typescript discriminated union from a scala sealed trait
-    *
-    * @example
-    * ```
-    * sealed trait AorB
-    * case class A(foo: Int) extends AorB
-    * case class B(bar: Int) extends AorB
-    *
-    * implicit val tsAorB = TSType.fromSealed[AorB]
-    * ```
-    *
-    * wil produce
-    *
-    * `type AorB = A | B`
-    * @see [Typescript docs on Discriminated Unions](https://www.typescriptlang.org/docs/handbook/unions-and-intersections.html#discriminating-unions)
-    */
-  def fromSealed[T]: TSNamedType[T] = macro Macros.generateUnionFromSealedTrait[T, TSType]
 
   /** Uses the typescript type of Target whenever we're looking for the typescript type of Source
     * This will not generate a `type Source = Target` line like alias
@@ -108,7 +79,7 @@ object TSType extends DefaultTSTypes {
     * @example interface[Foo]("MyFoo", "bar" -> TSString) will output "interface MyFoo { bar: string }"
     */
   def interface[T](name: String, members: (String, TypescriptType)*): TSIType[T] =
-    TSIType(TSInterface(name, ListMap(members: _*)))
+    TSIType(TSInterface(name, ListMap(members*)))
 
   /** Create an indexed interface for T
     *
@@ -133,19 +104,13 @@ trait TSNamedType[T] extends TSType[T] { self =>
   def withName(newName: String): TSNamedType[T] = TSNamedType(get.withName(newName))
 }
 
-object TSNamedType extends DefaultTSTypes {
+object TSNamedType extends DefaultTSTypes with TSNamedTypeMacros {
   private class TSNamedTypeImpl[T](override val get: TypescriptNamedType) extends TSNamedType[T]
   def apply[T](tt: TypescriptNamedType): TSNamedType[T] =
     new TSNamedTypeImpl(tt)
 
   /** Get an implicit `TSNamedType[T]` */
   def get[T](implicit tsType: TSNamedType[T]): TSNamedType[T] = tsType
-
-  /** Get an implicit `TSNamedType[T]` or generate a default one
-    *
-    * @see [[TSType.getOrGenerate]]
-    */
-  def getOrGenerate[T]: TSNamedType[T] = macro Macros.getImplicitMappingOrGenerateDefault[T, TSNamedType]
 
   /** Uses the typescript type of Target whenever we're looking for the typescript type of Source
     * This will not generate a `type Source = Target` line like alias
@@ -164,18 +129,12 @@ trait TSIType[T] extends TSNamedType[T] { self =>
   override def withName(newName: String): TSIType[T] = TSIType(get.withName(newName))
 }
 
-object TSIType {
+object TSIType extends TSITypeMacros {
   private class TSITypeImpl[T](override val get: TSInterface) extends TSIType[T]
   def apply[T](tt: TSInterface): TSIType[T] = new TSITypeImpl(tt)
 
   /** Get an implicit TSIType[T] */
   def get[T](implicit tsType: TSIType[T]): TSIType[T] = tsType
-
-  /** Get an implicit `TSIType[T]` or generate a default one
-    *
-    * @see [[TSType.getOrGenerate]]
-    */
-  def getOrGenerate[T]: TSIType[T] = macro Macros.getImplicitInterfaceMappingOrGenerateDefault[T, TSType, TSIType]
 
   /** Uses the typescript type of Target whenever we're looking for the typescript type of Source
     * This will not generate a `type Source = Target` line like alias

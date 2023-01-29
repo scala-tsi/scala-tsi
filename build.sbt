@@ -1,6 +1,7 @@
 import sbt.Keys.scalacOptions
 import sbt.ScriptedPlugin.autoImport.scriptedBufferLog
 import xerial.sbt.Sonatype._
+import com.jsuereth.sbtpgp.PgpKeys.publishLocalSigned
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
@@ -42,7 +43,10 @@ lazy val publishSettings = Seq(
         usePgpKeyHex("6044257F427C2854A6F9A0C211A02377A6DD0E59"),
         pgpSecretRing := file(".circleci/circleci.key.asc"),
         pgpPublicRing := file(".circleci/circleci.pub.asc"),
-        pgpPassphrase := sys.env.get("GPG_passphrase").map(_.toCharArray)
+        pgpPassphrase := sys.env.get("GPG_passphrase").map(_.toCharArray),
+        // For some reason without these the dependencies can't be found on CI when testing locally
+        (publishLocal / publishMavenStyle).withRank(KeyRanks.Invisible)       := false,
+        (publishLocalSigned / publishMavenStyle).withRank(KeyRanks.Invisible) := false
       )
     })
     .getOrElse(Seq())
@@ -55,10 +59,10 @@ lazy val compilerOptions = scalacOptions := Seq(
   "UTF8",
   "-release",
   "8",
-  "-language:experimental.macros",
-  "-Xfatal-warnings"
+  "-Xfatal-warnings",
 ) ++ (if (isScala2.value)
         Seq(
+          "-language:experimental.macros",
           "-Xsource:3",
           // These are not yet implemented in Scala 3 compiler
           "-Xlint",
@@ -74,8 +78,9 @@ lazy val compilerOptions = scalacOptions := Seq(
         )
       else
         Seq(
-          "-rewrite",
           "-explain",
+          // Only enable during development of macros, this will lead to extra runtime overhead
+          // "-Xcheck-macros",
         ))
 
 /** ***************
@@ -91,7 +96,7 @@ lazy val `scala-tsi-macros` = (project in file("macros"))
     libraryDependencies ++= (if (isScala2.value) Seq("org.scala-lang" % "scala-reflect" % scalaVersion.value)
                              else Seq.empty),
     scalaVersion       := scala213,
-    crossScalaVersions := Seq(scala213),
+    crossScalaVersions := Seq(scala213, scala3),
     // Disable publishing
     publish        := {},
     publishLocal   := {},
@@ -102,7 +107,7 @@ lazy val `scala-tsi` = (project in file("."))
   .settings(commonSettings)
   .settings(publishSettings)
   .settings(scalatsiSettings)
-  // Scala 2 needs a separate compilation step and thus separate project. Scala 3 doensn't need any of this at all.
+  // Scala 2 needs a separate compilation step and thus separate project. Scala 3 doesn't need any of this at all.
   .dependsOn(`scala-tsi-macros` % "compile-internal, test-internal")
   .settings(
     // Add dependencies from the macro project
@@ -149,18 +154,14 @@ lazy val `sbt-scala-tsi` = (project in file("plugin"))
     crossScalaVersions := Seq(scala212),
     // Twirl template gives an incorrect unused import warning
     scalacOptions := scalacOptions.value diff Seq("-Xlint", "-Ywarn-unused:imports"),
-    publishLocal  := publishLocal.dependsOn(scalaTsiPublishLocal).value,
+    publishLocal  := publishLocal.dependsOn(scalaTsiPublishLocal).value
   )
   .settings(
     scriptedLaunchOpts := {
       scriptedLaunchOpts.value ++ Seq(
         "-Xmx1024M",
         "-Dplugin.version=" + version.value,
-        "-Dscala.version=" + (sys.props.get("scala.version") match {
-          case Some("3")    => scala3
-          case Some("2.13") => scala213
-          case _            => scala213
-        })
+        "-Dscala.version=" + sys.props.get("scala.version").getOrElse("\"Pass -Dscala.version=....\"")
       )
     },
     scriptedBufferLog := false,

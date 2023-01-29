@@ -1,0 +1,5 @@
+# Run typescript generation
+> generateTypescript
+# Compare to predefined test output
+> copyExpectedModel
+$ must-mirror model.ts expected_model.ts
