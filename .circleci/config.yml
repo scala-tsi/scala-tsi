@@ -58,7 +58,7 @@ jobs:
             if [ "<< parameters.scala-version >>" = "3"]; then
               exit 0
             fi
-            SCALAV=$(sbt -error ++"<< parameters.scala-version >>.x" "print scalaVersion")
+            SCALAV=$(sbt --no-colors -error ++"<< parameters.scala-version >>.x" "print scalaVersion" | xargs)
             sbt -batch -Dscala.version="$SCALAV" ++"<< parameters.scala-version >>.x" sbt-scala-tsi/scripted
 
       - store_test_results:
@@ -79,8 +79,8 @@ jobs:
       - run:
           name: Check, test and generate example project
           command: |
-            VERSION=$(cd ../ && sbt --no-colors --error "print version" | xargs)
-            SCALAV=$(sbt -error ++"<< parameters.scala-version >>.x" "print scalaVersion")
+            VERSION=$(cd ../ && sbt --no-colors -error "print version" | xargs)
+            SCALAV=$(cd ../ && sbt --no-colors -error ++"<< parameters.scala-version >>.x" "print scalaVersion" | xargs)
             sbt -batch -Dplugin.version="$VERSION" -Dscala.version="$SCALAV" \
               test \
               generateTypescript \
