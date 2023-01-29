@@ -151,6 +151,8 @@ lazy val `sbt-scala-tsi` = (project in file("plugin"))
     // Twirl template gives an incorrect unused import warning
     scalacOptions := scalacOptions.value diff Seq("-Xlint", "-Ywarn-unused:imports"),
     publishLocal  := publishLocal.dependsOn(scalaTsiPublishLocal).value,
+    // Locally we need ivy publishing
+    publishLocal / publishMavenStyle := false
   )
   .settings(
     scriptedLaunchOpts := {

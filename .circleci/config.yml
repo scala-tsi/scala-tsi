@@ -52,6 +52,18 @@ jobs:
             sbt -batch ++"<< parameters.scala-version >>.x" test scala-tsi-macros/test exit
 
       - run:
+          name: Publish locally
+          command: |
+            set -x
+            if [ -z "$CIRCLE_PR_USERNAME" ]; then
+              gpg --batch --yes --import .circleci/circleci.key.asc
+              sbt -batch ++"<< parameters.scala-version >>.x" publishLocalSigned sbt-scala-tsi/publishLocalSigned
+            else
+              # On forked PR, do an unsigned publish
+              sbt -batch ++"<< parameters.scala-version >>.x" publishLocal sbt-scala-tsi/publishLocal
+            fi
+
+      - run:
           name: Run sbt-scala-tsi scripted tests
           command: |
             # These tests can be enabled on Scala 3 once all features are supported there
@@ -63,18 +75,6 @@ jobs:
 
       - store_test_results:
           path: target/test-reports
-
-      - run:
-          name: Publish locally
-          command: |
-            set -x
-            if [ -z "$CIRCLE_PR_USERNAME" ]; then
-              gpg --batch --yes --import .circleci/circleci.key.asc
-              sbt -batch ++"<< parameters.scala-version >>.x" publishLocalSigned sbt-scala-tsi/publishLocalSigned
-            else
-              # On forked PR, do an unsigned publish
-              sbt -batch ++"<< parameters.scala-version >>.x" publishLocal sbt-scala-tsi/publishLocal
-            fi
 
       - run:
           name: Check, test and generate example project
