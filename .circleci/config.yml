@@ -104,7 +104,7 @@ jobs:
   publish:
     working_directory: ~/scala-tsi
     docker:
-      - image: circleci/openjdk:8
+      - image: cimg/openjdk:8.0
     steps:
       - checkout
 
@@ -113,7 +113,7 @@ jobs:
             - scala-tsi-2.13-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
 
       - run:
-          command:
+          command: |
             gpg --batch --yes --import .circleci/circleci.key.asc
             sbt -batch +publishSigned +sbt-scala-tsi/publishSigned
 
