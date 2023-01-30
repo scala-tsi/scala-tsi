@@ -1,4 +1,4 @@
-## 0.8.0 - 2023-...
+## 0.8.0 - 2023-01-30
 
 * Scala 3 is now mostly supported, thanks @jdsalchow for the initial contribution!
   * Automatic recursive definitions are still unsupported: [#278](https://github.com/scala-tsi/scala-tsi/issues/278)
