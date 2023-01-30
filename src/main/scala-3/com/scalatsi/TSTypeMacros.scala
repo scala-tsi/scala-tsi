@@ -1,6 +1,36 @@
 package com.scalatsi
 
+import scala.deriving.Mirror
+import scala.compiletime.summonInline
+import scala.compiletime.erasedValue
+
 trait TSTypeMacros {
+  
+  /** Derive a TSType[T] for all types supporting automatic derivation in Scala 3, like case classes and sealed traits. */
+  inline def derived[T](using m : Mirror.Of[T]): TSType[T] = {
+    val elemInstances = summonAll[m.MirroredElemTypes]
+    inline m match {
+      case s: Mirror.SumOf[T] => eqSum(s, elemInstances)
+      case p: Mirror.ProductOf[T] => eqProduct(p, elemInstances)
+    }
+  }
+
+  private inline def summonAll[T <: Tuple]: List[TSType[_]] = {
+    inline erasedValue[T] match {
+      case _: EmptyTuple => Nil
+      case _: (t *: ts) => summonInline[TSType[t]] :: summonAll[ts]
+    }
+  }
+
+  /** Get a TSType for a Product type (case class). */
+  def tsTypeProduct[T](p: Mirror.ProductOf[T], elems: => List[TSType[_]]): TSType[T] =
+    new TSType[T]:
+      def get(): TypescriptType =
+        iterator(x).zip(iterator(y)).zip(elems.iterator).forall {
+          case ((x, y), elem) => check(elem)(x, y)
+        }
+
+
 
   /** Get an implicit `TSType[T]` or generate a default one
     *
