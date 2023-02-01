@@ -120,7 +120,14 @@ jobs:
 
       - run:
           name: Release
-          command: sbt -batch "sonatypeReleaseAll com.scalatsi"
+          command: |
+            IS_SNAPSHOT=$(sbt --no-colors -error "print isSnapshot" | xargs)
+            if [ "$IS_SNAPSHOT" = "false" ];
+            then
+              sbt -batch "sonatypeReleaseAll com.scalatsi"
+            else
+              echo "Skipping release for snapshot"
+            fi
 
 workflows:
   version: 2
@@ -140,6 +147,4 @@ workflows:
             - build
           filters:
             branches:
-              ignore: /.*/ # Only run for tagged builds
-            tags:
-              only: /[0-9].*/ # x.y.z version has that tag name
+              only: master
