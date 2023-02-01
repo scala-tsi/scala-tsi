@@ -191,11 +191,10 @@ class TypescriptTypeSerializerTests extends AnyFlatSpec with Matchers {
     case class Point(lat: Double, lon: Double) extends Geometry
     case class Polygon(coords: Seq[Point])     extends Geometry
 
-    // TODO: The type ascriptions can be removed once the deprecated TSType.interface is removed or 2.12 support is dropped
     implicit val pointTSType: TSNamedType[Point] =
-      TSType.interface("Point", "type" -> ("Point": TypescriptType), "coords" -> classOf[(Double, Double)])
+      TSType.interface("Point", "type" -> ("Point": TypescriptType), "coords" -> implicitly[TSType[(Double, Double)]].get)
     implicit val polygonTSType: TSNamedType[Polygon] =
-      TSType.interface("Polygon", "type" -> ("Polygon": TypescriptType), "coords" -> classOf[Seq[(Double, Double)]])
+      TSType.interface("Polygon", "type" -> ("Polygon": TypescriptType), "coords" -> implicitly[TSType[Seq[(Double, Double)]]].get)
     implicit val geometryTSType: TSNamedType[Geometry] =
       TSType.alias("Geometry", implicitly[TSType[Point]] | implicitly[TSType[Polygon]])
 
