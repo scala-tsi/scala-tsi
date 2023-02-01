@@ -104,7 +104,7 @@ jobs:
   publish:
     working_directory: ~/scala-tsi
     docker:
-      - image: circleci/openjdk:8
+      - image: cimg/openjdk:8.0
     steps:
       - checkout
 
@@ -113,14 +113,14 @@ jobs:
             - scala-tsi-2.13-{{ checksum "project/plugins.sbt" }}-{{ checksum "build.sbt" }}
 
       - run:
-          command:
+          name: Publish
+          command: |
             gpg --batch --yes --import .circleci/circleci.key.asc
             sbt -batch +publishSigned +sbt-scala-tsi/publishSigned
 
-      # releases everything from com.scala-tsi, look into releasing only this project
       - run:
-          command:
-            sbt -batch "sonatypeReleaseAll com.scalatsi"
+          name: Release
+          command: sbt -batch "sonatypeReleaseAll com.scalatsi"
 
 workflows:
   version: 2

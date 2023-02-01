@@ -27,11 +27,12 @@ lazy val commonSettings = Seq(
 lazy val publishSettings = Seq(
   versionScheme     := Some("early-semver"),
   publishMavenStyle := true,
-  publishTo         := sonatypePublishTo.value,
+  publishTo         := sonatypePublishToBundle.value,
   credentials ++= sys.env
     .get("MAVEN_CENTRAL_USER")
     .map(user => Seq(Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, sys.env("MAVEN_CENTRAL_PASSWORD"))))
     .getOrElse(Seq()),
+  sonatypeProfileName    := "com.scalatsi",
   licenses               := Seq("MIT" -> url("https://github.com/scala-tsi/scala-tsi/blob/master/LICENSE")),
   sonatypeProjectHosting := Some(GitHubHosting("scala-tsi", "scala-tsi", "992153+dhoepelman@users.noreply.github.com")),
 ) ++
