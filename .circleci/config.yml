@@ -130,7 +130,7 @@ jobs:
             IS_SNAPSHOT=$(sbt --no-colors -error "print isSnapshot" | xargs)
             if [ "$IS_SNAPSHOT" = "false" ];
             then
-              sbt -batch "sonatypeReleaseAll com.scalatsi"
+              sbt -batch sonatypeBundleRelease
             else
               echo "Skipping release for snapshot"
             fi
