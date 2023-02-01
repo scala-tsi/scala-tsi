@@ -45,9 +45,6 @@ lazy val publishSettings = Seq(
         pgpSecretRing := file(".circleci/circleci.key.asc"),
         pgpPublicRing := file(".circleci/circleci.pub.asc"),
         pgpPassphrase := sys.env.get("GPG_passphrase").map(_.toCharArray),
-        // For some reason without these the dependencies can't be found on CI when testing locally
-        (publishLocal / publishMavenStyle).withRank(KeyRanks.Invisible)       := false,
-        (publishLocalSigned / publishMavenStyle).withRank(KeyRanks.Invisible) := false
       )
     })
     .getOrElse(Seq())
