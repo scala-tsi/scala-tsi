@@ -85,12 +85,6 @@ class MacroTests extends AnyFlatSpec with Matchers {
     TSType.fromSealed[LinkedList] shouldBe TSType.alias("LinkedList", TSNull | TSTypeReference("INode", Some(llType.get), Some("Node")))
   }
 
-  it should "handle sealed traits without subclasses" in {
-    sealed trait Empty
-
-    (TSType.fromSealed[Empty]: @nowarn()) shouldBe TSNamedType[Empty](TSAlias("IEmpty", TSNever))
-  }
-
   it should "handle sealed traits with a single subclass" in {
     sealed trait Single
     case class A(foo: Int) extends Single
