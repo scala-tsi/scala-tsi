@@ -26,7 +26,8 @@ lazy val root = (project in file("."))
       typescriptOutputFile               := baseDirectory.value / "model.ts",
       typescriptTaggedUnionDiscriminator := Some("kind"),
       scalafmtConfig                     := file("../.scalafmt.conf"),
-    )
+      resolvers += Resolver.mavenLocal
+    ),
   )
 
 lazy val compilerOptions = scalacOptions := Seq(
