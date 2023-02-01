@@ -25,7 +25,7 @@ lazy val root = (project in file("."))
       typescriptGenerationImports        := Seq("models._", "ReadmeTSTypes._", "models.enumeration._"),
       typescriptOutputFile               := baseDirectory.value / "model.ts",
       typescriptTaggedUnionDiscriminator := Some("kind"),
-      scalafmtConfig                     := file("../.scalafmt.conf")
+      scalafmtConfig                     := file("../.scalafmt.conf"),
     )
   )
 

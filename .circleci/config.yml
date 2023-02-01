@@ -58,10 +58,10 @@ jobs:
             set -x
             if [ -z "$CIRCLE_PR_USERNAME" ]; then
               gpg --batch --yes --import .circleci/circleci.key.asc
-              sbt -batch ++"<< parameters.scala-version >>.x" publishLocalSigned sbt-scala-tsi/publishLocalSigned
+              sbt -batch ++"<< parameters.scala-version >>.x" publishM2 publishLocalSigned sbt-scala-tsi/publishLocalSigned
             else
               # On forked PR, do an unsigned publish
-              sbt -batch ++"<< parameters.scala-version >>.x" publishLocal sbt-scala-tsi/publishLocal
+              sbt -batch ++"<< parameters.scala-version >>.x" publishM2 publishLocal sbt-scala-tsi/publishLocal
             fi
 
       - run:
