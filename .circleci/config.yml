@@ -7,6 +7,7 @@ jobs:
     working_directory: ~/scala-tsi
     docker:
       - image: cimg/openjdk:8.0
+    resource_class: medium+
     steps:
       - checkout
 
@@ -105,6 +106,7 @@ jobs:
     working_directory: ~/scala-tsi
     docker:
       - image: cimg/openjdk:8.0
+    resource_class: medium
     steps:
       - checkout
 
