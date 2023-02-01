@@ -11,12 +11,12 @@ import scala.compiletime.constValue
 
 trait TSTypeMacros {
   inline given [T: Mirror.Of]: TSType[T] = derived[T]
-  
+
   /** Derive a TSType[T] for all types supporting automatic derivation in Scala 3, like case classes and sealed traits. */
-  inline def derived[T](using m : Mirror.Of[T]): TSType[T] = {
+  inline def derived[T](using m: Mirror.Of[T]): TSType[T] = {
     val elemInstances = summonAll[m.MirroredElemTypes]
     inline m match {
-      case s: Mirror.SumOf[T] => tsTypeSum(s, elemInstances)
+      case s: Mirror.SumOf[T]     => tsTypeSum(s, elemInstances)
       case p: Mirror.ProductOf[T] => tsTypeProduct(p, elemInstances)
     }
   }
@@ -24,28 +24,29 @@ trait TSTypeMacros {
   private inline def summonAll[T <: Tuple]: List[TSType[_]] = {
     inline erasedValue[T] match {
       case _: EmptyTuple => Nil
-      case _: (t *: ts) => summonInline[TSType[t]] :: summonAll[ts]
+      case _: (t *: ts)  => summonInline[TSType[t]] :: summonAll[ts]
     }
   }
 
   /** Get a TSType for a Product type (case class). */
   private inline def tsTypeProduct[T](p: Mirror.ProductOf[T], elems: List[TSType[_]]): TSIType[T] = {
     val tsElems: Seq[(String, TypescriptType)] =
-      elemNames[p.MirroredElemLabels].zip(elems)
+      elemNames[p.MirroredElemLabels]
+        .zip(elems)
         .map((name, tstype) => (name, tstype.get))
-      
 
     val interface = TSInterface(tsName(p), ListMap(tsElems*))
-    TSIType[T](interface) 
+    TSIType[T](interface)
   }
 
   private inline def tsTypeSum[T](s: Mirror.SumOf[T], elems: List[TSType[_]]): TSNamedType[T] = {
     val aliasFor: TypescriptType = elems match {
-      case Nil => TSNever
+      case Nil          => TSNever
       case List(single) => TypescriptType.nameOrType(single.get)
-      case multiple => 
-        val children: Seq[TypescriptType] = 
-          multiple.zip(elemNames[s.MirroredElemLabels])
+      case multiple =>
+        val children: Seq[TypescriptType] =
+          multiple
+            .zip(elemNames[s.MirroredElemLabels])
             .map((tstype, name) => TypescriptType.nameOrType(tstype.get, discriminator = Some(name)))
         TSUnion(children)
     }
@@ -53,18 +54,18 @@ trait TSTypeMacros {
   }
 
   private inline def tsName(p: Mirror): String =
-    (if(p.isInstanceOf[Mirror.Product]) "I" else "") +
+    (if (p.isInstanceOf[Mirror.Product]) "I" else "") +
       constValue[p.MirroredLabel]
 
   private inline def elemNames[T <: Tuple]: List[String] = {
     inline erasedValue[T] match {
       case _: EmptyTuple => Nil
-      case _: (t *: ts) => constValue[t].asInstanceOf[String] :: elemNames[ts]
+      case _: (t *: ts)  => constValue[t].asInstanceOf[String] :: elemNames[ts]
     }
   }
 
   /** Get an implicit `TSType[T]` or generate a default one.
-   * Prefer using summon[TSType[T]] in Scala 3.
+    * Prefer using summon[TSType[T]] in Scala 3.
     */
   def getOrGenerate[T](using tstype: TSType[T]): TSType[T] = tstype
 
@@ -91,7 +92,7 @@ trait TSTypeMacros {
 }
 
 trait TSNamedTypeMacros {
-  inline given [T: Mirror.Of]: TSNamedType[T] = derived[T]
+  inline given [T: Mirror.Of]: TSNamedType[T]      = derived[T]
   inline def derived[T: Mirror.Of]: TSNamedType[T] = TSType.derived[T].asInstanceOf[TSNamedType[T]]
 
   /** Get an implicit `TSNamedType[T]` or generate a default one
@@ -102,7 +103,7 @@ trait TSNamedTypeMacros {
 }
 
 trait TSITypeMacros {
-  inline given [T: Mirror.ProductOf]: TSIType[T] = derived[T]
+  inline given [T: Mirror.ProductOf]: TSIType[T]      = derived[T]
   inline def derived[T: Mirror.ProductOf]: TSIType[T] = TSType.fromCaseClass[T]
 
   /** Get an implicit `TSIType[T]` or generate a default one

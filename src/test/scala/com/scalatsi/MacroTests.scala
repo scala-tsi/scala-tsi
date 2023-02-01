@@ -2,7 +2,7 @@ package com.scalatsi
 
 import TypescriptType.*
 
-import scala.annotation.{nowarn, unused}
+import scala.annotation.unused
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
