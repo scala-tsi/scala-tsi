@@ -149,9 +149,6 @@ workflows:
               scala-version:
                 - "2.13"
                 - "3"
-          filters:  # required since `deploy` has tag filters AND requires `build`
-            tags:
-              only: /.*/
       - publish:
           requires:
             - build
