@@ -60,12 +60,14 @@ jobs:
               gpg --batch --yes --import .circleci/circleci.key.asc
               sbt -batch ++"<< parameters.scala-version >>.x" \
                 publishLocalSigned \
+                publishM2 \
                 sbt-scala-tsi/publishLocalSigned \
                 sbt-scala-tsi/publishM2
             else
               # On forked PR, do an unsigned publish
               sbt -batch ++"<< parameters.scala-version >>.x" \
                 publishLocal \
+                publishM2 \
                 sbt-scala-tsi/publishLocal \
                 sbt-scala-tsi/publishM2
             fi
