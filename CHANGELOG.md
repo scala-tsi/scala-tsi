@@ -1,3 +1,7 @@
+## 0.8.1 - 2013-02-01
+
+Fixes [an issue with the 0.8.0 SBT plugin](https://github.com/scala-tsi/scala-tsi/issues/282), rendering it inusable.
+
 ## 0.8.0 - 2023-01-30
 
 * Scala 3 is now mostly supported, thanks @jdsalchow for the initial contribution!
