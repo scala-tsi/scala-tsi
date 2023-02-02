@@ -27,10 +27,6 @@ object Macros {
           .filterNot({ case '[t] => Expr.summon[TSType[t]].isDefined })
           .zipWithIndex
           .map { case ('[t], i) =>
-            // TODO: The reason that nested generation doesn't work might be that this is a lookup inside
-            //  this macro instead of delaying it until the next compilation cycle.
-            // See https://github.com/lampepfl/dotty-macro-examples/blob/55c7e8aacb7738cb9020ed25f67bbacd7c2f28d5/macroTypeClassDerivation/src/macro.scala#LL77C13-L77C13
-            // for what might work.
             ValDef
               .let(Symbol.spliceOwner, s"targ${i}Val", getTSType[t].asTerm) { targVal =>
                 ('{ given TSType[t] = ${ targVal.asExprOf[TSType[t]] } }).asTerm
