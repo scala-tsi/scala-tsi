@@ -28,6 +28,15 @@ class MacroTests extends AnyFlatSpec with Matchers {
     TSType.fromCaseClass[B] shouldBe TSType.interface("IB", "a" -> tsA.get)
   }
 
+  it should "handle multiple layers of nesting" in {
+    case class DeepNestingTopLevel(prop1: String, prop2: Nest1)
+    case class Nest1(prop3: String, prop4: Nest2)
+    case class Nest2(prop5: String)
+
+    val generated = TSType.getOrGenerate[DeepNestingTopLevel]
+    generated shouldBe TSType.interface("IDeepNestingTopLevel", "prop1" -> TSString, "prop2" -> TSType.getOrGenerate[Nest1].get)
+  }
+
   it should "handle nested polymorphic members " in {
     case class Element(foo: String)
     case class Root(

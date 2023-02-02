@@ -64,10 +64,8 @@ trait TSTypeMacros {
     }
   }
 
-  /** Get an implicit `TSType[T]` or generate a default one.
-    * Prefer using summon[TSType[T]] in Scala 3.
-    */
-  def getOrGenerate[T](using tstype: TSType[T]): TSType[T] = tstype
+  /** Get an implicit `TSType[T]` or generate a default one. */
+  inline def getOrGenerate[T](using tstype: TSType[T]): TSType[T] = tstype
 
   /** Generate a typescript interface for a case class */
   inline def fromCaseClass[T: Mirror.ProductOf]: TSIType[T] = derived[T].asInstanceOf[TSIType[T]]
