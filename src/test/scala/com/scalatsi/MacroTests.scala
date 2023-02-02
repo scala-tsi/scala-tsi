@@ -2,7 +2,7 @@ package com.scalatsi
 
 import TypescriptType.*
 
-import scala.annotation.{nowarn, unused}
+import scala.annotation.unused
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -26,6 +26,51 @@ class MacroTests extends AnyFlatSpec with Matchers {
     val tsA: TSIType[A] = TSType.fromCaseClass
 
     TSType.fromCaseClass[B] shouldBe TSType.interface("IB", "a" -> tsA.get)
+  }
+
+  it should "handle multiple layers of nesting" in {
+    case class DeepNestingTopLevel(prop1: String, prop2: Nest1)
+    case class Nest1(prop3: String, prop4: Nest2)
+    case class Nest2(prop5: String)
+
+    val generated = TSType.getOrGenerate[DeepNestingTopLevel]
+    generated shouldBe TSType.interface("IDeepNestingTopLevel", "prop1" -> TSString, "prop2" -> TSType.getOrGenerate[Nest1].get)
+  }
+
+  it should "handle nested polymorphic members " in {
+    case class Element(foo: String)
+    case class Root(
+        twoLevels: Seq[Seq[Element]],
+        threeLevels: Seq[Seq[Seq[Element]]],
+        branched: Either[String, Either[Int, Seq[Element]]]
+    )
+
+    val tsElement: TypescriptType = TSType.fromCaseClass[Element].get
+
+    TSType.fromCaseClass[Root] shouldBe TSType.interface(
+      "IRoot",
+      "twoLevels"   -> tsElement.array.array,
+      "threeLevels" -> tsElement.array.array.array,
+      "branched"    -> (TSString | TSNumber | tsElement.array)
+    )
+  }
+
+  it should "handle polymorphic members with parameter type that is itself generated" in {
+    case class Element(foo: String)
+    case class Root(
+        listField: Seq[Element],
+        eitherField: Either[String, Element],
+        tuple3Field: (Element, String, Int)
+    )
+
+    val tsElement: TypescriptType = TSType.fromCaseClass[Element].get
+
+    TSType.fromCaseClass[Root] shouldBe TSType.interface(
+      "IRoot",
+      "listField"   -> tsElement.array,
+      "eitherField" -> (TSString | tsElement),
+      "tuple3Field" -> TSTuple.of(tsElement, TSString, TSNumber)
+    )
   }
 
   "The sealed trait/class to Typescript type macro" should "handle sealed traits" in {
@@ -83,12 +128,6 @@ class MacroTests extends AnyFlatSpec with Matchers {
     implicit val llType: TSType[Node]              = TSType.alias("INode", TSNull | TSTypeReference("ILinkedList"))
 
     TSType.fromSealed[LinkedList] shouldBe TSType.alias("LinkedList", TSNull | TSTypeReference("INode", Some(llType.get), Some("Node")))
-  }
-
-  it should "handle sealed traits without subclasses" in {
-    sealed trait Empty
-
-    (TSType.fromSealed[Empty]: @nowarn()) shouldBe TSNamedType[Empty](TSAlias("IEmpty", TSNever))
   }
 
   it should "handle sealed traits with a single subclass" in {

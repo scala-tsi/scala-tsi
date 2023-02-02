@@ -9,6 +9,10 @@ lazy val root = (project in file("."))
       typescriptExports           := Seq("DeepNestingTopLevel", "NestedGenerated"),
       typescriptGenerationImports := Seq("models._"),
       typescriptOutputFile        := baseDirectory.value / "model.ts",
-      scalafmtConfig              := file("../../../../.scalafmt.conf")
+      scalafmtConfig              := file("../../../../.scalafmt.conf"),
+      scalacOptions := (CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, _)) => Seq()
+        case _            => Seq("-Xmax-inlines", "64")
+      })
     )
   )

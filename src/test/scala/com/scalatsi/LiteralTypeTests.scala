@@ -34,7 +34,7 @@ class LiteralTypeTests extends AnyWordSpec with Matchers {
           c: true
       )
 
-      implicit val tsType = TSType.fromCaseClass[Literal]
+      implicit val tsType: TSIType[Literal] = TSType.fromCaseClass[Literal]
 
       TypescriptTypeSerializer.emit[Literal]() shouldBe
         """export interface ILiteral {
