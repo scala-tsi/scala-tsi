@@ -55,10 +55,10 @@ trait TSTypeMacros {
     (if (p.isInstanceOf[Mirror.Product]) "I" else "") +
       constValue[p.MirroredLabel]
 
-  private inline def elemNames[T <: Tuple]: List[String] = 
+  private inline def elemNames[T <: Tuple]: List[String] =
     constValueTuple[T].productIterator.toList.asInstanceOf[List[String]]
 
-   /** Get an implicit `TSType[T]` or generate a default one
+  /** Get an implicit `TSType[T]` or generate a default one
     *
     * By default
     * Case class will use [[fromCaseClass]]
