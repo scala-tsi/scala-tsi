@@ -1,55 +1,42 @@
 package com.scalatsi
 
 import com.scalatsi.TypescriptType.*
-import com.scalatsi.TypescriptTypeToExpr.given
+//import com.scalatsi.TypescriptTypeToExpr.given
 
 import scala.collection.immutable.ListMap
 import scala.quoted.*
 
 object Macros {
-  inline def getImplicitMappingOrGenerateDefault[T] = ${ getImplicitMappingOrGenerateDefaultImpl[T] }
+  // inline def getImplicitMappingOrGenerateDefault[T] = ${ getImplicitMappingOrGenerateDefaultImpl[T] }
 
-  def getImplicitMappingOrGenerateDefaultImpl[T: Type](using Quotes): Expr[TSType[T]] =
-    Expr.summon[TSType[T]].getOrElse(generateDefaultMapping[T])
+  // def getImplicitMappingOrGenerateDefaultImpl[T: Type](using Quotes): Expr[TSType[T]] =
+  //   Expr.summon[TSType[T]].getOrElse(bringGenericArgumentTSTypesIntoScope[T])
 
-  private def generateDefaultMapping[T: Type](using q: Quotes): Expr[TSType[T]] = {
-    import q.reflect.*
+  // private inline def bringGenericArgumentTSTypesIntoScope[T: Type](using q: Quotes): Expr[TSType[T]] = {
+  //   import q.reflect.*
 
-    val allTypeArguments: Iterator[Type[_]] = findNestedTypeParameters(TypeRepr.of[T]).map(_.asType)
+  //   val tsTypeTpe = TypeRepr.of[TSType]
 
-    val typeArgImplicits: List[Expr[Unit]] =
-      allTypeArguments.distinct
-        .filterNot({ case '[t] => Expr.summon[TSType[t]].isDefined })
-        .zipWithIndex
-        .map { case ('[t], i) =>
-          // TODO: The reason that nested generation doesn't work might be that this is a lookup inside
-          //  this macro instead of delaying it until the next compilation cycle.
-          // See https://github.com/lampepfl/dotty-macro-examples/blob/55c7e8aacb7738cb9020ed25f67bbacd7c2f28d5/macroTypeClassDerivation/src/macro.scala#LL77C13-L77C13
-          // for what might work.
-          ValDef
-            .let(Symbol.spliceOwner, s"targ${i}Val", getTSType[t].asTerm) { targVal =>
-              ('{ given TSType[t] = ${ targVal.asExprOf[TSType[t]] } }).asTerm
-            }
-            .asExprOf[Unit]
-        }
-        .toList
+  //   val allTypeArguments: Iterator[Type[_]] = findNestedTypeParameters(TypeRepr.of[T]).map(_.asType)
 
-    // val symbol = TypeRepr.of[T].typeSymbol
-    // if (!(symbol.isClassDef)) notFound[T]
-    // else if (symbol.flags is Flags.Case) generateInterfaceFromCaseClassImpl[T]
-    // else if (symbol.flags is Flags.Sealed) generateUnionFromSealedTraitImpl[T]
-    // else notFound[T]
-  }
+  //   val typeArgImplicits: List[Expr[Unit]] =
+  //     allTypeArguments.distinct
+  //       .zipWithIndex
+  //       .map { case ('[t], i) =>
+  //         println(Type.show[t])
+  //         val x: Expr[TSType[t]] = notFound[t]//'{ summon[TSType[t]].getOrElse(${notFound[t]}) }
+  //         ValDef
+  //           .let(Symbol.spliceOwner, s"targ${i}Val", x.asTerm) { targVal =>
+  //             ('{ given TSType[t] = ${ targVal.asExprOf[TSType[t]] } }).asTerm
+  //           }
+  //           .asExprOf[Unit]
+  //       }
+  //       .toList
 
-  private def getTSType[T: Type](using q: Quotes): Expr[TSType[T]] = {
-    import q.reflect.*
-    if (TypeRepr.of[T].typeArgs.isEmpty) {
-      '{ TSType.getOrGenerate[T] }
-    } else {
-      
-      Expr.block(typeArgImplicits, '{ TSType.getOrGenerate[T] })
-    }
-  }
+  //   println(typeArgImplicits)
+
+  //   Expr.block(typeArgImplicits, notFound[T]/*'{ summon[TSType[T]] }*/)
+  // }  
 
   // inline def generateInterfaceFromCaseClass[T]: TSIType[T]               = ${ generateInterfaceFromCaseClassImpl[T] }
   // inline def getImplicitNamedMappingOrGenerateDefault[T]                 = ${ getImplicitNamedMappingOrGenerateDefaultImpl[T] }
@@ -119,10 +106,10 @@ object Macros {
   //       '{ TSNamedType(TSAlias(${ name }, TSUnion(Vector(${ Varargs(operands) }*)))) }
   // }
 
-  // private def notFound[T: Type](using q: Quotes): Expr[TSType[T]] = {
-  //   import q.reflect.*
-  //   val msg = s"Could not find TSType[${Type.show[T]}] in scope and could not generate it"
-  //   report.warning(s"$msg. Did you create and import it?")
-  //   '{ TSType(TSLiteralString(${ Expr(msg) })) }
-  // }
+  private def notFound[T: Type](using q: Quotes): Expr[TSType[T]] = {
+    import q.reflect.*
+    val msg = s"Could not find TSType[${Type.show[T]}] in scope and could not generate it"
+    report.warning(s"$msg. Did you create and import it?")
+    '{ TSType(TSLiteralString(${ Expr(msg) })) }
+  }
 }

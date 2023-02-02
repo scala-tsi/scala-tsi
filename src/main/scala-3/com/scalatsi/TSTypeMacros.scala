@@ -5,9 +5,7 @@ import TypescriptType.*
 import scala.collection.immutable.ListMap
 
 import scala.deriving.Mirror
-import scala.compiletime.summonInline
-import scala.compiletime.erasedValue
-import scala.compiletime.constValue
+import scala.compiletime.*
 
 trait TSTypeMacros {
   inline given [T: Mirror.Of]: TSType[T] = derived[T]
@@ -57,12 +55,8 @@ trait TSTypeMacros {
     (if (p.isInstanceOf[Mirror.Product]) "I" else "") +
       constValue[p.MirroredLabel]
 
-  private inline def elemNames[T <: Tuple]: List[String] = {
-    inline erasedValue[T] match {
-      case _: EmptyTuple => Nil
-      case _: (t *: ts)  => constValue[t].asInstanceOf[String] :: elemNames[ts]
-    }
-  }
+  private inline def elemNames[T <: Tuple]: List[String] = 
+    constValueTuple[T].productIterator.toList.asInstanceOf[List[String]]
 
   /** Get an implicit `TSType[T]` or generate a default one. */
   inline def getOrGenerate[T](using tstype: TSType[T]): TSType[T] = tstype
