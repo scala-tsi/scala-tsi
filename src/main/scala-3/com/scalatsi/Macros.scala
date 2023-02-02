@@ -7,11 +7,9 @@ import scala.collection.immutable.ListMap
 import scala.quoted.*
 
 object Macros {
-  inline def generateInterfaceFromCaseClass[T]: TSIType[T]               = ${ generateInterfaceFromCaseClassImpl[T] }
   inline def getImplicitMappingOrGenerateDefault[T]                      = ${ getImplicitMappingOrGenerateDefaultImpl[T] }
   inline def getImplicitNamedMappingOrGenerateDefault[T]                 = ${ getImplicitNamedMappingOrGenerateDefaultImpl[T] }
   inline def getImplicitInterfaceMappingOrGenerateDefault[T]: TSIType[T] = ${ getImplicitInterfaceMappingOrGenerateDefaultImpl[T] }
-  inline def generateUnionFromSealedTrait[T]: TSNamedType[T]             = ${ generateUnionFromSealedTraitImpl[T] }
 
   private def getTSType[T: Type](using q: Quotes): Expr[TSType[T]] = {
     import q.reflect.*
