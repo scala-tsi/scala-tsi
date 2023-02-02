@@ -13,7 +13,7 @@ val isScala2 = settingKey[Boolean]("isScala2")
 
 lazy val commonSettings = Seq(
   organization       := "com.scalatsi",
-  version            := "0.8.2",
+  version            := "0.8.3-SNAPSHOT",
   scalaVersion       := scala3,
   crossScalaVersions := Seq(scala213, scala3),
   compilerOptions,
