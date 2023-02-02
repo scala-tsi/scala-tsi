@@ -58,8 +58,13 @@ trait TSTypeMacros {
   private inline def elemNames[T <: Tuple]: List[String] = 
     constValueTuple[T].productIterator.toList.asInstanceOf[List[String]]
 
-  /** Get an implicit `TSType[T]` or generate a default one. */
-  inline def getOrGenerate[T](using tstype: TSType[T]): TSType[T] = tstype
+   /** Get an implicit `TSType[T]` or generate a default one
+    *
+    * By default
+    * Case class will use [[fromCaseClass]]
+    * Sealed traits/classes will use [[fromSealed]]
+    */
+  inline def getOrGenerate[T]: TSType[T] = Macros.getImplicitMappingOrGenerateDefault[T]
 
   /** Generate a typescript interface for a case class */
   inline def fromCaseClass[T: Mirror.ProductOf]: TSIType[T] = derived[T].asInstanceOf[TSIType[T]]
@@ -91,7 +96,7 @@ trait TSNamedTypeMacros {
     *
     * @see [[TSType.getOrGenerate]]
     */
-  def getOrGenerate[T](using tsNamedType: TSNamedType[T]): TSNamedType[T] = tsNamedType
+  inline def getOrGenerate[T]: TSNamedType[T] = Macros.getImplicitNamedMappingOrGenerateDefault[T]
 }
 
 trait TSITypeMacros {
@@ -102,5 +107,5 @@ trait TSITypeMacros {
     *
     * @see [[TSType.getOrGenerate]]
     */
-  def getOrGenerate[T](using tsiType: TSIType[T]): TSIType[T] = tsiType
+  inline def getOrGenerate[T]: TSIType[T] = Macros.getImplicitInterfaceMappingOrGenerateDefault[T]
 }
