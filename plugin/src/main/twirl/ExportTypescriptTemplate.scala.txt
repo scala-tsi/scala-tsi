@@ -2,10 +2,10 @@
 
 package com.scalatsi.generator
 
-import com.scalatsi.*
-import com.scalatsi.output.*
-import com.scalatsi.TypescriptType.*
-import com.scalatsi.TSType.*
+import com.scalatsi._
+import com.scalatsi.output._
+import com.scalatsi.TypescriptType._
+import com.scalatsi.TSType._
 import java.io.File
 
 /** User imports */
@@ -31,7 +31,5 @@ object ExportTypescript {
     header = if("""@header""" == "") None else Some("""@header""")
   )
 
-  def main(args: Array[String]): Unit = {
-    output.WriteTSToFiles.generate(options)(toOutput)
-  }
+  def main(args: Array[String]): Unit = WriteTSToFiles.generate(options)(toOutput)
 }
