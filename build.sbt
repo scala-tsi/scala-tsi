@@ -128,7 +128,7 @@ lazy val scalatsiSettings = Seq(
   description := "Generate Typescript interfaces from your scala classes",
   libraryDependencies ++= Seq(
     // testing framework
-    "org.scalatest" %% "scalatest" % "3.2.16" % "test"
+    "org.scalatest" %% "scalatest" % "3.2.17" % "test"
   )
 )
 
