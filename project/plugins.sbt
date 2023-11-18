@@ -2,7 +2,7 @@
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.2")
 
 // Templating engine for the generator application
-addSbtPlugin("com.typesafe.play" % "sbt-twirl" % "1.6.2")
+addSbtPlugin("com.typesafe.play" % "sbt-twirl" % "1.6.3")
 
 // To enable publishing to maven central
 addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.21")
