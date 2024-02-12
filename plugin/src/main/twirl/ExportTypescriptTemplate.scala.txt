@@ -13,10 +13,13 @@ import java.io.File
 import @imp }
 
 object ExportTypescript {
+  @for(userClass <- classes) {
+  def  `tstype_@userClass` = TSType.getOrGenerate[@userClass].get }
+
   // If you get a generator or implicit not found error here, make sure you have defined a TSType[T] implicit and imported it
   val toOutput: Map[String, TypescriptType] = Map[String, TypescriptType](
     @for(userClass <- classes) {
-      """@userClass""" -> TSType.getOrGenerate[@userClass].get, }
+      """@userClass""" -> `tstype_@userClass`, }
   )
 
   val options = output.OutputOptions(
