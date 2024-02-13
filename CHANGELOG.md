@@ -1,11 +1,15 @@
-## 0.8.2 - 2013-02-02
+## 0.8.3 - 2024-02-13
+
+Decreases the chances of hitting the 64KB method bytecode limit during Typescript generation, see issue [#304](https://github.com/scala-tsi/scala-tsi/issues/304).
+
+## 0.8.2 - 2023-02-02
 
 Improves Scala 3 support by adding [Type Class Derivation](https://docs.scala-lang.org/scala3/reference/contextual/derivation.html) for `TSType`.
 This adds support for some unsupported scenario's mentioned in the 0.8.0 release notes.
 
 The Scala 3 version should now have feature parity with the Scala 2 version.
 
-## 0.8.1 - 2013-02-01
+## 0.8.1 - 2023-02-01
 
 Fixes [an issue with the 0.8.0 SBT plugin](https://github.com/scala-tsi/scala-tsi/issues/282), rendering it inusable.
 
