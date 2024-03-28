@@ -1,6 +1,6 @@
 import sbt.Keys._
 
-val scala3   = "3.3.3"
+val scala3   = "3.4.1"
 val scala213 = "2.13.12"
 
 lazy val root = (project in file("."))
