@@ -5,7 +5,7 @@ addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.2")
 addSbtPlugin("org.playframework.twirl" % "sbt-twirl" % "2.0.7")
 
 // To enable publishing to maven central
-addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.11.1")
+addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.11.2")
 addSbtPlugin("com.github.sbt" % "sbt-pgp"      % "2.2.1")
 
 // Enable version infromation in the build
