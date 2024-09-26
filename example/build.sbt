@@ -1,7 +1,7 @@
 import sbt.Keys._
 
 val scala3   = "3.3.3"
-val scala213 = "2.13.14"
+val scala213 = "2.13.15"
 
 lazy val root = (project in file("."))
   .enablePlugins(ScalaTsiPlugin)
