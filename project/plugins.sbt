@@ -6,7 +6,7 @@ addSbtPlugin("org.playframework.twirl" % "sbt-twirl" % "2.0.7")
 
 // To enable publishing to maven central
 addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.12.2")
-addSbtPlugin("com.github.sbt" % "sbt-pgp"      % "2.3.0")
+addSbtPlugin("com.github.sbt" % "sbt-pgp"      % "2.3.1")
 
 // Enable version infromation in the build
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.11.0")
