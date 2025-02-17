@@ -174,8 +174,8 @@ object TypescriptType {
     override def withName(newName: String): TSTypeReference = copy(name = newName)
   }
 
-  case object TSUndefined                     extends TypescriptType
-  case object TSUnknown                       extends TypescriptType
+  case object TSUndefined extends TypescriptType
+  case object TSUnknown   extends TypescriptType
   case class TSUnion(of: Seq[TypescriptType]) extends TypescriptAggregateType {
 
     /** Recursively flatten this union */
