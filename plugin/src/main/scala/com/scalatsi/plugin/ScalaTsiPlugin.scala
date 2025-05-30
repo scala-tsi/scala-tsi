@@ -7,7 +7,7 @@ import sbt.info.BuildInfo
 object ScalaTsiPlugin extends AutoPlugin {
   object autoImport {
     // user settings
-    val typescriptExports = settingKey[Seq[String]]("Types to export typescript version for").withRank(KeyRanks.ASetting)
+    val typescriptExports           = settingKey[Seq[String]]("Types to export typescript version for").withRank(KeyRanks.ASetting)
     val typescriptGenerationImports = settingKey[Seq[String]](
       "Additional imports, i.e. your packages so you don't need to prefix your classes."
     ).withRank(KeyRanks.BSetting)
@@ -18,7 +18,7 @@ object ScalaTsiPlugin extends AutoPlugin {
       settingKey[Option[String]]("The discriminator field for tagged unions, or None to disable tagged unions").withRank(KeyRanks.BSetting)
 
     // tasks
-    val generateTypescript = taskKey[Unit]("Generate typescript for this project").withRank(KeyRanks.ATask)
+    val generateTypescript       = taskKey[Unit]("Generate typescript for this project").withRank(KeyRanks.ATask)
     val typescriptCreateExporter = taskKey[Seq[File]](
       "Generate an application that will generate typescript from the classes that are configured"
     ).withRank(KeyRanks.CTask)
