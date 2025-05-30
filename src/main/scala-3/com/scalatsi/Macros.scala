@@ -103,7 +103,7 @@ object Macros {
         report.warning(s"Sealed $symbolType ${Type.show[T]} has now known subclasses, could not generate union")
         '{ TSNamedType(TSAlias(${ Expr(tsName[T]) }, TSNever)) }
       case Seq('[t]) => '{ TSNamedType(TSAlias(${ name }, TypescriptType.nameOrType(${ getTSType[t] }.get))) }
-      case children =>
+      case children  =>
         val operands = children.map { tpe =>
           tpe match {
             case '[t] =>
