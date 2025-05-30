@@ -70,7 +70,7 @@ object TSType extends DefaultTSTypes with TSTypeMacros {
   def external[T](name: String): TSNamedType[T] =
     TypescriptType.fromString(name) match {
       case t: TSTypeReference => TSNamedType(t)
-      case t =>
+      case t                  =>
         throw new IllegalArgumentException(s"String $name is a predefined type $t")
     }
 

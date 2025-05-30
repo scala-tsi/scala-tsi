@@ -14,7 +14,7 @@ private[scalatsi] class Macros(val c: blackbox.Context) {
       q"""_root_.com.scalatsi.TSType.getOrGenerate[$T]"""
     } else {
       val allTypeArguments = findNestedTypeParameters(T)
-      val targImplicits =
+      val targImplicits    =
         allTypeArguments.distinct
           // Prevent generating an `implicit val` again if it is already in scope before macro expansion, otherwise
           // we might get ambiguous implicit values
