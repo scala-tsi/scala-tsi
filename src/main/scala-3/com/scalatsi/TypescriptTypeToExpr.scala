@@ -35,14 +35,14 @@ object TypescriptTypeToExpr {
           '{ TSIndexedInterface(${ Expr(indexName) }, ${ Expr(indexType) }, ${ Expr(valueType) }) }
         case TSInterfaceIndexed(name, indexName, indexType, valueType) =>
           '{ TSInterfaceIndexed(${ Expr(name) }, ${ Expr(indexName) }, ${ Expr(indexType) }, ${ Expr(valueType) }) }
-        case TSInterface(name, members) => '{ TSInterface(${ Expr(name) }, ${ Expr(members) }) }
-        case TSIntersection(of)         => '{ TSIntersection(${ Expr(of) }) }
-        case TSNever                    => '{ TSNever }
-        case TSNull                     => '{ TSNull }
-        case TSNumber                   => '{ TSNumber }
-        case TSObject                   => '{ TSObject }
-        case TSString                   => '{ TSString }
-        case TSTuple(of)                => '{ TSTuple(${ Expr(of) }) }
+        case TSInterface(name, members)                               => '{ TSInterface(${ Expr(name) }, ${ Expr(members) }) }
+        case TSIntersection(of)                                       => '{ TSIntersection(${ Expr(of) }) }
+        case TSNever                                                  => '{ TSNever }
+        case TSNull                                                   => '{ TSNull }
+        case TSNumber                                                 => '{ TSNumber }
+        case TSObject                                                 => '{ TSObject }
+        case TSString                                                 => '{ TSString }
+        case TSTuple(of)                                              => '{ TSTuple(${ Expr(of) }) }
         case TSTypeReference(name, impl, discriminator, useTypeQuery) =>
           '{ TSTypeReference(${ Expr(name) }, ${ Expr(impl) }, ${ Expr(discriminator) }, ${ Expr(useTypeQuery) }) }
         case TSUndefined => '{ TSUndefined }

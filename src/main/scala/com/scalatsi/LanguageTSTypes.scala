@@ -75,7 +75,7 @@ trait JavaTSTypes {
 
   implicit def javaEnumTSType[E <: java.lang.Enum[E]: ClassTag]: TSNamedType[E] = {
 
-    val cls = implicitly[ClassTag[E]].runtimeClass
+    val cls    = implicitly[ClassTag[E]].runtimeClass
     val values = Option(cls.getEnumConstants)
       .getOrElse(throw new IllegalStateException(s"Expected ${cls.getCanonicalName} to be a java.lang.Enum, it was not"))
       .asInstanceOf[Array[E]]

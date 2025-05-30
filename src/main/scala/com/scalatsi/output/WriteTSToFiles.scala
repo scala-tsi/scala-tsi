@@ -49,7 +49,7 @@ object WriteTSToFiles {
       //      }.get
       (for {
         writer <- Try(new FileWriter(targetFile))
-        _ <- Try {
+        _      <- Try {
           try { writer.write(output) }
           finally { writer.close() }
         }
