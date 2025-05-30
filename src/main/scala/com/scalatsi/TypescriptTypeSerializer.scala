@@ -10,11 +10,11 @@ object TypescriptTypeSerializer {
   def serialize(tp: TypescriptType)(implicit styleOptions: StyleOptions = StyleOptions()): String = {
     import styleOptions.*
     tp match {
-      case t: TypescriptNamedType => s"${if (t.useTypeQuery) "typeof " else ""}${t.name}"
-      case TSAny                  => "any"
-      case TSArray(elements)      => serialize(elements) + "[]"
-      case TSBoolean              => "boolean"
-      case TSFunction(args, rt)   => s"${serializeArgumentList(args)} => ${serialize(rt)}"
+      case t: TypescriptNamedType                              => s"${if (t.useTypeQuery) "typeof " else ""}${t.name}"
+      case TSAny                                               => "any"
+      case TSArray(elements)                                   => serialize(elements) + "[]"
+      case TSBoolean                                           => "boolean"
+      case TSFunction(args, rt)                                => s"${serializeArgumentList(args)} => ${serialize(rt)}"
       case TSIndexedInterface(indexName, indexType, valueType) =>
         s"{ [ $indexName: ${serialize(indexType)} ]: ${serialize(valueType)}$sc }"
       case TSIntersection(Seq())  => serialize(TSNever)
@@ -121,7 +121,7 @@ object TypescriptTypeSerializer {
       case union: TSUnion =>
         union.nested
           .map {
-            case query @ TSTypeReference(_, _, _, true) => query
+            case query @ TSTypeReference(_, _, _, true)                                                  => query
             case TSTypeReference(ref, Some(TSInterface(name, members)), Some(discriminatorValue), false) =>
               TSTypeReference(
                 ref,

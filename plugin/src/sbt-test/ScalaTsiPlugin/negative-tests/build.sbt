@@ -11,9 +11,9 @@ lazy val root = (project in file("."))
         case Some((2, _)) => Seq("ClassWithUndefinedMember", "RecursiveA")
         case _            => Seq("ClassWithUndefinedMember")
       }),
-      typescriptGenerationImports := Seq("models._"),
-      typescriptOutputFile        := baseDirectory.value / "model.ts",
-      scalafmtConfig              := file("../../../../.scalafmt.conf"),
+      typescriptGenerationImports        := Seq("models._"),
+      typescriptOutputFile               := baseDirectory.value / "model.ts",
+      scalafmtConfig                     := file("../../../../.scalafmt.conf"),
       TaskKey[Unit]("copyExpectedModel") := {
         val scalaV = CrossVersion.partialVersion(scalaVersion.value).get._1
         val source = baseDirectory.value / s"expected_model_scala$scalaV.ts"

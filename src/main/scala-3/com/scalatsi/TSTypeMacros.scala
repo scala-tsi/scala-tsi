@@ -41,7 +41,7 @@ trait TSTypeMacros {
     val aliasFor: TypescriptType = elems match {
       case Nil          => TSNever
       case List(single) => TypescriptType.nameOrType(single.get)
-      case multiple =>
+      case multiple     =>
         val children: Seq[TypescriptType] =
           multiple
             .zip(elemNames[s.MirroredElemLabels])
