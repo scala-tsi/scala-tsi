@@ -1,4 +1,4 @@
-addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.5")
+addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.6")
 
 val pluginVersionParam = sys.props
   .get("plugin.version")
