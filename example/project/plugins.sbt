@@ -1,5 +1,5 @@
 resolvers += Resolver.mavenLocal
-addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.6")
+addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.6.0")
 
 lazy val logger = ConsoleLogger()
 
