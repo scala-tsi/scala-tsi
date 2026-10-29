@@ -5,7 +5,7 @@ import com.jsuereth.sbtpgp.PgpKeys.publishLocalSigned
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-val scala3   = "3.3.7"
+val scala3   = "3.3.9"
 val scala213 = "2.13.18"
 val scala212 = "2.12.17" // for sbt
 
